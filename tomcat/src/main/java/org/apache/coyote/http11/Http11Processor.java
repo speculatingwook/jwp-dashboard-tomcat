@@ -2,6 +2,8 @@ package org.apache.coyote.http11;
 
 import nextstep.jwp.exception.UncheckedServletException;
 import org.apache.coyote.Processor;
+import org.apache.coyote.http11.request.HttpRequestWrapper;
+import org.apache.coyote.http11.response.HttpResponseWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,77 +34,25 @@ public class Http11Processor implements Runnable, Processor {
     @Override
     public void process(final Socket connection) {
         try{
-            if (isUrlIndex(connection)) {
-                getResourse(connection, getUrl(connection));
-            }else {
-                none(connection);
-            }
+            getResourse(connection);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void none(final Socket connection) {
+    private void getResourse(final Socket connection) throws IOException{
         try (final var inputStream = connection.getInputStream();
-             final var outputStream = connection.getOutputStream()) {
+             final var outputStream = connection.getOutputStream();
+             final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
 
-            final var responseBody = "Hello world!";
-
-            final var response = String.join("\r\n",
-                    "HTTP/1.1 200 OK ",
-                    "Content-Type: text/html;charset=utf-8 ",
-                    "Content-Length: " + responseBody.getBytes().length + " ",
-                    "",
-                    responseBody);
+            final HttpRequestWrapper requestWrapper = new HttpRequestWrapper(reader);
+            final HttpResponseWrapper responseWrapper = new HttpResponseWrapper(requestWrapper);
+            String response = responseWrapper.getResponse();
 
             outputStream.write(response.getBytes());
             outputStream.flush();
         } catch (IOException | UncheckedServletException e) {
             log.error(e.getMessage(), e);
         }
-    }
-    private void getResourse(final Socket connection, String url) {
-        try (final var inputStream = connection.getInputStream();
-             final var outputStream = connection.getOutputStream()) {
-
-            final URL resource = getClass().getClassLoader().getResource("static"+ url);
-            final var responseBody = new String(Files.readAllBytes(new File(resource.getFile()).toPath()));
-
-            final var response = String.join("\r\n",
-                    "HTTP/1.1 200 OK ",
-                    "Content-Type: text/html;charset=utf-8 ",
-                    "Content-Length: " + responseBody.getBytes(StandardCharsets.UTF_8).length + " ",
-                    "",
-                    responseBody);
-            outputStream.write(response.getBytes());
-            outputStream.flush();
-        } catch (IOException | UncheckedServletException e) {
-            log.error(e.getMessage(), e);
-        }
-    }
-
-    public boolean isUrlIndex(Socket connection) throws IOException {
-        try{
-            InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-            BufferedReader bufferedReader = new BufferedReader(reader);
-            String requestLine = bufferedReader.readLine();
-            ArrayList<String> requestLineList = Arrays.stream(requestLine.split(" ")).collect(Collectors.toCollection(ArrayList::new));
-            return requestLineList.get(1).equals("/index.html");
-        } catch (IOException | UncheckedServletException e) {
-            log.error(e.getMessage(), e);
-        }
-        return false;
-    }
-    public String getUrl(Socket connection) throws IOException {
-        try{
-            InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-            BufferedReader bufferedReader = new BufferedReader(reader);
-            String requestLine = bufferedReader.readLine();
-            ArrayList<String> requestLineList = Arrays.stream(requestLine.split(" ")).collect(Collectors.toCollection(ArrayList::new));
-            return requestLineList.get(1);
-        } catch (IOException | UncheckedServletException e) {
-            log.error(e.getMessage(), e);
-        }
-        return "";
     }
 }
