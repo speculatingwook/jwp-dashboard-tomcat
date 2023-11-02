@@ -11,7 +11,9 @@ public class CSSHandler implements Handler {
     public HttpResponse handle(HttpRequest httpRequest) {
         FileFinder fileFinder = new FileFinder();
         String responseBody = fileFinder.fromPath(httpRequest.getPath());
-        return HttpResponse.success(responseBody);
+        HttpResponse httpResponse = HttpResponse.success(responseBody);
+        httpResponse.addHeader("Content-Type", "text/css");
+        return httpResponse;
     }
 
     @Override
