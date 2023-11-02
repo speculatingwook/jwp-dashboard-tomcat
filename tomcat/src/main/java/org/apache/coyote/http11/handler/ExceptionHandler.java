@@ -1,7 +1,8 @@
-package org.apache.coyote.http11.exception;
+package org.apache.coyote.http11.handler;
 
-import org.apache.coyote.http11.httpResponse.HttpResponse;
 import org.apache.coyote.http11.HttpStatus;
+import org.apache.coyote.http11.exception.BaseRuntimeException;
+import org.apache.coyote.http11.httpResponse.HttpResponse;
 
 public class ExceptionHandler {
     public static HttpResponse handle(Exception e) {

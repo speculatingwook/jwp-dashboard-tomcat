@@ -1,8 +1,10 @@
 package org.apache.coyote.http11;
 
 import org.apache.coyote.Processor;
-import org.apache.coyote.http11.Utill.FileFinder;
-import org.apache.coyote.http11.exception.ExceptionHandler;
+import org.apache.coyote.http11.exception.BadRequestException;
+import org.apache.coyote.http11.handler.ExceptionHandler;
+import org.apache.coyote.http11.handler.Handler;
+import org.apache.coyote.http11.handler.HandlerAdapter;
 import org.apache.coyote.http11.httpResponse.HttpResponse;
 import org.apache.coyote.http11.httprequest.HttpRequest;
 import org.slf4j.Logger;
@@ -39,9 +41,11 @@ public class Http11Processor implements Runnable, Processor {
                 HttpRequest httpRequest = HttpRequest.parse(bufferedReader);
                 System.out.println(httpRequest.getPath()); // TODO Delete
 
-                FileFinder fileFinder = new FileFinder();
-                String responseBody = fileFinder.fromPath(httpRequest.getPath());
-                httpResponse = HttpResponse.success(responseBody);
+                Handler handler = HandlerAdapter.getHandler(httpRequest);
+                if (handler == null) {
+                    throw new BadRequestException("Handler not found");
+                }
+                httpResponse = handler.handle(httpRequest);
             } catch (Exception e) {
                 log.error(e.getMessage());
                 httpResponse = ExceptionHandler.handle(e);
