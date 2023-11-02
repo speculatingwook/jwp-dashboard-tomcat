@@ -1,7 +1,7 @@
 package org.apache.coyote.http11.Utill;
 
-import org.apache.coyote.http11.exception.InternalServerException;
-import org.apache.coyote.http11.exception.NotFoundException;
+import org.apache.coyote.http11.exception.base.InternalServerException;
+import org.apache.coyote.http11.exception.base.NotFoundException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

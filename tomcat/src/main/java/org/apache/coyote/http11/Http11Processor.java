@@ -1,7 +1,7 @@
 package org.apache.coyote.http11;
 
 import org.apache.coyote.Processor;
-import org.apache.coyote.http11.exception.BadRequestException;
+import org.apache.coyote.http11.exception.base.BadRequestException;
 import org.apache.coyote.http11.handler.ExceptionHandler;
 import org.apache.coyote.http11.handler.Handler;
 import org.apache.coyote.http11.handler.HandlerAdapter;

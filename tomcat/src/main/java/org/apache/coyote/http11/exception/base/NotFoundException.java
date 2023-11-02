@@ -1,4 +1,6 @@
-package org.apache.coyote.http11.exception;
+package org.apache.coyote.http11.exception.base;
+
+import org.apache.coyote.http11.exception.ErrorCode;
 
 public class NotFoundException extends BaseRuntimeException {
 

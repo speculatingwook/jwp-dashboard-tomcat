@@ -1,6 +1,6 @@
-package nextstep.jwp.exception;
+package org.apache.coyote.http11.exception;
 
-import org.apache.coyote.http11.exception.BadRequestException;
+import org.apache.coyote.http11.exception.base.BadRequestException;
 import org.apache.coyote.http11.exception.ErrorCode;
 
 public class RequestParseException extends BadRequestException {

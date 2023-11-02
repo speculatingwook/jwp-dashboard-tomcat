@@ -1,7 +1,7 @@
 package org.apache.coyote.http11.handler;
 
 import org.apache.coyote.http11.HttpStatus;
-import org.apache.coyote.http11.exception.BaseRuntimeException;
+import org.apache.coyote.http11.exception.base.BaseRuntimeException;
 import org.apache.coyote.http11.httpResponse.HttpResponse;
 
 public class ExceptionHandler {

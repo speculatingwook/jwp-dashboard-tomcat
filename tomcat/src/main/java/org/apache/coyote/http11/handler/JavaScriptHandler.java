@@ -2,7 +2,7 @@ package org.apache.coyote.http11.handler;
 
 import org.apache.coyote.http11.Utill.FileFinder;
 import org.apache.coyote.http11.httpResponse.HttpResponse;
-import org.apache.coyote.http11.httprequest.HttpMethod;
+import org.apache.coyote.http11.HttpMethod;
 import org.apache.coyote.http11.httprequest.HttpRequest;
 
 public class JavaScriptHandler implements Handler {

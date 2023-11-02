@@ -1,4 +1,6 @@
-package org.apache.coyote.http11.httprequest;
+package org.apache.coyote.http11;
+
+import org.apache.coyote.http11.exception.HttpRequestMethodNotSupportedException;
 
 import java.util.Arrays;
 
@@ -9,6 +11,6 @@ public enum HttpMethod {
         return Arrays.stream(values())
                 .filter(httpMethod -> httpMethod.name().equals(method))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 HTTP Method 입니다."));
+                .orElseThrow(HttpRequestMethodNotSupportedException::new);
     }
 }

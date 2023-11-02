@@ -1,7 +1,8 @@
 package org.apache.coyote.http11.httprequest;
 
-import nextstep.jwp.exception.RequestParseException;
+import org.apache.coyote.http11.exception.RequestParseException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.coyote.http11.HttpMethod;
 
 import java.io.BufferedReader;
 import java.util.HashMap;
