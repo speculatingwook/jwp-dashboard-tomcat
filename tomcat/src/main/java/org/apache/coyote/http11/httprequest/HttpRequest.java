@@ -1,9 +1,9 @@
 package org.apache.coyote.http11.httprequest;
 
+import nextstep.jwp.exception.RequestParseException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +22,7 @@ public class HttpRequest {
         this.body = body;
     }
 
-    public static HttpRequest parse(BufferedReader reader) throws IOException {
+    public static HttpRequest parse(BufferedReader reader) {
         final String requestLineSplitter = " ";
         final String headerSplitter = ": ";
         String str;
@@ -51,7 +51,7 @@ public class HttpRequest {
 
             return new HttpRequest(httpMethod, path, version, headers, body.toString());
         } catch (Exception e) {
-            throw new IllegalArgumentException("Http Request Parsing Error");
+            throw new RequestParseException();
         }
     }
 

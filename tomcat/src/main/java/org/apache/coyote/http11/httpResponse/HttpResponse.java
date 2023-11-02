@@ -1,4 +1,6 @@
-package org.apache.coyote.http11;
+package org.apache.coyote.http11.httpResponse;
+
+import org.apache.coyote.http11.HttpStatus;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,6 +9,7 @@ public class HttpResponse {
 
     private final String protocol = "HTTP";
     private final String version = "1.1";
+    private final String CRLF = "\r\n";
     private final HttpStatus status;
     private final Map<String, String> headers = new HashMap<>();
     private final String body;
@@ -34,7 +37,7 @@ public class HttpResponse {
     public String toString() {
         String statusLine = createStatusLine();
         String header = createHeader();
-        return String.join("\r\n", statusLine, header, "", body);
+        return String.join(CRLF, statusLine, header, "", body);
     }
 
     private String createStatusLine() {
