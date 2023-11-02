@@ -27,28 +27,32 @@ public class HttpRequest {
         final String headerSplitter = ": ";
         String str;
 
-        // 1. Request Line
-        str = reader.readLine();
-        String[] requestLines = str.split(requestLineSplitter);
-        HttpMethod httpMethod = parseMethod(requestLines[0]);
-        String path = parsePath(requestLines[1]);
-        String version = parseVersion(requestLines[2]);
+        try {
+            // 1. Request Line
+            str = reader.readLine();
+            String[] requestLines = str.split(requestLineSplitter);
+            HttpMethod httpMethod = parseMethod(requestLines[0]);
+            String path = parsePath(requestLines[1]);
+            String version = parseVersion(requestLines[2]);
 
-        // 2. Request Headers
-        Map<String, String> headers = new HashMap<>();
-        while (!(str = reader.readLine()).isEmpty()) {
-            String[] header = str.split(headerSplitter);
-            headers.put(header[0], header[1]);
+            // 2. Request Headers
+            Map<String, String> headers = new HashMap<>();
+            while (!(str = reader.readLine()).isEmpty()) {
+                String[] header = str.split(headerSplitter);
+                headers.put(header[0], header[1]);
+            }
+
+            // 3. body
+            StringBuilder body = new StringBuilder();
+            while (reader.ready()) {
+                body.append(reader.readLine());
+                body.append("\n");
+            }
+
+            return new HttpRequest(httpMethod, path, version, headers, body.toString());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Http Request Parsing Error");
         }
-
-        // 3. body
-        StringBuilder body = new StringBuilder();
-        while (reader.ready()) {
-            body.append(reader.readLine());
-            body.append("\n");
-        }
-
-        return new HttpRequest(httpMethod, path, version, headers, body.toString());
     }
 
     private static HttpMethod parseMethod(String str) {

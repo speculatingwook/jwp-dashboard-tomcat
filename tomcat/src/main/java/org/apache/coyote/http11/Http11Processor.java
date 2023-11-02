@@ -16,6 +16,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 public class Http11Processor implements Runnable, Processor {
 
@@ -40,19 +41,14 @@ public class Http11Processor implements Runnable, Processor {
              final var bufferedReader = new BufferedReader(reader)) {
 
             HttpRequest httpRequest = HttpRequest.parse(bufferedReader);
-            System.out.println(httpRequest.getPath());
+            System.out.println(httpRequest.getPath()); // To Debug
 
-            if (!httpRequest.getPath().equals("/") &&
-                    httpRequest.getMethod() == HttpMethod.GET) {
+            if (httpRequest.getMethod() == HttpMethod.GET) {
                 String responseBody;
                 try {
                     responseBody = responseBodyFromPath(httpRequest.getPath());
-                } catch (URISyntaxException | IOException e) {
-                    try {
-                        responseBody = responseBodyFromPath("404.html");
-                    } catch (URISyntaxException | IOException ex) {
-                        responseBody = "404 Not Found";
-                    }
+                } catch (Exception e) {
+                    responseBody = errorHandler();
                 }
                 final var response = String.join("\r\n",
                         "HTTP/1.1 200 OK ",
@@ -64,6 +60,7 @@ public class Http11Processor implements Runnable, Processor {
                 outputStream.write(response.getBytes());
                 outputStream.flush();
             }
+
             else {
                 final var responseBody = "Hello world!";
                 final var response = String.join("\r\n",
@@ -81,12 +78,16 @@ public class Http11Processor implements Runnable, Processor {
         }
     }
 
-    private String responseBodyFromPath(String filePath) throws URISyntaxException, IOException {
-        URL resource = this.getClass()
-                .getClassLoader()
-                .getResource("static" + filePath);
-        Path path = Paths.get(resource.toURI());
-        String responseBody = new String(Files.readAllBytes(path));
-        return responseBody;
+    private String responseBodyFromPath(String filePath) throws Exception {
+        try {
+            URL resource = this.getClass()
+                    .getClassLoader()
+                    .getResource("static" + filePath);
+            Path path = Paths.get(Objects.requireNonNull(resource).toURI());
+            String responseBody = new String(Files.readAllBytes(path));
+            return responseBody;
+        } catch (NullPointerException | URISyntaxException | IOException e) {
+            throw new Exception("404 Not Found");
+        }
     }
 }
