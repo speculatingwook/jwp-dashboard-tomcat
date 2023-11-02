@@ -1,11 +1,10 @@
 package org.apache.coyote.http11.response;
 
-import java.nio.file.Path;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import org.apache.coyote.http11.Http11Processor;
 import org.apache.coyote.http11.HttpMethod;
 import org.apache.coyote.http11.Paths;
+import org.apache.coyote.http11.login.Login;
 import org.apache.coyote.http11.request.HttpRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +32,10 @@ public class HttpResponseWrapper {
         HttpMethod method = HttpMethod.valueOf(request.getMethod());
         String path= request.getPath();
         ifGet(method, path);
+        if (path.equals(Paths.LOGIN.getPath())) {
+            Login login = new Login(request.getQueryData().get("account"), request.getQueryData().get("password"));
+            log.info(login.getUserInfo());
+        }
         if (header == null || body == null) {
             throw new NoSuchElementException("해당 페이지를 찾을 수 없습니다: " + path);
         }
@@ -48,6 +51,7 @@ public class HttpResponseWrapper {
                             .addContentLength(body.getContentLength());
                 }
             }
+
         }
     }
 

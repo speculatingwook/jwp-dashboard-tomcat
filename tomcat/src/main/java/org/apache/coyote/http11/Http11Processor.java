@@ -27,13 +27,13 @@ public class Http11Processor implements Runnable, Processor {
     @Override
     public void process(final Socket connection) {
         try{
-            getResourse(connection);
+            execute(connection);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void getResourse(final Socket connection) throws IOException{
+    private void execute(final Socket connection) throws IOException{
         try (final var inputStream = connection.getInputStream();
              final var outputStream = connection.getOutputStream();
              final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
