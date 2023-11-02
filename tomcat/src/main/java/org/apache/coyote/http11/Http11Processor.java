@@ -39,7 +39,7 @@ public class Http11Processor implements Runnable, Processor {
             HttpResponse httpResponse;
             try {
                 HttpRequest httpRequest = HttpRequest.parse(bufferedReader);
-                System.out.println(httpRequest.getPath()); // TODO Delete
+                //System.out.println(httpRequest.getPath()); // TODO Delete
 
                 Handler handler = HandlerAdapter.getHandler(httpRequest);
                 if (handler == null) {

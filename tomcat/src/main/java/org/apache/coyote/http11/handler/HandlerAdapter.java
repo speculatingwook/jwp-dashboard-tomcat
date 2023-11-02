@@ -7,7 +7,7 @@ import java.util.List;
 public class HandlerAdapter {
 
     static List<Handler> handlers
-            = List.of(new RootHandler(), new IndexHandler(), new JavaScriptHandler(), new CSSHandler());
+            = List.of(new RootHandler(), new IndexHandler(), new LoginHandler(), new JavaScriptHandler(), new CSSHandler());
 
     public static Handler getHandler(HttpRequest httpRequest) {
         for (Handler handler : handlers) {

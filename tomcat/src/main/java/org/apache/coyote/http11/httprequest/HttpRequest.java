@@ -95,4 +95,8 @@ public class HttpRequest {
     public HttpMethod getMethod() {
         return method;
     }
+
+    public String getQueryParam(String key) {
+        return queryParams.get(key);
+    }
 }
