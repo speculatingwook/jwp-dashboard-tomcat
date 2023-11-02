@@ -10,6 +10,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Objects;
 
 public class Http11Processor implements Runnable, Processor {
 
@@ -35,20 +41,49 @@ public class Http11Processor implements Runnable, Processor {
 
             HttpRequest httpRequest = HttpRequest.parse(bufferedReader);
 
+            if (Objects.equals(httpRequest.getPath(), "/index.html")) {
+                String responseBody;
+                try {
+                    responseBody = responseBodyToIndexFile("/index");
+                } catch (URISyntaxException | IOException e) {
+                    responseBody = "File not found!";
+                }
 
-            final var responseBody = "Hello world!";
+                final var response = String.join("\r\n",
+                        "HTTP/1.1 200 OK ",
+                        "Content-Type: text/html;charset=utf-8 ",
+                        "Content-Length: " + responseBody.getBytes().length + " ",
+                        "",
+                        responseBody);
 
-            final var response = String.join("\r\n",
-                    "HTTP/1.1 200 OK ",
-                    "Content-Type: text/html;charset=utf-8 ",
-                    "Content-Length: " + responseBody.getBytes().length + " ",
-                    "",
-                    responseBody);
+                outputStream.write(response.getBytes());
+                outputStream.flush();
+            }
+            else {
 
-            outputStream.write(response.getBytes());
-            outputStream.flush();
+                final var responseBody = "Hello world!";
+
+                final var response = String.join("\r\n",
+                        "HTTP/1.1 200 OK ",
+                        "Content-Type: text/html;charset=utf-8 ",
+                        "Content-Length: " + responseBody.getBytes().length + " ",
+                        "",
+                        responseBody);
+
+                outputStream.write(response.getBytes());
+                outputStream.flush();
+            }
         } catch (IOException | UncheckedServletException e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    private String responseBodyToIndexFile(String filePath) throws URISyntaxException, IOException {
+        URL resource = this.getClass()
+                .getClassLoader()
+                .getResource("static" + filePath + ".html");
+        Path path = Paths.get(resource.toURI());
+        String responseBody = new String(Files.readAllBytes(path));
+        return responseBody;
     }
 }

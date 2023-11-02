@@ -9,12 +9,14 @@ import java.util.Map;
 
 public class HttpRequest {
     private final HttpMethod method;
+    private final String path;
     private final String version;
     private final Map<String, String> headers;
     private final String body;
 
-    private HttpRequest(HttpMethod method, String version, Map<String, String> headers, String body) {
+    private HttpRequest(HttpMethod method, String path, String version, Map<String, String> headers, String body) {
         this.method = method;
+        this.path = path;
         this.version = version;
         this.headers = headers;
         this.body = body;
@@ -39,12 +41,12 @@ public class HttpRequest {
 
         // 3. body
         StringBuilder body = new StringBuilder();
-        while ((str = reader.readLine()) != null) {
-            body.append(str);
+        while (reader.ready()) {
+            body.append(reader.readLine());
             body.append("\n");
         }
 
-        return new HttpRequest(httpMethod, version, headers, body.toString());
+        return new HttpRequest(httpMethod, path, version, headers, body.toString());
     }
 
     private static String parseVersion(String requestLine) {
@@ -81,6 +83,10 @@ public class HttpRequest {
         }
 
         throw new IllegalArgumentException("지원하지 않는 메서드입니다.");
+    }
+
+    public String getPath() {
+        return path;
     }
 
     enum HttpMethod {
