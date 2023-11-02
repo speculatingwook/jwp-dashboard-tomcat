@@ -1,6 +1,5 @@
 package org.apache.coyote.http11.response;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 import org.apache.coyote.http11.Http11Processor;
 import org.apache.coyote.http11.HttpMethod;
@@ -31,9 +30,15 @@ public class HttpResponseWrapper {
         String path = request.getPath();
         if(method.equals(GET)){
             if (path.equals("/index.html")) {
-                body = HttpResponseBody.of("static/index.html");
+                body = HttpResponseBody.of("static"+path);
                 header = new HttpResponseHeader("200 OK")
                         .addContentType("text/html")
+                        .addContentLength(body.getContentLength());
+            }
+            if (path.equals("/css/styles.css")) {
+                body = HttpResponseBody.of("static"+path);
+                header = new HttpResponseHeader("200 OK")
+                        .addContentType("text/css")
                         .addContentLength(body.getContentLength());
             }
         }
