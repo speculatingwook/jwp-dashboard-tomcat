@@ -1,7 +1,9 @@
 package org.apache.coyote.http11;
 
 public enum Paths {
-    INDEX("/index.html", "text/html"), CSS("/css/styles.css", "text/css"), LOGIN("/login.html", "text/html");
+    INDEX("/index.html", "text/html"),
+    CSS("/css/styles.css", "text/css"),
+    LOGIN("/login.html", "text/html");
 
     private final String path;
     private final String contentType;

@@ -1,6 +1,7 @@
 package org.apache.coyote.http11.response;
 
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import org.apache.coyote.http11.Http11Processor;
 import org.apache.coyote.http11.HttpMethod;
@@ -30,7 +31,14 @@ public class HttpResponseWrapper {
 
     private void parseResponse(HttpRequestWrapper request) {
         HttpMethod method = HttpMethod.valueOf(request.getMethod());
-        String path = request.getPath();
+        String path= request.getPath();
+        ifGet(method, path);
+        if (header == null || body == null) {
+            throw new NoSuchElementException("해당 페이지를 찾을 수 없습니다: " + path);
+        }
+    }
+
+    private void ifGet(HttpMethod method, String path) {
         if(method.equals(GET)){
             for (Paths paths : Paths.values()) {
                 if (path.equals(paths.getPath())) {
@@ -41,10 +49,8 @@ public class HttpResponseWrapper {
                 }
             }
         }
-        if (header == null || body == null) {
-            throw new NoSuchElementException("해당 페이지를 찾을 수 없습니다: " + path);
-        }
     }
+
 
     public String getResponse() {
         return String.join("\r\n", header.getHeaders(), "", body.getBodyContext());

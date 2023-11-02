@@ -3,9 +3,8 @@ package org.apache.coyote.http11.request;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
+
 import org.apache.coyote.http11.Http11Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +16,8 @@ public class HttpRequestWrapper {
     List<String> lines;
     String method;
     String path;
+    String query;
+    private Map<String, String> queryData;
 
 
     public HttpRequestWrapper(BufferedReader reader) throws IOException {
@@ -25,9 +26,18 @@ public class HttpRequestWrapper {
             throw new NoSuchElementException(EMPTY_REQUEST);
         }
         this.lines = lines;
-        String[] firstLineSplit = lines.get(0).split(" ");
-        this.method = firstLineSplit[0];
-        this.path = firstLineSplit[1];
+        if(lines.get(0).contains("?")){
+            log.info(lines.toString());
+            String[] firstLineSplit = lines.get(0).split(" ");
+            this.method = firstLineSplit[0];
+            parseQueryString(firstLineSplit[1]);
+        }
+        else {
+            String[] firstLineSplit = lines.get(0).split(" ");
+            this.method = firstLineSplit[0];
+            this.path = firstLineSplit[1];
+        }
+
     }
 
     public String getMethod() {
@@ -36,6 +46,10 @@ public class HttpRequestWrapper {
 
     public String getPath() {
         return path;
+    }
+
+    public Map<String, String> getQueryData() {
+        return queryData;
     }
 
     public String getLines() {
@@ -50,5 +64,27 @@ public class HttpRequestWrapper {
             lines.add(line);
         }
         return lines;
+    }
+
+    private void parseQueryString(String urlString) {
+        Map<String, String> parameters = new HashMap<>();
+        String[] splitResult = urlString.split("[?]");
+        this.query = splitResult[1];
+        try {
+            if (query != null) {
+                String fileType = ".html";
+                path = splitResult[0] + fileType;
+                String[] keyValuePairs = query.split("&");
+                for (String keyValue : keyValuePairs) {
+                    String[] parts = keyValue.split("=");
+                    if (parts.length == 2) {
+                        parameters.put(parts[0], parts[1]);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        this.queryData = parameters;
     }
 }
