@@ -1,8 +1,10 @@
 package org.apache.coyote.http11.response;
 
+import java.nio.file.Path;
 import java.util.NoSuchElementException;
 import org.apache.coyote.http11.Http11Processor;
 import org.apache.coyote.http11.HttpMethod;
+import org.apache.coyote.http11.Paths;
 import org.apache.coyote.http11.request.HttpRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,7 @@ public class HttpResponseWrapper {
 
     private HttpResponseHeader header;
     private HttpResponseBody body;
+    private Paths paths;
 
 
     public HttpResponseWrapper(HttpRequestWrapper request) {
@@ -29,17 +32,13 @@ public class HttpResponseWrapper {
         HttpMethod method = HttpMethod.valueOf(request.getMethod());
         String path = request.getPath();
         if(method.equals(GET)){
-            if (path.equals("/index.html")) {
-                body = HttpResponseBody.of("static"+path);
-                header = new HttpResponseHeader("200 OK")
-                        .addContentType("text/html")
-                        .addContentLength(body.getContentLength());
-            }
-            if (path.equals("/css/styles.css")) {
-                body = HttpResponseBody.of("static"+path);
-                header = new HttpResponseHeader("200 OK")
-                        .addContentType("text/css")
-                        .addContentLength(body.getContentLength());
+            for (Paths paths : Paths.values()) {
+                if (path.equals(paths.getPath())) {
+                    body = HttpResponseBody.of(paths.createPath());
+                    header = new HttpResponseHeader("200 OK")
+                            .addContentType(paths.getContentType())
+                            .addContentLength(body.getContentLength());
+                }
             }
         }
         if (header == null || body == null) {
