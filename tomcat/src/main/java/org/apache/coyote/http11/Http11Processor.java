@@ -15,7 +15,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Objects;
 
 public class Http11Processor implements Runnable, Processor {
 
@@ -41,14 +40,18 @@ public class Http11Processor implements Runnable, Processor {
 
             HttpRequest httpRequest = HttpRequest.parse(bufferedReader);
 
-            if (Objects.equals(httpRequest.getPath(), "/index.html")) {
+            if (!httpRequest.getPath().equals("/") &&
+                    httpRequest.getMethod() == HttpRequest.HttpMethod.GET) {
                 String responseBody;
                 try {
-                    responseBody = responseBodyToIndexFile("/index");
+                    responseBody = responseBodyFromPath(httpRequest.getPath());
                 } catch (URISyntaxException | IOException e) {
-                    responseBody = "File not found!";
+                    try {
+                        responseBody = responseBodyFromPath("404.html");
+                    } catch (URISyntaxException | IOException ex) {
+                        responseBody = "404 Not Found";
+                    }
                 }
-
                 final var response = String.join("\r\n",
                         "HTTP/1.1 200 OK ",
                         "Content-Type: text/html;charset=utf-8 ",
@@ -60,9 +63,7 @@ public class Http11Processor implements Runnable, Processor {
                 outputStream.flush();
             }
             else {
-
                 final var responseBody = "Hello world!";
-
                 final var response = String.join("\r\n",
                         "HTTP/1.1 200 OK ",
                         "Content-Type: text/html;charset=utf-8 ",
@@ -78,10 +79,10 @@ public class Http11Processor implements Runnable, Processor {
         }
     }
 
-    private String responseBodyToIndexFile(String filePath) throws URISyntaxException, IOException {
+    private String responseBodyFromPath(String filePath) throws URISyntaxException, IOException {
         URL resource = this.getClass()
                 .getClassLoader()
-                .getResource("static" + filePath + ".html");
+                .getResource("static" + filePath);
         Path path = Paths.get(resource.toURI());
         String responseBody = new String(Files.readAllBytes(path));
         return responseBody;

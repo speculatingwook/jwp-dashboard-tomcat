@@ -89,7 +89,11 @@ public class HttpRequest {
         return path;
     }
 
-    enum HttpMethod {
+    public enum HttpMethod {
         GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD
+    }
+
+    public HttpMethod getMethod() {
+        return method;
     }
 }
