@@ -1,4 +1,4 @@
-package org.apache.utill;
+package org.apache.coyote.http11.httprequest;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,11 +23,13 @@ public class HttpRequest {
     }
 
     public static HttpRequest parse(BufferedReader reader) throws IOException {
+        final String requestLineSplitter = " ";
+        final String headerSplitter = ": ";
         String str;
 
         // 1. Request Line
         str = reader.readLine();
-        String[] requestLines = str.split(" ");
+        String[] requestLines = str.split(requestLineSplitter);
         HttpMethod httpMethod = parseMethod(requestLines[0]);
         String path = parsePath(requestLines[1]);
         String version = parseVersion(requestLines[2]);
@@ -35,7 +37,7 @@ public class HttpRequest {
         // 2. Request Headers
         Map<String, String> headers = new HashMap<>();
         while (!(str = reader.readLine()).isEmpty()) {
-            String[] header = str.split(":");
+            String[] header = str.split(headerSplitter);
             headers.put(header[0], header[1]);
         }
 
@@ -49,48 +51,22 @@ public class HttpRequest {
         return new HttpRequest(httpMethod, path, version, headers, body.toString());
     }
 
-    private static String parseVersion(String requestLine) {
-        String trim = StringUtils.trim(requestLine);
-        String[] split = trim.split("/");
-        return split[1];
+    private static HttpMethod parseMethod(String str) {
+        return HttpMethod.from(str);
     }
 
     private static String parsePath(String requestLine) {
         return StringUtils.trim(requestLine);
     }
 
-    private static HttpMethod parseMethod(String str) {
-        if (str.startsWith("GET")) {
-            return HttpMethod.GET;
-        }
-        else if (str.startsWith("POST")) {
-            return HttpMethod.POST;
-        }
-        else if (str.startsWith("PUT")) {
-            return HttpMethod.PUT;
-        }
-        else if (str.startsWith("DELETE")) {
-            return HttpMethod.DELETE;
-        }
-        else if (str.startsWith("PATCH")) {
-            return HttpMethod.PATCH;
-        }
-        else if (str.startsWith("OPTIONS")) {
-            return HttpMethod.OPTIONS;
-        }
-        else if (str.startsWith("HEAD")) {
-            return HttpMethod.HEAD;
-        }
-
-        throw new IllegalArgumentException("지원하지 않는 메서드입니다.");
+    private static String parseVersion(String requestLine) {
+        String trim = StringUtils.trim(requestLine);
+        String[] split = trim.split("/");
+        return split[1];
     }
 
     public String getPath() {
         return path;
-    }
-
-    public enum HttpMethod {
-        GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD
     }
 
     public HttpMethod getMethod() {
