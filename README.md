@@ -58,3 +58,10 @@ http://localhost:8080/login?account=gugu&password=password으로 접속하면 �
 
 - 미션은 [jwp-dashboard-http-mission](https://github.com/speculatingwook/jwp-dashboard-http-mission) 저장소를 Fork & Clone해 시작한다.
 - **기능을 구현하기 전 `README.md`에 구현할 기능 목록을 정리**해 추가한다.
+
+## 🔧 구현할 기능
+1. html 페이지 불러오기
+2. css 파일 불러오기
+3. 로그인 기능 
+   - db 찾아 연결하
+   - 회원 가입 기능 구현
