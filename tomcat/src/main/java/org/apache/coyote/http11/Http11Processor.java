@@ -1,6 +1,9 @@
 package org.apache.coyote.http11;
 
+import nextstep.jwp.db.InMemoryUserRepository;
 import nextstep.jwp.exception.UncheckedServletException;
+import nextstep.jwp.exception.notfound.UserNotFoundException;
+import nextstep.jwp.model.User;
 import org.apache.coyote.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +15,8 @@ import java.net.URL;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -47,20 +52,36 @@ public class Http11Processor implements Runnable, Processor {
             }
             String requestUrl = httpStartLine.split(" ")[1];
 
-            if (requestUrl.equals("/")) {
-                contentType = makeContentType(contentType, requestUrl);
-                responseBody = new String(readDefaultFile(), UTF_8);
+            int index = requestUrl.indexOf("?");
+            if (index != -1) {
+                String queryString = requestUrl.substring(index + 1);
+                requestUrl = requestUrl.substring(0, index);
+
+                final Map<String, String> data = makeDataFromQueryString(queryString);
+
+                final String account = data.get("account");
+                final User user = InMemoryUserRepository.findByAccount(account)
+                        .orElseThrow(UserNotFoundException::new);
+
+                log.info(user.toString());
             }
+
+
 
             if (requestUrl.contains(".html") || requestUrl.contains(".css") || requestUrl.contains(".js")) {
                 contentType = makeContentType(contentType, requestUrl);
                 responseBody = new String(readAllFile(requestUrl), UTF_8);
             }
 
-            if (!requestUrl.contains(".")) {
+            if (!requestUrl.contains(".") && !requestUrl.equals("/")) {
                 requestUrl = requestUrl + ".html";
                 contentType = makeContentType(contentType, requestUrl);
                 responseBody = new String(readAllFile(requestUrl), UTF_8);
+            }
+
+            if (requestUrl.equals("/")) {
+                contentType = makeContentType(contentType, requestUrl);
+                responseBody = new String(readDefaultFile(), UTF_8);
             }
 
             final String response = makeResponse(responseBody, contentType);
@@ -72,6 +93,19 @@ public class Http11Processor implements Runnable, Processor {
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private HashMap<String, String> makeDataFromQueryString(final String queryString) {
+        final HashMap<String, String> data = new HashMap<>();
+
+        final String[] queries = queryString.split("&");
+
+        for (String query : queries) {
+            final String[] values = query.split("=");
+            data.put(values[0], values[1]);
+        }
+
+        return data;
     }
 
     private static String makeContentType(String contentType, final String requestUrl) {
