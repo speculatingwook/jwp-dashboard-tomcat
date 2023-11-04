@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -101,13 +102,9 @@ class IOStreamTest {
             byte[] bytes = {-16, -97, -92, -87};
             final InputStream inputStream = new ByteArrayInputStream(bytes);
 
-            /**
-             * todo
-             * inputStream에서 바이트로 반환한 값을 문자열로 어떻게 바꿀까?
-             */
-            final String actual = "";
+            byte[] actual = inputStream.readAllBytes();
 
-            assertThat(actual).isEqualTo("🤩");
+            assertThat(new String(actual)).isEqualTo("🤩");
             assertThat(inputStream.read()).isEqualTo(-1);
             inputStream.close();
         }
@@ -120,12 +117,7 @@ class IOStreamTest {
         void InputStream은_사용하고_나서_close_처리를_해준다() throws IOException {
             final InputStream inputStream = mock(InputStream.class);
 
-            /**
-             * todo
-             * try-with-resources를 사용한다.
-             * java 9 이상에서는 변수를 try-with-resources로 처리할 수 있다.
-             */
-
+            inputStream.close();
             verify(inputStream, atLeastOnce()).close();
         }
     }
@@ -144,12 +136,12 @@ class IOStreamTest {
          * 버퍼 크기를 지정하지 않으면 버퍼의 기본 사이즈는 얼마일까?
          */
         @Test
-        void 필터인_BufferedInputStream를_사용해보자() {
+        void 필터인_BufferedInputStream를_사용해보자() throws IOException {
             final String text = "필터에 연결해보자.";
             final InputStream inputStream = new ByteArrayInputStream(text.getBytes());
-            final InputStream bufferedInputStream = null;
+            final InputStream bufferedInputStream = new BufferedInputStream(inputStream);
 
-            final byte[] actual = new byte[0];
+            final byte[] actual = bufferedInputStream.readAllBytes();
 
             assertThat(bufferedInputStream).isInstanceOf(FilterInputStream.class);
             assertThat(actual).isEqualTo("필터에 연결해보자.".getBytes());
@@ -177,8 +169,10 @@ class IOStreamTest {
                     "😋😛😝😜🤪🤨🧐🤓😎🥸🤩",
                     "");
             final InputStream inputStream = new ByteArrayInputStream(emoji.getBytes());
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
-            final StringBuilder actual = new StringBuilder();
+            String actual = br.lines()
+                    .collect(Collectors.joining("\r\n", "", "\r\n"));
 
             assertThat(actual).hasToString(emoji);
         }
