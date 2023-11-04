@@ -43,15 +43,13 @@ public class Http11Processor implements Runnable, Processor {
              final InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
              final BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
 
-            String responseBody = "Hello world!";
-
             final HttpRequestHeader httpRequestHeader = makeHttpRequestHeader(bufferedReader);
             String requestUrl = httpRequestHeader.getRequestUrl();
 
             int index = requestUrl.indexOf("?");
             if (index != -1) {
                 String queryString = requestUrl.substring(index + 1);
-                requestUrl = requestUrl.substring(0, index);
+                requestUrl = requestUrl.substring(0, index) + ".html";
 
                 final Map<String, String> data = makeDataFromQueryString(queryString);
 
@@ -65,15 +63,9 @@ public class Http11Processor implements Runnable, Processor {
             }
 
 
-            if (requestUrl.contains(".html") || requestUrl.contains(".css") || requestUrl.contains(".js")) {
-                responseBody = new String(readAllFile(requestUrl), UTF_8);
-            }
-
-            if (requestUrl.equals("/")) {
-                responseBody = new String(readDefaultFile(), UTF_8);
-            }
-
+            String responseBody = makeResponseBody(requestUrl);
             String statusCode = "200 OK";
+
             final HttpResponse httpResponse = new HttpResponse(statusCode, ContentType.from(requestUrl), responseBody);
             final String response = httpResponse.getResponse();
 
@@ -117,24 +109,13 @@ public class Http11Processor implements Runnable, Processor {
         return data;
     }
 
+    private String makeResponseBody(final String requestUrl) throws IOException, URISyntaxException {
+        return new String(readAllFile(requestUrl), UTF_8);
+    }
+
     private static byte[] readAllFile(final String requestUrl) throws IOException, URISyntaxException {
         final URL resourceUrl = ClassLoader.getSystemResource("static" + requestUrl);
         final Path path = Path.of(resourceUrl.toURI());
         return Files.readAllBytes(path);
-    }
-
-    private static byte[] readDefaultFile() throws IOException, URISyntaxException {
-        final URL resourceUrl = ClassLoader.getSystemResource("static/index.html");
-        final Path path = Path.of(resourceUrl.toURI());
-        return Files.readAllBytes(path);
-    }
-
-    private static String makeResponse(final String responseBody, final String contentType) {
-        return String.join("\r\n",
-                "HTTP/1.1 200 OK",
-                "Content-Type: " + contentType + ";charset=utf-8 ",
-                "Content-Length: " + responseBody.getBytes().length + " ",
-                "",
-                responseBody);
     }
 }
