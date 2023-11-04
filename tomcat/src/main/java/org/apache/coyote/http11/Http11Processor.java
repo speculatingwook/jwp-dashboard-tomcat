@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -45,7 +46,7 @@ public class Http11Processor implements Runnable, Processor {
 
             if (requestUrl.equals("/")) {
                 contentType = makeContentType(contentType, requestUrl);
-                responseBody = new String(readDefaultFile(requestUrl), StandardCharsets.UTF_8);
+                responseBody = new String(readDefaultFile(), StandardCharsets.UTF_8);
             }
 
             if (requestUrl.contains(".html") || requestUrl.contains(".css") || requestUrl.contains(".js")) {
@@ -65,6 +66,8 @@ public class Http11Processor implements Runnable, Processor {
             outputStream.flush();
         } catch (IOException | UncheckedServletException e) {
             log.error(e.getMessage(), e);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -83,16 +86,15 @@ public class Http11Processor implements Runnable, Processor {
         return httpStartLine.split(" ")[1];
     }
 
-    private static byte[] readAllFile(final String requestUrl) throws IOException {
-
+    private static byte[] readAllFile(final String requestUrl) throws IOException, URISyntaxException {
         final URL resourceUrl = ClassLoader.getSystemResource("static" + requestUrl);
-        final Path path = new File(resourceUrl.getPath()).toPath();
+        final Path path = Path.of(resourceUrl.toURI());
         return Files.readAllBytes(path);
     }
 
-    private static byte[] readDefaultFile(final String requestUrl) throws  IOException {
+    private static byte[] readDefaultFile() throws IOException, URISyntaxException {
         final URL resourceUrl = ClassLoader.getSystemResource("static/index.html");
-        final Path path = new File(resourceUrl.getPath()).toPath();
+        final Path path = Path.of(resourceUrl.toURI());
         return Files.readAllBytes(path);
     }
 }
