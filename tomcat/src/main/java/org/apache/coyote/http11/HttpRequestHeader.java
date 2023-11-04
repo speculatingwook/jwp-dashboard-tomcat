@@ -25,7 +25,7 @@ public class HttpRequestHeader {
             return "/index.html";
         }
 
-        if (!requestUrl.contains(".") && !requestUrl.equals("/") && !requestUrl.contains("?")) {
+        if (!requestUrl.contains(".") && !requestUrl.contains("?")) {
             requestUrl = requestUrl + ".html";
         }
         return requestUrl;
