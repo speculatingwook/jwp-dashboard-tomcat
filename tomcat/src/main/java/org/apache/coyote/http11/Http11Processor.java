@@ -73,7 +73,9 @@ public class Http11Processor implements Runnable, Processor {
                 responseBody = new String(readDefaultFile(), UTF_8);
             }
 
-            final String response = makeResponse(responseBody, ContentType.from(requestUrl));
+            String statusCode = "200 OK";
+            final HttpResponse httpResponse = new HttpResponse(statusCode, ContentType.from(requestUrl), responseBody);
+            final String response = httpResponse.getResponse();
 
             outputStream.write(response.getBytes());
             outputStream.flush();
