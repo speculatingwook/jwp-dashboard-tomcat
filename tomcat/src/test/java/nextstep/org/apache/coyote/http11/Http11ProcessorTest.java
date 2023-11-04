@@ -16,25 +16,54 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class Http11ProcessorTest {
 
+//    @Test
+//    void process() {
+//        // given
+//        final var socket = new StubSocket();
+//        final var processor = new Http11Processor(socket);
+//
+//        // when
+//        processor.process(socket);
+//
+//        // then
+//        var expected = String.join("\r\n",
+//                "HTTP/1.1 200 OK ",
+//                "Content-Type: text/html;charset=utf-8 ",
+//                "",
+//                "Hello world!");
+//
+//        assertThat(socket.output()).isEqualTo(expected);
+//    }
+
+    @DisplayName("루트 주소로 접속시, index.html 파일을 불러온다.")
     @Test
-    void process() {
+    void rootPage() throws IOException, URISyntaxException {
         // given
-        final var socket = new StubSocket();
-        final var processor = new Http11Processor(socket);
+        final String httpRequest = String.join("\r\n",
+                "GET / HTTP/1.1 ",
+                "Host: localhost:8080 ",
+                "Connection: keep-alive ",
+                "",
+                "");
+
+        final var socket = new StubSocket(httpRequest);
+        final Http11Processor processor = new Http11Processor(socket);
 
         // when
         processor.process(socket);
 
         // then
-        var expected = String.join("\r\n",
-                "HTTP/1.1 200 OK ",
-                "Content-Type: text/html;charset=utf-8 ",
-                "Content-Length: 5564",
-                "",
-                "Hello world!");
+        final URL resource = ClassLoader.getSystemResource("static/index.html");
+        final Path path = Path.of(resource.toURI());
+
+        var expected = "HTTP/1.1 200 OK \r\n" +
+                "Content-Type: text/html;charset=utf-8 \r\n" +
+                "\r\n" +
+                new String(Files.readAllBytes(path));
 
         assertThat(socket.output()).isEqualTo(expected);
     }
+
 
     @DisplayName("/index.html 페이지 요청시 응답으로 반환된다.")
     @Test
@@ -59,7 +88,6 @@ class Http11ProcessorTest {
 
         var expected = "HTTP/1.1 200 OK \r\n" +
                 "Content-Type: text/html;charset=utf-8 \r\n" +
-                "Content-Length: 5564 \r\n" +
                 "\r\n" +
                 new String(Files.readAllBytes(path));
 

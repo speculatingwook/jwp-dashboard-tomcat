@@ -58,7 +58,6 @@ public class Http11Processor implements Runnable, Processor {
             String response = String.join("\r\n",
                     "HTTP/1.1 200 OK ",
                     "Content-Type: " + contentType + ";charset=utf-8 ",
-                    "Content-Length: 5564 ",
                     "",
                     responseBody);
 
