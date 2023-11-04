@@ -51,7 +51,6 @@ public class HttpResponseWrapper {
                             .addContentLength(body.getContentLength());
                 }
             }
-
         }
     }
 

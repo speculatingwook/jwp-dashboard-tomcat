@@ -3,7 +3,11 @@ package org.apache.coyote.http11;
 public enum Paths {
     INDEX("/index.html", "text/html"),
     CSS("/css/styles.css", "text/css"),
-    LOGIN("/login.html", "text/html");
+    LOGIN("/login.html", "text/html"),
+    JS("/js/scripts.js", "text/javascript"),
+    CHART_AREA("/assets/chart-area.js", "text/javascript"),
+    CHART_BAR("/assets/chart-bar.js", "text/javascript"),
+    CHART_PIE("/assets/chart-pie.js", "text/javascript");
 
     private final String path;
     private final String contentType;
