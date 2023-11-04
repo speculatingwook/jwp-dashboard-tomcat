@@ -16,14 +16,11 @@ public class LoginHandler {
 
 
 
-    public String getUserInfo() {
+    public boolean checkUser() {
         if(InMemoryUserRepository.findByAccount(account).isPresent()){
             Optional<User> optionalUser = InMemoryUserRepository.findByAccount(account);
-            User user = optionalUser.get();
-            if(user.checkPassword(password)){
-                return user.toString();
-            }
+            return optionalUser.get().checkPassword(password);
         }
-        return "잘못된 정보입니다.";
+        return false;
     }
 }

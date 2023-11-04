@@ -35,6 +35,10 @@ public class HttpResponseWrapper {
         ifGet(method, path);
         login(path, request);
         if (header == null || body == null) {
+            body = HttpResponseBody.of(Paths.NOT_FOUND.createPath());
+            header = new HttpResponseHeader(StatusCode.NOT_FOUND.getStatus())
+                    .addContentType(Paths.NOT_FOUND.getContentType())
+                    .addContentLength(body.getContentLength());
             throw new NoSuchElementException("해당 페이지를 찾을 수 없습니다: " + path);
         }
     }
@@ -42,7 +46,18 @@ public class HttpResponseWrapper {
     private void login(String path, HttpRequestWrapper request) {
         if (path.equals(Paths.LOGIN.getPath())) {
             LoginHandler login = new LoginHandler(request.getQueryData().get("account"), request.getQueryData().get("password"));
-
+            if (login.checkUser()) {
+                body = HttpResponseBody.of(Paths.INDEX.createPath());
+                header = new HttpResponseHeader(StatusCode.FOUND.getStatus())
+                        .addContentType(Paths.INDEX.getContentType())
+                        .addContentLength(body.getContentLength());
+            }
+            else{
+                body = HttpResponseBody.of(Paths.UNAUTHORIZED.createPath());
+                header = new HttpResponseHeader(StatusCode.UNAUTHORIZED.getStatus())
+                        .addContentType(Paths.UNAUTHORIZED.getContentType())
+                        .addContentLength(body.getContentLength());
+            }
         }
     }
 
