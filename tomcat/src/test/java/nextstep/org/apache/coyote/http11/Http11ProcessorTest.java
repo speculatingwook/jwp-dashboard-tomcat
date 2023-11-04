@@ -1,5 +1,6 @@
 package nextstep.org.apache.coyote.http11;
 
+import org.junit.jupiter.api.DisplayName;
 import support.StubSocket;
 import org.apache.coyote.http11.Http11Processor;
 import org.junit.jupiter.api.Test;
@@ -26,13 +27,14 @@ class Http11ProcessorTest {
         var expected = String.join("\r\n",
                 "HTTP/1.1 200 OK ",
                 "Content-Type: text/html;charset=utf-8 ",
-                "Content-Length: 12 ",
+                "Content-Length: 5564",
                 "",
                 "Hello world!");
 
         assertThat(socket.output()).isEqualTo(expected);
     }
 
+    @DisplayName("/index.html 페이지 요청시 응답으로 반환된다.")
     @Test
     void index() throws IOException {
         // given

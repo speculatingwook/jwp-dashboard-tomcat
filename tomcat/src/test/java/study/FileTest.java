@@ -30,7 +30,7 @@ class FileTest {
     @Test
     void resource_디렉터리에_있는_파일의_경로를_찾는다() {
         final String fileName = "nextstep.txt";
-        URL resource = getClass().getResource("/" + fileName);
+        URL resource = getClass().getClassLoader().getResource(fileName);
         final String actual = resource.getFile();
         assertThat(actual).endsWith(fileName);
     }

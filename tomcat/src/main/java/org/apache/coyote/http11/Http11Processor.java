@@ -5,13 +5,13 @@ import org.apache.coyote.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,33 +34,19 @@ public class Http11Processor implements Runnable, Processor {
     @Override
     public void process(final Socket connection) {
         try (final var inputStream = connection.getInputStream();
-             final var outputStream = connection.getOutputStream()) {
+             final var outputStream = connection.getOutputStream();
+             final InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+             final BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
 
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            String request = bufferedReader.readLine();
+            String responseBody = "Hello world!";
 
-            List<String> requests = Arrays.stream(request.split(" ")).collect(Collectors.toList());
-            String requestURI = requests.get(1);
+            final String requestUrl = readRequestUrl(bufferedReader);
 
-            if (requestURI.equals("/")) {
-                final var responseBody = "Hello world!";
-                final var response = String.join("\r\n",
-                        "HTTP/1.1 200 OK ",
-                        "Content-Type: text/html; charset=utf-8",
-                        "Content-Length: " + responseBody.getBytes().length + " ",
-                        "",
-                        responseBody);
-                outputStream.write(response.getBytes());
-                outputStream.flush();
-                return;
+            if (requestUrl.contains(".html")) {
+                responseBody = new String(readAllFile(requestUrl), StandardCharsets.UTF_8);
             }
 
-            URL resource = getClass()
-                    .getClassLoader()
-                    .getResource("static" + requestURI);
 
-            File file = new File(resource.getFile());
-            String responseBody = new String(Files.readAllBytes(file.toPath()));
             String response = String.join("\r\n",
                     "HTTP/1.1 200 OK ",
                     "Content-Type: text/html;charset=utf-8 ",
@@ -75,10 +61,15 @@ public class Http11Processor implements Runnable, Processor {
         }
     }
 
-    private String contentType(String requestURI) {
-        if (requestURI.endsWith(".html")) {
-            return "text/html";
-        }
-        return "text/css";
+    private static String readRequestUrl(final BufferedReader bufferedReader) throws IOException {
+        final String httpStartLine = bufferedReader.readLine();
+        return httpStartLine.split(" ")[1];
+    }
+
+    private static byte[] readAllFile(final String requestUrl) throws IOException {
+
+        final URL resourceUrl = ClassLoader.getSystemResource("static" + requestUrl);
+        final Path path = new File(resourceUrl.getPath()).toPath();
+        return Files.readAllBytes(path);
     }
 }
