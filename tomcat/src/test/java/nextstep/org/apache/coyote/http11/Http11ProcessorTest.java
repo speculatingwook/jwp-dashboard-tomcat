@@ -4,14 +4,13 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import org.apache.coyote.processor.LoginProcessor;
+import org.apache.coyote.handler.LoginHandler;
 import org.junit.jupiter.api.DisplayName;
 import org.slf4j.LoggerFactory;
 import support.StubSocket;
 import org.apache.coyote.http11.Http11Processor;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -203,7 +202,7 @@ class Http11ProcessorTest {
     void loginWithLog() {
         // given
         final ListAppender<ILoggingEvent> appender = new ListAppender<>();
-        final Logger logger = (Logger) LoggerFactory.getLogger(LoginProcessor.class);
+        final Logger logger = (Logger) LoggerFactory.getLogger(LoginHandler.class);
         logger.addAppender(appender);
         appender.start();
 
