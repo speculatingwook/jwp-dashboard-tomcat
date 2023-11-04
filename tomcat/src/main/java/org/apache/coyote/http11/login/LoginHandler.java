@@ -6,10 +6,10 @@ import nextstep.jwp.model.User;
 
 import java.util.Optional;
 
-public class Login {
+public class LoginHandler {
     private final String account;
     private final String password;
-    public Login(String account, String password) {
+    public LoginHandler(String account, String password) {
         this.account = account;
         this.password = password;
     }
