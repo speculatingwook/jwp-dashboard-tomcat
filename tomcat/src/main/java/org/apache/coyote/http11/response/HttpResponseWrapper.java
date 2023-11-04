@@ -4,6 +4,7 @@ import java.util.NoSuchElementException;
 import org.apache.coyote.http11.Http11Processor;
 import org.apache.coyote.http11.HttpMethod;
 import org.apache.coyote.http11.Paths;
+import org.apache.coyote.http11.StatusCode;
 import org.apache.coyote.http11.login.LoginHandler;
 import org.apache.coyote.http11.request.HttpRequestWrapper;
 import org.slf4j.Logger;
@@ -51,7 +52,7 @@ public class HttpResponseWrapper {
                 String convertedPath = pathConvert(path, paths.getContentType());
                 if (convertedPath.equals(paths.getPath())) {
                     body = HttpResponseBody.of(paths.createPath());
-                    header = new HttpResponseHeader("200 OK")
+                    header = new HttpResponseHeader(StatusCode.OK.getStatus())
                             .addContentType(paths.getContentType())
                             .addContentLength(body.getContentLength());
                 }
