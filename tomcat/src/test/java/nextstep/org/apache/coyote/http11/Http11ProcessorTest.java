@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import org.apache.coyote.processor.LoginProcessor;
 import org.junit.jupiter.api.DisplayName;
 import org.slf4j.LoggerFactory;
 import support.StubSocket;
@@ -202,7 +203,7 @@ class Http11ProcessorTest {
     void loginWithLog() {
         // given
         final ListAppender<ILoggingEvent> appender = new ListAppender<>();
-        final Logger logger = (Logger) LoggerFactory.getLogger(Http11Processor.class);
+        final Logger logger = (Logger) LoggerFactory.getLogger(LoginProcessor.class);
         logger.addAppender(appender);
         appender.start();
 

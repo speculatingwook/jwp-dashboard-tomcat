@@ -1,11 +1,11 @@
-package org.apache.coyote.http11;
+package org.apache.coyote.response;
 
 public class HttpResponse {
-    private final String statusCode;
+    private final StatusCode statusCode;
     private final ContentType contentType;
     private final String responseBody;
 
-    public HttpResponse(final String statusCode, final ContentType contentType, final String responseBody) {
+    public HttpResponse(final StatusCode statusCode, final ContentType contentType, final String responseBody) {
         this.statusCode = statusCode;
         this.contentType = contentType;
         this.responseBody = responseBody;
