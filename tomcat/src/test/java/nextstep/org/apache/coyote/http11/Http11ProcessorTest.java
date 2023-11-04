@@ -7,8 +7,10 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,7 +38,7 @@ class Http11ProcessorTest {
 
     @DisplayName("/index.html 페이지 요청시 응답으로 반환된다.")
     @Test
-    void index() throws IOException {
+    void index() throws IOException, URISyntaxException {
         // given
         final String httpRequest = String.join("\r\n",
                 "GET /index.html HTTP/1.1 ",
@@ -52,12 +54,14 @@ class Http11ProcessorTest {
         processor.process(socket);
 
         // then
-        final URL resource = getClass().getClassLoader().getResource("static/index.html");
+        final URL resource = ClassLoader.getSystemResource("static/index.html");
+        final Path path = Path.of(resource.toURI());
+
         var expected = "HTTP/1.1 200 OK \r\n" +
                 "Content-Type: text/html;charset=utf-8 \r\n" +
                 "Content-Length: 5564 \r\n" +
                 "\r\n" +
-                new String(Files.readAllBytes(new File(resource.getFile()).toPath()));
+                new String(Files.readAllBytes(path));
 
         assertThat(socket.output()).isEqualTo(expected);
     }
