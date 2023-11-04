@@ -48,7 +48,8 @@ public class HttpResponseWrapper {
     private void ifGet(HttpMethod method, String path) {
         if(method.equals(GET)){
             for (Paths paths : Paths.values()) {
-                if (path.equals(paths.getPath())) {
+                String convertedPath = pathConvert(path, paths.getContentType());
+                if (convertedPath.equals(paths.getPath())) {
                     body = HttpResponseBody.of(paths.createPath());
                     header = new HttpResponseHeader("200 OK")
                             .addContentType(paths.getContentType())
@@ -56,6 +57,13 @@ public class HttpResponseWrapper {
                 }
             }
         }
+    }
+
+    private String pathConvert(String path, String contentType) {
+        if ((!path.contains(".html")) && contentType.equals("text/html")) {
+            return path + ".html";
+        }
+        return path;
     }
 
 

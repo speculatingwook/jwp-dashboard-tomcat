@@ -87,4 +87,12 @@ public class HttpRequestWrapper {
         }
         this.queryData = parameters;
     }
+
+    private String parsePath(String path) {
+        if (!path.contains(".html")) {
+            String fileType = ".html";
+            return path + fileType;
+        }
+        return path;
+    }
 }

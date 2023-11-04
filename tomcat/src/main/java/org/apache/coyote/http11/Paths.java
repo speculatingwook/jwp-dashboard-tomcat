@@ -11,6 +11,7 @@ public enum Paths {
 
     private final String path;
     private final String contentType;
+
     Paths(String path, String contentType) {
         this.path = path;
         this.contentType = contentType;
