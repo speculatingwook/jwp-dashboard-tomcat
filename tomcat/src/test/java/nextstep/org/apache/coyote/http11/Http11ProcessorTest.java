@@ -98,7 +98,7 @@ class Http11ProcessorTest {
     @Test
     void loadCss() {
         // given
-        final String httpRequest= String.join("\r\n",
+        final String httpRequest = String.join("\r\n",
                 "GET /css/styles.css HTTP/1.1 ",
                 "Host: localhost:8080 ",
                 "Accept: text/css,*/*;q=0.1 ",
@@ -119,7 +119,7 @@ class Http11ProcessorTest {
     @Test
     void loadJs() {
         // given
-        final String httpRequest= String.join("\r\n",
+        final String httpRequest = String.join("\r\n",
                 "GET /js/scripts.js HTTP/1.1 ",
                 "Host: localhost:8080 ",
                 "Accept: */* ",
@@ -135,5 +135,35 @@ class Http11ProcessorTest {
                 "Content-Type: application/javascript;charset=utf-8 \r\n";
 
         assertThat(socket.output()).startsWith(expected);
+    }
+
+    @DisplayName("파일 확장자가 없는 경우 기본 확장자인 .html로 응답한다.")
+    @Test
+    void defaultExtension() throws IOException, URISyntaxException {
+        // given
+        final String httpRequest= String.join("\r\n",
+                "GET /index HTTP/1.1 ",
+                "Host: localhost:8080 ",
+                "Connection: keep-alive ",
+                "",
+                "");
+
+        final var socket = new StubSocket(httpRequest);
+        final Http11Processor processor = new Http11Processor(socket);
+
+        // when
+        processor.process(socket);
+
+        // then
+        final URL resource = ClassLoader.getSystemResource("static/index.html");
+        final Path path = Path.of(resource.toURI());
+
+        var expected = "HTTP/1.1 200 OK\r\n" +
+                "Content-Type: text/html;charset=utf-8 \r\n" +
+                "Content-Length: " +  Files.readAllBytes(path).length + " \r\n" +
+                "\r\n" +
+                new String(Files.readAllBytes(path));
+
+        assertThat(socket.output()).isEqualTo(expected);
     }
 }
