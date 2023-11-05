@@ -47,6 +47,8 @@ public class Http11Processor implements Runnable, Processor {
 			String httpMethod = splittedRequestLine[HTTP_METHOD];
 			String uri = splittedRequestLine[HTTP_URI];
 			String httpVersion = splittedRequestLine[HTTP_VERSION];
+			log.info("httpMethod: {}, uri: {}, httpVersion: {}", httpMethod, uri, httpVersion);
+			log.info("requestHeaders: {}", requestHeaders);
 
 			final var responseBody = "Hello world!";
 
