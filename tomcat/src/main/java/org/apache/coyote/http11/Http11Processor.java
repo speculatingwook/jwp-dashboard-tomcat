@@ -33,6 +33,13 @@ public class Http11Processor implements Runnable, Processor {
 
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
+			String line = bufferedReader.readLine();
+			String[] splittedRequestLine = line.split(" ");
+
+			String httpMethod = splittedRequestLine[0];
+			String uri = splittedRequestLine[1];
+			String httpVersion = splittedRequestLine[2];
+
 			final var responseBody = "Hello world!";
 
 			final var response = String.join("\r\n",
