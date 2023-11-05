@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.coyote.Processor;
 import org.slf4j.Logger;
@@ -48,6 +50,16 @@ public class Http11Processor implements Runnable, Processor {
 			String uri = splittedRequestLine[HTTP_URI];
 			String httpVersion = splittedRequestLine[HTTP_VERSION];
 			log.info("httpMethod: {}, uri: {}, httpVersion: {}", httpMethod, uri, httpVersion);
+
+			Map<String, String> requestHeaders = new HashMap<>();
+
+			line = bufferedReader.readLine();
+			while (!line.equals("")) {
+				String[] splittedHeaderLine = line.split(HEADER_SPLITTER);
+				requestHeaders.put(splittedHeaderLine[HEADER_KEY], splittedHeaderLine[HEADER_VALUE]);
+				line = bufferedReader.readLine();
+			}
+
 			log.info("requestHeaders: {}", requestHeaders);
 
 			final var responseBody = "Hello world!";
