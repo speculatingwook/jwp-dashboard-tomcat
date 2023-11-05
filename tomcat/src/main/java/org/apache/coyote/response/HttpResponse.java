@@ -1,6 +1,6 @@
 package org.apache.coyote.response;
 
-import org.apache.coyote.session.Cookie;
+import org.apache.coyote.cookie.Cookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.coyote.response.StatusCode.FOUND;
 
 public class HttpResponse {
 

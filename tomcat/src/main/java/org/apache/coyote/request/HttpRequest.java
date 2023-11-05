@@ -1,6 +1,6 @@
 package org.apache.coyote.request;
 
-import org.apache.coyote.session.Cookies;
+import org.apache.coyote.cookie.Cookies;
 
 import java.util.Map;
 
