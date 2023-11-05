@@ -17,6 +17,7 @@ public class Http11Processor implements Runnable, Processor {
 	private static final int HTTP_URI = 1;
 	private static final int HTTP_VERSION = 2;
 	private static final String REQUEST_LINE_SPACE = " ";
+	private static final String BLANK_SPACE = " ";
 
 	private static final Logger log = LoggerFactory.getLogger(Http11Processor.class);
 
@@ -39,7 +40,7 @@ public class Http11Processor implements Runnable, Processor {
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
 			String line = bufferedReader.readLine();
-			String[] splittedRequestLine = line.split(REQUEST_LINE_SPACE);
+			String[] splittedRequestLine = line.split(BLANK_SPACE);
 
 			String httpMethod = splittedRequestLine[HTTP_METHOD];
 			String uri = splittedRequestLine[HTTP_URI];
