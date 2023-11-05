@@ -3,6 +3,8 @@ package org.apache.coyote.http11;
 import nextstep.jwp.exception.UncheckedServletException;
 import org.apache.coyote.Processor;
 import org.apache.coyote.handler.LoginHandler;
+import org.apache.coyote.handler.SignUpHandler;
+import org.apache.coyote.request.HttpMethod;
 import org.apache.coyote.request.HttpRequest;
 import org.apache.coyote.response.ContentType;
 import org.apache.coyote.response.HttpResponse;
@@ -22,6 +24,7 @@ import java.util.Map;
 
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.coyote.request.HttpMethod.POST;
 import static org.apache.coyote.response.StatusCode.FOUND;
 import static org.apache.coyote.response.StatusCode.OK;
 
@@ -52,11 +55,15 @@ public class Http11Processor implements Runnable, Processor {
              final BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
 
             final HttpRequest httpRequest = readHttpRequest(bufferedReader);
+            final HttpMethod requestMethod = httpRequest.getRequestMethod();
             String requestUrl = httpRequest.getRequestUrlWithoutQuery();
-            HttpResponse httpResponse = HttpResponse.of(OK, ContentType.from(requestUrl), "", requestUrl);
+            HttpResponse httpResponse = HttpResponse.of(OK, ContentType.from(requestUrl), requestUrl);
 
-            if (requestUrl.contains("login") && !httpRequest.getRequestBody().isBlank()) {
-                httpResponse = LoginHandler.login(httpRequest.getRequestBody());
+            if (requestUrl.contains("login") && requestMethod.equals(POST)) {
+                httpResponse = LoginHandler.login(httpRequest.getRequestBody(), httpRequest.getCookies());
+            }
+            if (requestUrl.contains("register") && requestMethod.equals(POST)) {
+                httpResponse = SignUpHandler.register(httpRequest.getRequestBody());
             }
 
             final String response = httpResponse.getResponse();
@@ -74,7 +81,7 @@ public class Http11Processor implements Runnable, Processor {
         final Map<String, String> httpHeaderLines = readHttpHeaderLines(bufferedReader);
         final String requestBody = readRequestBody(bufferedReader, httpHeaderLines);
 
-        return new HttpRequest(httpStartLine, httpHeaderLines, requestBody);
+        return HttpRequest.of(httpStartLine, httpHeaderLines, requestBody);
     }
 
     private static Map<String, String> readHttpHeaderLines(BufferedReader bufferedReader) throws IOException {
@@ -86,7 +93,7 @@ public class Http11Processor implements Runnable, Processor {
                 break;
             }
             final String[] header = line.split(HEADER_DELIMITER);
-            httpHeaderLines.put(header[KEY_INDEX], header[VALUE_INDEX]);
+            httpHeaderLines.put(header[KEY_INDEX], header[VALUE_INDEX].trim());
         }
 
         return httpHeaderLines;

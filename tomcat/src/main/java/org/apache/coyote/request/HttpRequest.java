@@ -1,5 +1,7 @@
 package org.apache.coyote.request;
 
+import org.apache.coyote.session.Cookies;
+
 import java.util.Map;
 
 public class HttpRequest {
@@ -10,15 +12,23 @@ public class HttpRequest {
     private static final String EXTENSION_CHARACTER = ".";
 
     private static final String DEFAULT_PAGE_URL = "/index.html";
-
+    private static final String COOKIE_HEADER = "Cookie";
     private final StartLine startLine;
     private final Map<String, String> headers;
+    private final Cookies cookies;
     private final String requestBody;
 
-    public HttpRequest(final String startLine, final Map<String, String> headers, final String requestBody) {
-        this.startLine = StartLine.from(startLine);
+    public HttpRequest(StartLine startLine, final Map<String, String> headers, Cookies cookies, String requestBody) {
+        this.startLine = startLine;
         this.headers = headers;
+        this.cookies = cookies;
         this.requestBody = requestBody;
+    }
+
+    public static HttpRequest of(final String startLine, final Map<String, String> headers, final String requestBody) {
+        final String cookie = headers.get(COOKIE_HEADER);
+
+        return new HttpRequest(StartLine.from(startLine), headers, Cookies.from(cookie), requestBody);
     }
 
     public String getRequestUrlWithoutQuery() {
@@ -41,6 +51,13 @@ public class HttpRequest {
         return requestBody;
     }
 
+    public HttpMethod getRequestMethod() {
+        return startLine.getMethod();
+    }
+
+    public Cookies getCookies() {
+        return cookies;
+    }
     private String addExtension(final String requestUrl) {
         final int index = requestUrl.indexOf(QUERY_START_CHARACTER);
         if (index != -1) {

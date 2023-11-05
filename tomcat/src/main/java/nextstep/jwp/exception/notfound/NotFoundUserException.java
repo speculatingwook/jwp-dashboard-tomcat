@@ -1,8 +1,8 @@
 package nextstep.jwp.exception.notfound;
 
-public class UserNotFoundException extends RuntimeException {
+public class NotFoundUserException extends RuntimeException {
 
-    public UserNotFoundException() {
+    public NotFoundUserException() {
         super("유저를 조회할 수 없습니다.");
     }
 }
