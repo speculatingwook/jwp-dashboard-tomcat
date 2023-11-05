@@ -1,6 +1,8 @@
 package org.apache.coyote.http11;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
 
 import org.apache.coyote.Processor;
@@ -28,6 +30,8 @@ public class Http11Processor implements Runnable, Processor {
 	public void process(final Socket connection) {
 		try (final var inputStream = connection.getInputStream();
 			 final var outputStream = connection.getOutputStream()) {
+
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
 			final var responseBody = "Hello world!";
 
