@@ -2,7 +2,7 @@ package org.apache.coyote.request;
 
 import java.util.Map;
 
-public class HttpRequestHeader {
+public class HttpRequest {
 
     private static final String HTML_EXTENSION = ".html";
     private static final String QUERY_START_CHARACTER = "?";
@@ -11,12 +11,14 @@ public class HttpRequestHeader {
 
     private static final String DEFAULT_PAGE_URL = "/index.html";
 
-    private final String startLine;
+    private final StartLine startLine;
     private final Map<String, String> headers;
+    private final String requestBody;
 
-    public HttpRequestHeader(final String startLine, final Map<String, String> headers) {
-        this.startLine = startLine;
+    public HttpRequest(final String startLine, final Map<String, String> headers, final String requestBody) {
+        this.startLine = StartLine.from(startLine);
         this.headers = headers;
+        this.requestBody = requestBody;
     }
 
     public String getRequestUrlWithoutQuery() {
@@ -29,10 +31,14 @@ public class HttpRequestHeader {
     }
 
     public String getRequestUrl() {
-        String requestUrl = startLine.split(" ")[1];
+        String requestUrl = startLine.getUri();
         requestUrl = makeDefaultRequestUrl(requestUrl);
 
         return requestUrl;
+    }
+
+    public String getRequestBody() {
+        return requestBody;
     }
 
     private String addExtension(final String requestUrl) {

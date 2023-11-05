@@ -3,7 +3,7 @@ package org.apache.coyote.http11;
 import nextstep.jwp.exception.UncheckedServletException;
 import org.apache.coyote.Processor;
 import org.apache.coyote.handler.LoginHandler;
-import org.apache.coyote.request.HttpRequestHeader;
+import org.apache.coyote.request.HttpRequest;
 import org.apache.coyote.response.ContentType;
 import org.apache.coyote.response.HttpResponse;
 import org.apache.coyote.response.StatusCode;
@@ -51,23 +51,15 @@ public class Http11Processor implements Runnable, Processor {
              final InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
              final BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
 
-            final HttpRequestHeader httpRequestHeader = makeHttpRequestHeader(bufferedReader);
-            StatusCode statusCode = OK;
-            String requestUrl = httpRequestHeader.getRequestUrlWithoutQuery();
+            final HttpRequest httpRequest = readHttpRequest(bufferedReader);
+            String requestUrl = httpRequest.getRequestUrlWithoutQuery();
+            HttpResponse httpResponse = HttpResponse.of(OK, ContentType.from(requestUrl), "", requestUrl);
 
-
-            if (requestUrl.contains("login")) {
-                final String fullRequestUrl = httpRequestHeader.getRequestUrl();
-                requestUrl = LoginHandler.login(fullRequestUrl);
-                statusCode = changeStatusCode(statusCode, requestUrl);
+            if (requestUrl.contains("login") && !httpRequest.getRequestBody().isBlank()) {
+                httpResponse = LoginHandler.login(httpRequest.getRequestBody());
             }
-            String location = requestUrl;
 
-            String responseBody = makeResponseBody(requestUrl);
-
-            final HttpResponse httpResponse = new HttpResponse(statusCode, ContentType.from(requestUrl), responseBody, location);
             final String response = httpResponse.getResponse();
-
             outputStream.write(response.getBytes());
             outputStream.flush();
         } catch (IOException | UncheckedServletException e) {
@@ -77,17 +69,18 @@ public class Http11Processor implements Runnable, Processor {
         }
     }
 
-    private HttpRequestHeader makeHttpRequestHeader(final BufferedReader bufferedReader) throws IOException {
+    private static HttpRequest readHttpRequest(final BufferedReader bufferedReader) throws IOException {
         final String httpStartLine = bufferedReader.readLine();
-        final Map<String, String> httpHeaderLines = makeHttpHeaderLines(bufferedReader);
+        final Map<String, String> httpHeaderLines = readHttpHeaderLines(bufferedReader);
+        final String requestBody = readRequestBody(bufferedReader, httpHeaderLines);
 
-        return new HttpRequestHeader(httpStartLine, httpHeaderLines);
+        return new HttpRequest(httpStartLine, httpHeaderLines, requestBody);
     }
 
-    private static Map<String, String> makeHttpHeaderLines(final BufferedReader bufferedReader) throws IOException {
+    private static Map<String, String> readHttpHeaderLines(BufferedReader bufferedReader) throws IOException {
         final Map<String, String> httpHeaderLines = new HashMap<>();
-
         String line;
+
         while ((line = bufferedReader.readLine()) != null) {
             if (line.isBlank()) {
                 break;
@@ -99,20 +92,17 @@ public class Http11Processor implements Runnable, Processor {
         return httpHeaderLines;
     }
 
-    private StatusCode changeStatusCode(StatusCode statusCode, String requestUrl) {
-        if (!requestUrl.equals("/login.html")) {
-            statusCode = FOUND;
+    private static String readRequestBody(BufferedReader bufferedReader, Map<String, String> httpHeaderLines)
+            throws IOException {
+        final String contentLengthHeader = httpHeaderLines.get("Content-Length");
+        if (contentLengthHeader == null) {
+            return "";
         }
-        return statusCode;
-    }
 
-    private String makeResponseBody(final String requestUrl) throws IOException, URISyntaxException {
-        return new String(readAllFile(requestUrl), UTF_8);
-    }
+        final int contentLength = Integer.parseInt(contentLengthHeader.trim());
+        final char[] buffer = new char[contentLength];
+        bufferedReader.read(buffer, 0, contentLength);
 
-    private static byte[] readAllFile(final String requestUrl) throws IOException, URISyntaxException {
-        final URL resourceUrl = ClassLoader.getSystemResource("static" + requestUrl);
-        final Path path = Path.of(resourceUrl.toURI());
-        return Files.readAllBytes(path);
+        return new String(buffer);
     }
 }
