@@ -91,7 +91,24 @@ public class Http11Processor implements Runnable, Processor {
 			}
 
 			// HTTP Response
+			HttpStatus httpStatus = null;
+			String responseBody = null;
 
+			if (httpMethod == null) {
+				responseBody = "Unsupported Method";
+				httpStatus = HttpStatus.BAD_REQUEST;
+			} else {
+				if (httpMethod.equals(HttpMethod.GET)) {
+					String resourceContent = findResources(uri);
+					if (resourceContent != null) {
+						responseBody = resourceContent;
+						httpStatus = HttpStatus.OK;
+					} else {
+						responseBody = "Resource Not Found";
+						httpStatus = HttpStatus.NOT_FOUND;
+					}
+				}
+			}
 
 			final var responseBody = "Hello world!";
 
