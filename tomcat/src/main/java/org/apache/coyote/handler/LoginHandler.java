@@ -9,6 +9,8 @@ import org.apache.coyote.response.HttpResponse;
 import org.apache.coyote.response.Location;
 import org.apache.coyote.cookie.Cookie;
 import org.apache.coyote.cookie.Cookies;
+import org.apache.coyote.session.Session;
+import org.apache.coyote.session.SessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,13 +23,12 @@ import static org.apache.coyote.response.StatusCode.*;
 
 public class LoginHandler {
 
-
     private static final Logger log = LoggerFactory.getLogger(LoginHandler.class);
 
     private LoginHandler() {
     }
 
-    public static HttpResponse loginWithGet(HttpRequest httpRequest) {
+    public static HttpResponse loginWithGet(HttpRequest httpRequest) throws URISyntaxException {
         final Optional<Cookie> optionalCookie = httpRequest.getJSessionCookie();
         if (optionalCookie.isPresent()) {
             final Cookie cookie = optionalCookie.get();
@@ -38,13 +39,13 @@ public class LoginHandler {
         return HttpResponse.of(OK, HTML, "/login.html");
     }
 
-    public static HttpResponse login(final HttpRequest request) {
+    public static HttpResponse login(final HttpRequest request) throws URISyntaxException {
         final QueryParams queryParams = QueryParams.from(request.getRequestBody());
         final String account = queryParams.getValueFromKey("account");
         final String password = queryParams.getValueFromKey("password");
 
         final User user = InMemoryUserRepository.findByAccount(account)
-                .orElseThrow(NoSuchUserException::new);
+                .orElseThrow(NotFoundUserException::new);
 
         if (user.checkPassword(password)) {
             final String userInformation = user.toString();
@@ -54,7 +55,7 @@ public class LoginHandler {
             return makeLoginSuccessResponse(request, session);
         }
 
-        return HttpResponse.of(FOUND, HTML, Location.from("/401.html"));
+        return HttpResponse.of(UNAUTHORIZED, HTML, Location.from("/401.html"));
     }
 
     private static void handleSession(Cookie cookie) {
@@ -73,7 +74,7 @@ public class LoginHandler {
         return session;
     }
 
-    private static HttpResponse makeLoginSuccessResponse(HttpRequest request, Session session) {
+    private static HttpResponse makeLoginSuccessResponse(HttpRequest request, Session session) throws URISyntaxException {
         final Optional<Cookie> cookie = request.getJSessionCookie();
         if (cookie.isEmpty()) {
             final Cookie jsessionid = Cookie.ofJSessionId(session.getId());

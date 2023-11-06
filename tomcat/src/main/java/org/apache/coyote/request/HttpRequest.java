@@ -1,8 +1,10 @@
 package org.apache.coyote.request;
 
+import org.apache.coyote.cookie.Cookie;
 import org.apache.coyote.cookie.Cookies;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class HttpRequest {
 
@@ -55,9 +57,7 @@ public class HttpRequest {
         return startLine.getMethod();
     }
 
-    public Cookies getCookies() {
-        return cookies;
-    }
+
     private String addExtension(final String requestUrl) {
         final int index = requestUrl.indexOf(QUERY_START_CHARACTER);
         if (index != -1) {
@@ -77,4 +77,14 @@ public class HttpRequest {
         }
         return requestUrl;
     }
+
+    public Cookies getCookies() {
+        return cookies;
+    }
+
+    public Optional<Cookie> getJSessionCookie() {
+        return cookies.getJSessionCookie();
+    }
+
+
 }

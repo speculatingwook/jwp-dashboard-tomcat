@@ -80,6 +80,10 @@ public class HttpResponse {
         return builder.toString();
     }
 
+    public Cookie getCookie() {
+        return cookie;
+    }
+
     private void appendLocation(StringBuilder builder) {
         if (location != null) {
             builder.append("Location: ").append(location).append(" \r\n");
