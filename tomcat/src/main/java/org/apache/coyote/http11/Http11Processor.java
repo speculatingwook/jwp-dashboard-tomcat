@@ -41,6 +41,7 @@ public class Http11Processor implements Runnable, Processor {
 		try (final var inputStream = connection.getInputStream();
 			 final var outputStream = connection.getOutputStream()) {
 
+			// HTTP Request
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
 			String line = bufferedReader.readLine();
@@ -83,6 +84,9 @@ public class Http11Processor implements Runnable, Processor {
 				}
 				requestBody = chunkRequestBody.toString();
 			}
+
+			// HTTP Response
+
 
 			final var responseBody = "Hello world!";
 
