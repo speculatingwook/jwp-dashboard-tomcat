@@ -47,7 +47,12 @@ public class Http11Processor implements Runnable, Processor {
 			String line = bufferedReader.readLine();
 			String[] splittedRequestLine = line.split(BLANK_SPACE);
 
-			String httpMethod = splittedRequestLine[HTTP_METHOD];
+			HttpMethod httpMethod;
+			try {
+				httpMethod = HttpMethod.valueOf(splittedRequestLine[HTTP_METHOD]);
+			} catch (IllegalArgumentException e) {
+				httpMethod = null;
+			}
 			String uri = splittedRequestLine[HTTP_URI];
 			String httpVersion = splittedRequestLine[HTTP_VERSION];
 			log.info("httpMethod: {}, uri: {}, httpVersion: {}", httpMethod, uri, httpVersion);
