@@ -62,6 +62,28 @@ public class Http11Processor implements Runnable, Processor {
 
 			log.info("requestHeaders: {}", requestHeaders);
 
+			String requestBody;
+			if (requestHeaders.containsKey("Content-Length")) {
+				int contentLength = Integer.parseInt(requestHeaders.get("Content-Length"));
+				char[] bodyChars = new char[contentLength];
+				bufferedReader.read(bodyChars, 0, contentLength);
+				requestBody = new String(bodyChars);
+			} else if (requestHeaders.containsKey("Transfer-Encoding") && requestHeaders.get("Transfer-Encoding")
+				.equals("chunked")) {
+				StringBuilder chunkRequestBody = new StringBuilder();
+				while ((line = bufferedReader.readLine()) != null) {
+					int chunkSize = Integer.parseInt(line, 16);
+					if (chunkSize == 0) {
+						break;
+					}
+					char[] chunk = new char[chunkSize];
+					bufferedReader.read(chunk, 0, chunkSize);
+					chunkRequestBody.append(chunk);
+					bufferedReader.readLine();
+				}
+				requestBody = chunkRequestBody.toString();
+			}
+
 			final var responseBody = "Hello world!";
 
 			final var response = String.join("\r\n",
