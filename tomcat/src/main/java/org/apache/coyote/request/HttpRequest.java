@@ -12,15 +12,15 @@ public class HttpRequest {
     private static final String QUERY_START_CHARACTER = "?";
     private static final String ROOT = "/";
     private static final String EXTENSION_CHARACTER = ".";
-
     private static final String DEFAULT_PAGE_URL = "/index.html";
     private static final String COOKIE_HEADER = "Cookie";
+
     private final StartLine startLine;
     private final Map<String, String> headers;
     private final Cookies cookies;
     private final String requestBody;
 
-    public HttpRequest(StartLine startLine, final Map<String, String> headers, Cookies cookies, String requestBody) {
+    public HttpRequest(StartLine startLine, Map<String, String> headers, Cookies cookies, String requestBody) {
         this.startLine = startLine;
         this.headers = headers;
         this.cookies = cookies;
@@ -49,14 +49,15 @@ public class HttpRequest {
         return requestUrl;
     }
 
-    public String getRequestBody() {
-        return requestBody;
+    private String makeDefaultRequestUrl(String requestUrl) {
+        if (requestUrl.equals(ROOT)) {
+            return DEFAULT_PAGE_URL;
+        }
+        if (!requestUrl.contains(EXTENSION_CHARACTER)) {
+            return addExtension(requestUrl);
+        }
+        return requestUrl;
     }
-
-    public HttpMethod getRequestMethod() {
-        return startLine.getMethod();
-    }
-
 
     private String addExtension(final String requestUrl) {
         final int index = requestUrl.indexOf(QUERY_START_CHARACTER);
@@ -68,14 +69,12 @@ public class HttpRequest {
         return requestUrl + HTML_EXTENSION;
     }
 
-    private String makeDefaultRequestUrl(String requestUrl) {
-        if (requestUrl.equals(ROOT)) {
-            return DEFAULT_PAGE_URL;
-        }
-        if (!requestUrl.contains(EXTENSION_CHARACTER)) {
-            return addExtension(requestUrl);
-        }
-        return requestUrl;
+    public String getRequestBody() {
+        return requestBody;
+    }
+
+    public HttpMethod getRequestMethod() {
+        return startLine.getMethod();
     }
 
     public Cookies getCookies() {

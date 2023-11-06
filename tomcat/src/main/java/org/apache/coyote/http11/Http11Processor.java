@@ -63,7 +63,6 @@ public class Http11Processor implements Runnable, Processor {
             if (requestUrl.contains("login") && requestMethod.equals(GET)) {
                 httpResponse = LoginHandler.loginWithGet(httpRequest);
             }
-
             if (requestUrl.contains("login") && requestMethod.equals(POST)) {
                 httpResponse = LoginHandler.login(httpRequest);
             }

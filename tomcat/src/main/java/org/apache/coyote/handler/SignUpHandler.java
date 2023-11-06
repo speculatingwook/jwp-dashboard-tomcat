@@ -19,7 +19,6 @@ public class SignUpHandler {
     private static final Logger log = LoggerFactory.getLogger(SignUpHandler.class);
 
     private SignUpHandler() {
-
     }
 
     public static HttpResponse register(final String requestBody) throws URISyntaxException {
