@@ -103,6 +103,7 @@ public class Http11Processor implements Runnable, Processor {
 			} else {
 				if (httpMethod.equals(HttpMethod.GET)) {
 					String resourceContent = findResources(uri);
+					log.info("resourceContent: {}", resourceContent);
 					if (resourceContent != null) {
 						responseBody = resourceContent;
 						httpStatus = HttpStatus.OK;
@@ -122,6 +123,8 @@ public class Http11Processor implements Runnable, Processor {
 				"",
 				responseBody);
 
+			log.info("response: {}", response);
+
 			outputStream.write(response.getBytes());
 			outputStream.flush();
 		} catch (IOException | UncheckedServletException e) {
@@ -132,6 +135,7 @@ public class Http11Processor implements Runnable, Processor {
 	private String findResources(String uri) {
 		try {
 			Path filePath = Paths.get(System.getProperty("user.dir"), "tomcat/src/main/resources/static" + uri);
+			log.info("filePath: {}", filePath);
 			if (Files.exists(filePath) && !Files.isDirectory(filePath)) {
 				return Files.readString(filePath);
 			}
