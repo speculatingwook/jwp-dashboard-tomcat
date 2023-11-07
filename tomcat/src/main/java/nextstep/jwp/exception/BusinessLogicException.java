@@ -1,11 +1,11 @@
 package nextstep.jwp.exception;
 
-public class UserException extends RuntimeException {
-    public UserException(String message) {
-        super(message);
-    }
+import org.apache.util.HttpResponseCode;
 
-    public UserException(String message, Exception cause) {
-        super(message, cause);
+public class BusinessLogicException extends RuntimeException {
+    private HttpResponseCode exceptionCode;
+
+    public BusinessLogicException(HttpResponseCode exceptionCode) {
+        this.exceptionCode = exceptionCode;
     }
 }
