@@ -114,12 +114,11 @@ public class Http11Processor implements Runnable, Processor {
 				}
 			}
 
-			final var responseBody = "Hello world!";
-
-			final var response = String.join("\r\n",
-				"HTTP/1.1 200 OK ",
-				"Content-Type: text/html;charset=utf-8 ",
-				"Content-Length: " + responseBody.getBytes().length + " ",
+			// creating HTTP Response
+			String response = String.join("\r\n",
+				"HTTP/1.1 " + httpStatus.getCode() + " " + httpStatus.getStatus(),
+				"Content-Type: text/html;charset=utf-8",
+				"Content-Length: " + responseBody.getBytes().length,
 				"",
 				responseBody);
 
