@@ -1,4 +1,4 @@
-package nextstep.jwp.Conrtroller;
+package nextstep.jwp.conrtroller;
 
 public class LoginController {
 }
