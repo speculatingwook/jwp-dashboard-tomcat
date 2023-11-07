@@ -1,5 +1,6 @@
 package org.apache.coyote.http11;
 
+import nextstep.jwp.conrtroller.LoginController;
 import nextstep.jwp.db.InMemoryUserRepository;
 import nextstep.jwp.exception.UncheckedServletException;
 import nextstep.jwp.model.User;
@@ -12,6 +13,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
@@ -41,6 +45,20 @@ public class Http11Processor implements Runnable, Processor {
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String requestLine = reader.readLine();
+
+            // -- test --
+            String requestMethod = getRequestMethod(requestLine);
+            String requestUrl = getRequestUrl(requestLine);
+
+            Response response = controllerMapping(requestMethod, requestUrl);
+
+
+            // todo 메소드 분리하고 첫'/' 문자 뒤에 어떤 단어가 오는 지 검사 하기
+            // 확장자가 없을 수도 있음 -> /부터 '확장자가 있는 지 검사할 것
+            // 1. index.html
+            // 2. login?
+            // 3. login
+
 
             int contentLength = 0;
             String line;
@@ -74,6 +92,36 @@ public class Http11Processor implements Runnable, Processor {
 
     private String getRequestUrl(String requestLine) {
         return requestLine.split(" ")[1];
+    }
+
+    private Response controllerMapping(String requestMethod, String requestUrl) {
+        ArrayList<String> domains = new ArrayList<>();
+        domains.add("index");
+        domains.add("login");
+        domains.add("register");
+
+        // 기본 응답 생성
+        Response response = new Response("", "", "", "");
+
+        for (String domain : domains) {
+            if (requestUrl.contains(domain)) {
+                String controllerClassName = domain.substring(0, 1).toUpperCase() + domain.substring(1) + "Controller";
+
+                try {
+                    Class<?> controllerClass = Class.forName("your.package.name." + controllerClassName);
+                    Constructor<?> constructor = controllerClass.getConstructor(String.class, String.class);
+                    Object controllerInstance = constructor.newInstance(requestMethod, requestUrl);
+
+                    Method generateResponseMethod = controllerClass.getMethod("generateResponse");
+                    response = (Response) generateResponseMethod.invoke(controllerInstance);
+                } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException |
+                         InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return response;
     }
 
     private URL getResource(String requestURL) {
