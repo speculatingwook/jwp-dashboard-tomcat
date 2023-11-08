@@ -1,5 +1,5 @@
 package org.apache.coyote.http11;
 
 public enum HttpMethod {
-    GET, POST, DELETE, HEAD, PATCH, PUT
+    GET, POST, DELETE, HEAD, PATCH, PUT, NONE
 }

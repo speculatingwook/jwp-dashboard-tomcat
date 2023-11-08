@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class HttpRequestWrapper {
 
     private static final String EMPTY_REQUEST = "요청이 비어있습니다.";
-    private static final Logger log = LoggerFactory.getLogger(Http11Processor.class);
+    private static final Logger log = LoggerFactory.getLogger(HttpRequestWrapper.class);
     List<String> lines;
     String method;
     String path;
@@ -26,8 +26,8 @@ public class HttpRequestWrapper {
             throw new NoSuchElementException(EMPTY_REQUEST);
         }
         this.lines = lines;
+        log.info(lines.toString());
         if(lines.get(0).contains("?")){
-            log.info(lines.toString());
             String[] firstLineSplit = lines.get(0).split(" ");
             this.method = firstLineSplit[0];
             parseQueryString(firstLineSplit[1]);
@@ -67,6 +67,7 @@ public class HttpRequestWrapper {
     }
 
     private void parseQueryString(String urlString) {
+        log.info("url String"+urlString);
         Map<String, String> parameters = new HashMap<>();
         String[] splitResult = urlString.split("[?]");
         this.query = splitResult[1];

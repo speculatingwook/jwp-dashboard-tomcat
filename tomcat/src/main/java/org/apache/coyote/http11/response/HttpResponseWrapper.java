@@ -15,7 +15,7 @@ import static org.apache.coyote.http11.HttpMethod.POST;
 
 public class HttpResponseWrapper {
 
-    private static final Logger log = LoggerFactory.getLogger(Http11Processor.class);
+    private static final Logger log = LoggerFactory.getLogger(HttpResponseWrapper.class);
 
     private HttpResponseHeader header;
     private HttpResponseBody body;
@@ -33,9 +33,19 @@ public class HttpResponseWrapper {
     private void parseResponse(HttpRequestWrapper request) {
         HttpMethod method = HttpMethod.valueOf(request.getMethod());
         String path= request.getPath();
-        ifGet(method, path);
-        login(path, request);
-        register(method, path);
+        switch (method) {
+            case GET:
+                response(path);
+                break;
+            case POST:
+                login(path, request);
+                register(path);
+                break;
+        }
+        invalidRequest(path);
+    }
+
+    private void invalidRequest(String path) {
         if (header == null || body == null) {
             body = HttpResponseBody.of(Paths.NOT_FOUND.createPath());
             header = new HttpResponseHeader(StatusCode.NOT_FOUND.getStatus())
@@ -46,7 +56,8 @@ public class HttpResponseWrapper {
     }
 
     private void login(String path, HttpRequestWrapper request) {
-        if (path.equals(Paths.LOGIN.getPath())) {
+        log.info(path);
+        if (Paths.LOGIN.getPath().contains(path)) {
             LoginHandler login = new LoginHandler(request.getQueryData().get("account"), request.getQueryData().get("password"));
             if (login.checkUser()) {
                 body = HttpResponseBody.of(Paths.INDEX.createPath());
@@ -62,19 +73,16 @@ public class HttpResponseWrapper {
             }
         }
     }
-    private void register(HttpMethod method, String path) {
-        if (method.equals(POST)) {
+    private void register(String path) {
             if (path.equals("/register")) {
                 body = HttpResponseBody.of(Paths.INDEX.createPath());
                 header = new HttpResponseHeader(StatusCode.OK.getStatus())
                         .addContentType(Paths.INDEX.getContentType())
                         .addContentLength(body.getContentLength());
             }
-        }
     }
 
-    private void ifGet(HttpMethod method, String path) {
-        if(method.equals(GET)){
+    private void response(String path) {
             for (Paths paths : Paths.values()) {
                 String convertedPath = pathConvert(path, paths.getContentType());
                 if (convertedPath.equals(paths.getPath())) {
@@ -84,7 +92,6 @@ public class HttpResponseWrapper {
                             .addContentLength(body.getContentLength());
                 }
             }
-        }
     }
 
     private String pathConvert(String path, String contentType) {
