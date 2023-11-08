@@ -19,5 +19,9 @@ public class HttpRequest {
 
 	}
 
+	private static String getRequestLine(BufferedReader bufferedReader) throws IOException {
+		return bufferedReader.readLine();
+	}
+
 	}
 }
