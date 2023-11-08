@@ -23,5 +23,12 @@ public class HttpRequest {
 		return bufferedReader.readLine();
 	}
 
+	private static String getRequestHeader(BufferedReader bufferedReader) throws IOException {
+		StringBuilder requestHeaderBuilder = new StringBuilder();
+		String headerLine;
+		while ((headerLine = bufferedReader.readLine()) != null && !headerLine.equals("")) {
+			requestHeaderBuilder.append(headerLine).append("\r\n");
+		}
+		return requestHeaderBuilder.toString();
 	}
 }
