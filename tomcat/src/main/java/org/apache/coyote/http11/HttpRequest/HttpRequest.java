@@ -11,9 +11,6 @@ public class HttpRequest {
 	private String httpVersion;
 
 	private HttpRequest(String requestLine, String requestHeader, String requestBody) {
-		this.requestLine = requestLine;
-		this.requestHeader = requestHeader;
-		this.requestBody = requestBody;
 	}
 
 	public static HttpRequest from(BufferedReader bufferedReader) throws IOException {
