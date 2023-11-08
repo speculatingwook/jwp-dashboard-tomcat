@@ -41,6 +41,16 @@ public class HttpRequest {
 		return requestHeaderBuilder.toString();
 	}
 
+	private void parseRequestHeaders(String requestHeader) {
+		this.requestHeaders = Arrays.stream(requestHeader.split(REGEX_CRLF))
+			.filter(line -> line.contains(":"))
+			.map(line -> line.split(":", 2))
+			.collect(Collectors.toMap(
+				arr -> arr[0].trim(),
+				arr -> arr[1].trim(),
+				(value1, value2) -> value1));
+	}
+
 	private static String getRequestBody(BufferedReader bufferedReader) throws IOException {
 		StringBuilder requestBodyBuilder = new StringBuilder();
 		String bodyLine;
