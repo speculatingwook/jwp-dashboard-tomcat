@@ -5,6 +5,8 @@ import java.io.IOException;
 
 public class HttpRequest {
 
+	private static final String CRLF = "\r\n";
+
 	private final String requestLine;
 	private final String requestHeader;
 	private final String requestBody;
@@ -27,7 +29,7 @@ public class HttpRequest {
 		StringBuilder requestHeaderBuilder = new StringBuilder();
 		String headerLine;
 		while ((headerLine = bufferedReader.readLine()) != null && !headerLine.equals("")) {
-			requestHeaderBuilder.append(headerLine).append("\r\n");
+			requestHeaderBuilder.append(headerLine).append(CRLF);
 		}
 		return requestHeaderBuilder.toString();
 	}
@@ -36,7 +38,7 @@ public class HttpRequest {
 		StringBuilder requestBodyBuilder = new StringBuilder();
 		String bodyLine;
 		while ((bodyLine = bufferedReader.readLine()) != null) {
-			requestBodyBuilder.append(bodyLine).append("\r\n");
+			requestBodyBuilder.append(bodyLine).append(CRLF);
 		}
 		return requestBodyBuilder.toString();
 	}
