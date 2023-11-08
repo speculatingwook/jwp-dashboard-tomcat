@@ -1,5 +1,8 @@
 package org.apache.coyote.http11.HttpRequest;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+
 public class HttpRequest {
 
 	private final String requestLine;
@@ -12,7 +15,9 @@ public class HttpRequest {
 		this.requestBody = requestBody;
 	}
 
-	public static HttpRequest of(String httpMethod, String uri, String httpVersion) {
-		return new HttpRequest(httpMethod, uri, httpVersion);
+	public static HttpRequest of(BufferedReader bufferedReader) throws IOException {
+
+	}
+
 	}
 }
