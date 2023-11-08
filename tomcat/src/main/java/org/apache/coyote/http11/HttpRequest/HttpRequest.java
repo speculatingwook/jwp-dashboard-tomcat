@@ -18,7 +18,8 @@ public class HttpRequest {
 	}
 
 	public static HttpRequest from(BufferedReader bufferedReader) throws IOException {
-
+		return new HttpRequest(getRequestLine(bufferedReader), getRequestHeader(bufferedReader),
+			getRequestBody(bufferedReader));
 	}
 
 	private static String getRequestLine(BufferedReader bufferedReader) throws IOException {
