@@ -3,15 +3,16 @@ package org.apache.coyote.http11.HttpRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Map;
+import org.apache.coyote.http11.HttpMethod;
 
 public class HttpRequest {
 
 	private static final String CRLF = "\r\n";
 	private static final String REGEX_CRLF = "\\r?\\n";
 	private static final String BLANK_SPACE = " ";
-	private String httpMethod;
 	private static final String CONTENT_LENGTH = "Content-Length";
 	private static final String TRANSFER_ENCODING = "Transfer-Encoding";
+	private HttpMethod httpMethod;
 	private String uri;
 	private String httpVersion;
 	private Map<String, String> requestHeaders;
@@ -30,7 +31,7 @@ public class HttpRequest {
 
 	private void parseRequestLine(String requestline) {
 		String[] splittedRequestLine = requestline.split(BLANK_SPACE);
-		this.httpMethod = splittedRequestLine[0];
+		this.httpMethod = HttpMethod.valueOf(splittedRequestLine[0]);
 		this.uri = splittedRequestLine[1];
 		this.httpVersion = splittedRequestLine[2];
 	}
