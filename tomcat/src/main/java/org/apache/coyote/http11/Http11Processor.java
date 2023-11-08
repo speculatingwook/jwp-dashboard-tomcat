@@ -57,6 +57,20 @@ public class Http11Processor implements Runnable, Processor {
 				httpMethod = null;
 			}
 			String uri = splittedRequestLine[HTTP_URI];
+
+			// if `uri` contains `?`
+			Map<String, String> queryParams = new HashMap<>();
+			if (uri.contains("?")) {
+				String[] splittedQuery = uri.split("\\?")[1].split("\\&");
+				uri = uri.split("\\?")[0];
+				for (int i = 0; i < splittedQuery.length; i++) {
+					String[] values = splittedQuery[i].split("\\=");
+					queryParams.put(values[0], values[1]);
+				}
+			}
+
+			log.info("queryParams: {}", queryParams);
+
 			String httpVersion = splittedRequestLine[HTTP_VERSION];
 			log.info("httpMethod: {}, uri: {}, httpVersion: {}", httpMethod, uri, httpVersion);
 
