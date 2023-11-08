@@ -25,6 +25,13 @@ public class HttpRequest {
 		return bufferedReader.readLine();
 	}
 
+	private void parseRequestLine(String requestline) {
+		String[] splittedRequestLine = requestline.split(BLANK_SPACE);
+		this.httpMethod = splittedRequestLine[0];
+		this.uri = splittedRequestLine[1];
+		this.httpVersion = splittedRequestLine[2];
+	}
+
 	private static String getRequestHeader(BufferedReader bufferedReader) throws IOException {
 		StringBuilder requestHeaderBuilder = new StringBuilder();
 		String headerLine;
