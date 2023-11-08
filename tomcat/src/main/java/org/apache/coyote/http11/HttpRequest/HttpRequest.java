@@ -31,4 +31,13 @@ public class HttpRequest {
 		}
 		return requestHeaderBuilder.toString();
 	}
+
+	private static String getRequestBody(BufferedReader bufferedReader) throws IOException {
+		StringBuilder requestBodyBuilder = new StringBuilder();
+		String bodyLine;
+		while ((bodyLine = bufferedReader.readLine()) != null) {
+			requestBodyBuilder.append(bodyLine).append("\r\n");
+		}
+		return requestBodyBuilder.toString();
+	}
 }
