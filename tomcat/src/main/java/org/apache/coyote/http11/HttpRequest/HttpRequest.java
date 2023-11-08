@@ -10,6 +10,9 @@ public class HttpRequest {
 	private final String requestLine;
 	private final String requestHeader;
 	private final String requestBody;
+	private String httpMethod;
+	private String uri;
+	private String httpVersion;
 
 	private HttpRequest(String requestLine, String requestHeader, String requestBody) {
 		this.requestLine = requestLine;
