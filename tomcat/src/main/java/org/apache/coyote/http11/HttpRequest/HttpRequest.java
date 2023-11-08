@@ -2,6 +2,7 @@ package org.apache.coyote.http11.HttpRequest;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Map;
 
 public class HttpRequest {
 
@@ -10,6 +11,7 @@ public class HttpRequest {
 	private String httpMethod;
 	private String uri;
 	private String httpVersion;
+	private Map<String, String> requestHeaders;
 
 	private HttpRequest(String requestLine, String requestHeader, String requestBody) {
 	}
