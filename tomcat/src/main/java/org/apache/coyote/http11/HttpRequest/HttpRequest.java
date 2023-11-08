@@ -15,7 +15,7 @@ public class HttpRequest {
 		this.requestBody = requestBody;
 	}
 
-	public static HttpRequest of(BufferedReader bufferedReader) throws IOException {
+	public static HttpRequest from(BufferedReader bufferedReader) throws IOException {
 
 	}
 
