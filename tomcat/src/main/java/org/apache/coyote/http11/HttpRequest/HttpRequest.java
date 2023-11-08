@@ -7,8 +7,11 @@ import java.util.Map;
 public class HttpRequest {
 
 	private static final String CRLF = "\r\n";
+	private static final String REGEX_CRLF = "\\r?\\n";
 	private static final String BLANK_SPACE = " ";
 	private String httpMethod;
+	private static final String CONTENT_LENGTH = "Content-Length";
+	private static final String TRANSFER_ENCODING = "Transfer-Encoding";
 	private String uri;
 	private String httpVersion;
 	private Map<String, String> requestHeaders;
