@@ -6,10 +6,6 @@ import java.io.IOException;
 public class HttpRequest {
 
 	private static final String CRLF = "\r\n";
-
-	private final String requestLine;
-	private final String requestHeader;
-	private final String requestBody;
 	private String httpMethod;
 	private String uri;
 	private String httpVersion;
