@@ -6,6 +6,7 @@ import java.io.IOException;
 public class HttpRequest {
 
 	private static final String CRLF = "\r\n";
+	private static final String BLANK_SPACE = " ";
 	private String httpMethod;
 	private String uri;
 	private String httpVersion;
