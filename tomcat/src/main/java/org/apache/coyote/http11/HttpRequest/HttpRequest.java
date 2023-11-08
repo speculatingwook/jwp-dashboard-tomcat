@@ -3,6 +3,8 @@ package org.apache.coyote.http11.HttpRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.coyote.http11.HttpMethod;
 
 public class HttpRequest {
@@ -16,6 +18,7 @@ public class HttpRequest {
 	private String uri;
 	private String httpVersion;
 	private Map<String, String> requestHeaders;
+	private String requestBody;
 
 	private HttpRequest(String requestLine, String requestHeader, String requestBody) {
 	}
