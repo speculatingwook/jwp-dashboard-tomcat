@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.apache.coyote.http11.HttpMethod.GET;
+import static org.apache.coyote.http11.HttpMethod.POST;
 
 public class HttpResponseWrapper {
 
@@ -34,6 +35,7 @@ public class HttpResponseWrapper {
         String path= request.getPath();
         ifGet(method, path);
         login(path, request);
+        register(method, path);
         if (header == null || body == null) {
             body = HttpResponseBody.of(Paths.NOT_FOUND.createPath());
             header = new HttpResponseHeader(StatusCode.NOT_FOUND.getStatus())
@@ -56,6 +58,16 @@ public class HttpResponseWrapper {
                 body = HttpResponseBody.of(Paths.UNAUTHORIZED.createPath());
                 header = new HttpResponseHeader(StatusCode.UNAUTHORIZED.getStatus())
                         .addContentType(Paths.UNAUTHORIZED.getContentType())
+                        .addContentLength(body.getContentLength());
+            }
+        }
+    }
+    private void register(HttpMethod method, String path) {
+        if (method.equals(POST)) {
+            if (path.equals("/register")) {
+                body = HttpResponseBody.of(Paths.INDEX.createPath());
+                header = new HttpResponseHeader(StatusCode.OK.getStatus())
+                        .addContentType(Paths.INDEX.getContentType())
                         .addContentLength(body.getContentLength());
             }
         }

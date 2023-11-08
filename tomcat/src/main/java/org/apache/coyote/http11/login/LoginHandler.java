@@ -14,8 +14,6 @@ public class LoginHandler {
         this.password = password;
     }
 
-
-
     public boolean checkUser() {
         if(InMemoryUserRepository.findByAccount(account).isPresent()){
             Optional<User> optionalUser = InMemoryUserRepository.findByAccount(account);

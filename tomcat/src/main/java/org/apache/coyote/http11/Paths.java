@@ -5,6 +5,7 @@ public enum Paths {
     CSS("/css/styles.css", "text/css"),
     LOGIN("/login.html", "text/html"),
     JS("/js/scripts.js", "text/javascript"),
+    REGISTER("/register.html","text/html"),
     UNAUTHORIZED("/401.html", "text/html"),
     NOT_FOUND("/404.html", "text/html"),
     NOT_FOUND_SVG("/assets/img/error-404-monochrome.svg", "image/svg+xml"),
