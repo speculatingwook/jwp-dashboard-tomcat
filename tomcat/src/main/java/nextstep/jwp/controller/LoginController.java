@@ -1,6 +1,7 @@
 package nextstep.jwp.conrtroller;
 
 import nextstep.jwp.service.LoginService;
+import org.apache.coyote.http11.Response;
 
 public class LoginController {
     private String requestMethod;
@@ -10,5 +11,16 @@ public class LoginController {
     public LoginController(String requestMethod, String requestUrl) {
         this.requestMethod = requestMethod;
         this.requestUrl = requestUrl;
+    }
+
+    public Response generateResponse() {
+        switch (requestMethod) {
+            case "POST":
+                break;
+            case "GET":
+                break;
+            default:
+                break;
+        }
     }
 }
