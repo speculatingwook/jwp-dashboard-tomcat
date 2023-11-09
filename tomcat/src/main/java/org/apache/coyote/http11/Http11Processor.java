@@ -9,7 +9,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.URL;
 
 public class Http11Processor implements Runnable, Processor {
 
@@ -35,6 +37,7 @@ public class Http11Processor implements Runnable, Processor {
 
             // HTTP 요청 메시지 파싱
             String requestLine = parsingHttpRequestMessage(inputStream);
+            URL url = parsingUrl(requestLine);
 
 
 
@@ -57,5 +60,9 @@ public class Http11Processor implements Runnable, Processor {
     private String parsingHttpRequestMessage(InputStream inputStream) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         return reader.readLine();
+    }
+
+    private URL parsingUrl(String requestLine) throws MalformedURLException {
+        return new URL(requestLine);
     }
 }
