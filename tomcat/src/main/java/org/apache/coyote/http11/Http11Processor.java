@@ -9,9 +9,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.Socket;
-import java.net.URL;
 
 public class Http11Processor implements Runnable, Processor {
 
@@ -37,26 +38,42 @@ public class Http11Processor implements Runnable, Processor {
 
             // HTTP 요청 메시지 파싱
             String requestLine = parsingHttpRequestMessage(inputStream);
+
             String url = parsingUrl(requestLine);
             String method = parsingMethod(requestLine);
 
+            Object controller = controllerMapper.mappingController(url);
+            Response response = delegateController(controller);
 
-//            controllerMapper.
+//            final var responseBody = "Hello world!";
+//
+//            final var response = String.join("\r\n",
+//                    "HTTP/1.1 200 OK ",
+//                    "Content-Type: text/html;charset=utf-8 ",
+//                    "Content-Length: " + responseBody.getBytes().length + " ",
+//                    "",
+//                    responseBody);
 
-            final var responseBody = "Hello world!";
-
-            final var response = String.join("\r\n",
-                    "HTTP/1.1 200 OK ",
-                    "Content-Type: text/html;charset=utf-8 ",
-                    "Content-Length: " + responseBody.getBytes().length + " ",
-                    "",
-                    responseBody);
-
-            outputStream.write(response.getBytes());
+            outputStream.write(response.toString().getBytes());
             outputStream.flush();
         } catch (IOException | UncheckedServletException e) {
             log.error(e.getMessage(), e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    private Response delegateController(Object controller) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method handleRequestMethod = controller.getClass().getMethod("handleRequest");
+        return (Response) handleRequestMethod.invoke(controller);
     }
 
     private String parsingHttpRequestMessage(InputStream inputStream) throws IOException {
