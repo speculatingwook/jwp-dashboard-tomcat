@@ -4,6 +4,10 @@ import nextstep.jwp.Response.Response;
 import nextstep.jwp.Response.ResponseBody;
 import nextstep.jwp.Response.ResponseHeader;
 import nextstep.jwp.exception.UncheckedServletException;
+import nextstep.jwp.request.Request;
+import nextstep.jwp.request.RequestBody;
+import nextstep.jwp.request.RequestHeader;
+import nextstep.jwp.util.ParsingUtil;
 import nextstep.jwp.util.ResourceFinder;
 import org.apache.coyote.Processor;
 import org.apache.util.HttpResponseCode;
@@ -24,6 +28,7 @@ public class Http11Processor implements Runnable, Processor {
 
     private final ControllerMapper controllerMapper = new ControllerMapper();
     private final ResourceFinder resourceFinder = new ResourceFinder();
+    private final ParsingUtil parsingUtil = new ParsingUtil();
 
     public Http11Processor(final Socket connection) {
         this.connection = connection;
@@ -39,32 +44,15 @@ public class Http11Processor implements Runnable, Processor {
         try (final var inputStream = connection.getInputStream();
              final var outputStream = connection.getOutputStream()) {
 
-            // HTTP 요청 메시지 파싱
-            String requestLine = parsingHttpRequestMessage(inputStream);
+            RequestHeader requestHeader = parsingUtil.parseRequestHeader(inputStream);
+            RequestBody requestBody = parsingUtil.parseRequestBody(inputStream, requestHeader);
+            Request request = new Request(requestHeader, requestBody);
 
-            String url = parsingUrl(requestLine);
-            String domain = parsingDomain(url);
-            String method = parsingMethod(requestLine);
-
-            Response response;
-
-            // 데이터 가공이 필요한지 단순 자원 요청인지 검사
-            if(url.contains(".")) {
-                ResponseBody responseBody = new ResponseBody(resourceFinder.getResource(url));
-                ResponseHeader responseHeader = new ResponseHeader(HttpResponseCode.OK.toString(),
-                        HttpResponseCode.OK.getReasonPhrase(),
-                        resourceFinder.getContentType(resourceFinder.getFileExtension(url)),
-                        responseBody.getLength());
-                response = new Response(responseHeader, responseBody);
-            } else {
-                Object controller = controllerMapper.mappingController(domain);
-                response = delegateController(controller, method, url);
-
-            }
+            Response response = controllerMapper.findController(request);
 
             outputStream.write(response.toString().getBytes());
             outputStream.flush();
-        } catch (IOException | UncheckedServletException | ClassNotFoundException | InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
+        } catch (IOException | UncheckedServletException e) {
             log.error(e.getMessage(), e);
         }
     }
