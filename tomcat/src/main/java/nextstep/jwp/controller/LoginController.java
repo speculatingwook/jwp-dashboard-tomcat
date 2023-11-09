@@ -34,14 +34,17 @@ public class LoginController {
                 responseHeader.setResponseStatus(HttpResponseCode.FOUND.getReasonPhrase());
                 responseHeader.setContentType(resourceFinder.getContentType(resourceFinder.getFileExtension("/index.html")));
                 responseHeader.setContentLength(responseBody.getLength());
+                responseHeader.setLocation("/index.html");
             } else {
                 // login 실패
-                responseBody.setFileContent(resourceFinder.getResource("/401.html"));
+                responseBody.setFileContent(resourceFinder.getResource("/401.html")); // todo: 리다이렉션으로 바꿀 것
 
                 responseHeader.setResponseCode(HttpResponseCode.UNAUTHORIZED.toString());
                 responseHeader.setResponseStatus(HttpResponseCode.UNAUTHORIZED.getReasonPhrase());
                 responseHeader.setContentType(resourceFinder.getContentType(resourceFinder.getFileExtension("/401.html")));
                 responseHeader.setContentLength(responseBody.getLength());
+                responseHeader.setLocation("/404.html");
+
             }
 
             return new Response(responseHeader, responseBody);
