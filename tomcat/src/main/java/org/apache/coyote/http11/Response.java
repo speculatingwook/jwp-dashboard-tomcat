@@ -2,11 +2,12 @@ package org.apache.coyote.http11;
 
 public class Response {
     private final String HTTP_VERSION = "http/1.1";
-    private final String responseCode;
-    private final String responseStatus;
-    private final String contentType;
-    private final String fileContent;
+    private String responseCode;
+    private String responseStatus;
+    private String contentType;
+    private String fileContent;
 
+    public Response() {}
     public Response(String responseCode, String responseStatus, String contentType, String fileContent) {
         this.responseCode = responseCode;
         this.responseStatus = responseStatus;
