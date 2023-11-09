@@ -1,10 +1,6 @@
 package nextstep.jwp.Response;
 
 public class ResponseBody {
-    public void setFileContent(String fileContent) {
-        this.fileContent = fileContent;
-    }
-
     private String fileContent;
 
     public ResponseBody() {}
@@ -13,7 +9,16 @@ public class ResponseBody {
         this.fileContent = fileContent;
     }
 
+    public void setFileContent(String fileContent) {
+        this.fileContent = fileContent;
+    }
+
     public int getLength() {
         return fileContent.length();
+    }
+
+    @Override
+    public String toString() {
+        return fileContent;
     }
 }
