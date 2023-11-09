@@ -13,9 +13,9 @@ public class Response {
 
     @Override
     public String toString() {
-        return responseHeader +
+        return responseHeader.toString() +
                 "\r\n" +
-                responseBody;
+                responseBody.toString();
     }
 
 }
