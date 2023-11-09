@@ -1,27 +1,21 @@
-package org.apache.coyote.http11;
+package nextstep.jwp.Response;
 
 public class Response {
-    private final String HTTP_VERSION = "http/1.1";
-    private String responseCode;
-    private String responseStatus;
-    private String contentType;
-    private String fileContent;
+    private ResponseHeader responseHeader;
+    private ResponseBody responseBody;
 
     public Response() {}
-    public Response(String responseCode, String responseStatus, String contentType, String fileContent) {
-        this.responseCode = responseCode;
-        this.responseStatus = responseStatus;
-        this.contentType = contentType;
-        this.fileContent = fileContent;
+
+    public Response(ResponseHeader responseHeader, ResponseBody responseBody) {
+        this.responseHeader = responseHeader;
+        this.responseBody = responseBody;
     }
 
     @Override
     public String toString() {
-        return HTTP_VERSION + " " + responseCode + " " + responseStatus + "\r\n" +
-                "Content-Type: " + contentType + "\r\n" +
-                "Content-Length: " + fileContent.length() + " \r\n" +
+        return responseHeader +
                 "\r\n" +
-                fileContent;
+                responseBody;
     }
 
 }
