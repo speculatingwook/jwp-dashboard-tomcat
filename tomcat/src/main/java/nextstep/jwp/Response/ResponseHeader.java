@@ -5,6 +5,8 @@ public class ResponseHeader {
     private String responseCode;
     private String responseStatus;
     private String contentType;
+    private int contentLength;
+    private String location;
 
     public void setResponseCode(String responseCode) {
         this.responseCode = responseCode;
@@ -21,8 +23,9 @@ public class ResponseHeader {
     public void setContentLength(int contentLength) {
         this.contentLength = contentLength;
     }
-
-    private int contentLength;
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
     public ResponseHeader() {}
 
@@ -35,8 +38,14 @@ public class ResponseHeader {
 
     @Override
     public String toString() {
-        return HTTP_VERSION + " " + responseCode + " " + responseStatus + "\r\n" +
+        String header = HTTP_VERSION + " " + responseCode + " " + responseStatus + "\r\n" +
                 "Content-Type: " + contentType + "\r\n" +
                 "Content-Length: " + contentLength + " \r\n";
+
+        if (location != null && !location.isEmpty()) {
+            header += "Location: " + location + "\r\n";
+        };
+
+        return header;
     }
 }
