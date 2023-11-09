@@ -37,9 +37,11 @@ public class Http11Processor implements Runnable, Processor {
 
             // HTTP 요청 메시지 파싱
             String requestLine = parsingHttpRequestMessage(inputStream);
-            URL url = parsingUrl(requestLine);
+            String url = parsingUrl(requestLine);
+            String method = parsingMethod(requestLine);
 
 
+//            controllerMapper.
 
             final var responseBody = "Hello world!";
 
@@ -62,7 +64,13 @@ public class Http11Processor implements Runnable, Processor {
         return reader.readLine();
     }
 
-    private URL parsingUrl(String requestLine) throws MalformedURLException {
-        return new URL(requestLine);
+    private String parsingUrl(String requestLine) throws MalformedURLException {
+        String[] requestParts = requestLine.split(" ");
+        return requestParts[1];
+    }
+
+    private String parsingMethod(String requestLine) throws MalformedURLException {
+        String[] requestParts = requestLine.split(" ");
+        return requestParts[0];
     }
 }
