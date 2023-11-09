@@ -1,5 +1,8 @@
 package org.apache.coyote.http11;
 
+import nextstep.jwp.Response.Response;
+import nextstep.jwp.Response.ResponseBody;
+import nextstep.jwp.Response.ResponseHeader;
 import nextstep.jwp.exception.UncheckedServletException;
 import nextstep.jwp.util.ResourceFinder;
 import org.apache.coyote.Processor;
@@ -12,8 +15,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.Socket;
-import java.net.URL;
-import java.nio.file.Files;
 
 public class Http11Processor implements Runnable, Processor {
 
@@ -42,19 +43,21 @@ public class Http11Processor implements Runnable, Processor {
             String requestLine = parsingHttpRequestMessage(inputStream);
 
             String url = parsingUrl(requestLine);
+            String domain = parsingDomain(url);
             String method = parsingMethod(requestLine);
 
-            Response response = new Response();
+            Response response;
 
-            // 데이터 가공이 필요한 지 단순 자원 요청인 지 검사
+            // 데이터 가공이 필요한지 단순 자원 요청인지 검사
             if(url.contains(".")) {
-                response = new Response(
-                        HttpResponseCode.OK.toString(),
+                ResponseBody responseBody = new ResponseBody(resourceFinder.getResource(url));
+                ResponseHeader responseHeader = new ResponseHeader(HttpResponseCode.OK.toString(),
                         HttpResponseCode.OK.getReasonPhrase(),
                         resourceFinder.getContentType(resourceFinder.getFileExtension(url)),
-                        resourceFinder.getResource(url));
+                        responseBody.getLength());
+                response = new Response(responseHeader, responseBody);
             } else {
-                Object controller = controllerMapper.mappingController(url);
+                Object controller = controllerMapper.mappingController(domain);
                 response = delegateController(controller, method, url);
 
             }
@@ -64,6 +67,13 @@ public class Http11Processor implements Runnable, Processor {
         } catch (IOException | UncheckedServletException | ClassNotFoundException | InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    private String parsingDomain(String url) {
+        String domain = url;
+        if(url.contains("?")) domain = url.substring(0, url.indexOf("?"));
+        if(url.contains("/")) domain = domain.split("/")[1];
+        return domain;
     }
 
     private Response delegateController(Object controller, String method, String url) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
