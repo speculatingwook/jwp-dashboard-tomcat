@@ -7,6 +7,8 @@ public class ResponseHeader {
     private String contentType;
     private int contentLength;
 
+    public ResponseHeader() {}
+
     public ResponseHeader(String responseCode, String responseStatus, String contentType, int contentLength) {
         this.responseCode = responseCode;
         this.responseStatus = responseStatus;
