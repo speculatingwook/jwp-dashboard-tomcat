@@ -1,7 +1,7 @@
 package nextstep.jwp.service;
 
 import nextstep.jwp.db.InMemoryUserRepository;
-import nextstep.jwp.exception.BusinessLogicException;
+import nextstep.jwp.exception.RequestException;
 import nextstep.jwp.model.User;
 import org.apache.util.HttpResponseCode;
 
@@ -17,6 +17,6 @@ public class LoginService {
     // 계정 존재 시 계정 반환, 부재 시 예외 처리
     public User findUserByAccount(String account) {
         Optional<User> optionalUser = InMemoryUserRepository.findByAccount(account);
-        return optionalUser.orElseThrow(() -> new BusinessLogicException(HttpResponseCode.USER_NOT_FOUND)) ;
+        return optionalUser.orElseThrow(() -> new RequestException(HttpResponseCode.USER_NOT_FOUND)) ;
     }
 }
