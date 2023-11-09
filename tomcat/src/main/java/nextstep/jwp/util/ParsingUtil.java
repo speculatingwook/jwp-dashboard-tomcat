@@ -1,5 +1,6 @@
 package nextstep.jwp.util;
 
+import nextstep.jwp.request.RequestBody;
 import nextstep.jwp.request.RequestHeader;
 
 import java.io.BufferedReader;
@@ -30,5 +31,16 @@ public class ParsingUtil {
         return new RequestHeader(method, path, contentType, contentLength);
     }
 
-
+    public RequestBody parseRequestBody(InputStream inputStream, RequestHeader requestHeader) throws IOException {
+        int contentLength = requestHeader.getContentLength();
+        if (contentLength > 0) {
+            byte[] bodyBytes = new byte[contentLength];
+            int bytesRead = inputStream.read(bodyBytes, 0, contentLength);
+            if (bytesRead == contentLength) {
+                String requestBody = new String(bodyBytes, "UTF-8");
+                return new RequestBody(requestBody);
+            }
+        }
+        return new RequestBody("");
+    }
 }
