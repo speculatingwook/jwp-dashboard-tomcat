@@ -7,13 +7,14 @@ public class Response {
     private final String contentType;
     private final String fileContent;
 
-    Response(String responseCode, String responseStatus, String contentType, String fileContent) {
+    public Response(String responseCode, String responseStatus, String contentType, String fileContent) {
         this.responseCode = responseCode;
         this.responseStatus = responseStatus;
         this.contentType = contentType;
         this.fileContent = fileContent;
     }
 
+    @Override
     public String toString() {
         return HTTP_VERSION + " " + responseCode + " " + responseStatus + "\r\n" +
                 "Content-Type: " + contentType + "\r\n" +
