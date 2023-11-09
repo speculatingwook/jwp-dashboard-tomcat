@@ -2,10 +2,10 @@ package nextstep.jwp.exception;
 
 import org.apache.util.HttpResponseCode;
 
-public class BusinessLogicException extends RuntimeException {
+public class RequestException extends RuntimeException {
     private HttpResponseCode exceptionCode;
 
-    public BusinessLogicException(HttpResponseCode exceptionCode) {
+    public RequestException(HttpResponseCode exceptionCode) {
         this.exceptionCode = exceptionCode;
     }
 }
