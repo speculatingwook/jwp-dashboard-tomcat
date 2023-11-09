@@ -3,6 +3,8 @@ package nextstep.jwp.Response;
 public class ResponseBody {
     private String fileContent;
 
+    public ResponseBody() {}
+
     public ResponseBody(String fileContent) {
         this.fileContent = fileContent;
     }
