@@ -1,6 +1,7 @@
 package org.apache.coyote.http11;
 
 import nextstep.jwp.exception.UncheckedServletException;
+import nextstep.jwp.util.ResourceFinder;
 import org.apache.coyote.Processor;
 import org.apache.util.HttpResponseCode;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ public class Http11Processor implements Runnable, Processor {
     private final Socket connection;
 
     private final ControllerMapper controllerMapper = new ControllerMapper();
+    private final ResourceFinder resourceFinder = new ResourceFinder();
 
     public Http11Processor(final Socket connection) {
         this.connection = connection;
@@ -49,8 +51,8 @@ public class Http11Processor implements Runnable, Processor {
                 response = new Response(
                         HttpResponseCode.OK.toString(),
                         HttpResponseCode.OK.getReasonPhrase(),
-                        getContentType(getFileExtension(url)),
-                        getResource(url));
+                        resourceFinder.getContentType(resourceFinder.getFileExtension(url)),
+                        resourceFinder.getResource(url));
             } else {
                 Object controller = controllerMapper.mappingController(url);
                 response = delegateController(controller, method, url);
@@ -61,41 +63,6 @@ public class Http11Processor implements Runnable, Processor {
             outputStream.flush();
         } catch (IOException | UncheckedServletException | ClassNotFoundException | InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
             log.error(e.getMessage(), e);
-        }
-    }
-
-    public String getResource(String url) throws IOException {
-        URL resource = getClass().getClassLoader().getResource("static" + url);
-        return new String(Files.readAllBytes(new File(resource.getFile()).toPath()));
-    }
-
-    public String getFileExtension(String url) {
-        int lastDotIndex = url.lastIndexOf(".");
-        if (lastDotIndex != -1) {
-            return url.substring(lastDotIndex + 1);
-        }
-        return "";
-    }
-
-    public String getContentType(String fileExtension) {
-        switch (fileExtension) {
-            case "html":
-                return "text/html;charset=utf-8";
-            case "js":
-                return "application/javascript";
-            case "css":
-                return "text/css";
-            case "jpg":
-                return "image/jpeg";
-            case "jpeg":
-                return "image/jpeg";
-            case "png":
-                return "image/png";
-            case "gif":
-                return "image/gif";
-            // 다른 확장자에 대한 MIME 타입 추가
-            default:
-                return "application/octet-stream"; // 알 수 없는 확장자의 경우 기본값 설정
         }
     }
 
