@@ -5,6 +5,23 @@ public class ResponseHeader {
     private String responseCode;
     private String responseStatus;
     private String contentType;
+
+    public void setResponseCode(String responseCode) {
+        this.responseCode = responseCode;
+    }
+
+    public void setResponseStatus(String responseStatus) {
+        this.responseStatus = responseStatus;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    public void setContentLength(int contentLength) {
+        this.contentLength = contentLength;
+    }
+
     private int contentLength;
 
     public ResponseHeader() {}
