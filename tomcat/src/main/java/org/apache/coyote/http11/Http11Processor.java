@@ -43,37 +43,18 @@ public class Http11Processor implements Runnable, Processor {
             String method = parsingMethod(requestLine);
 
             Object controller = controllerMapper.mappingController(url);
-            Response response = delegateController(controller);
-
-//            final var responseBody = "Hello world!";
-//
-//            final var response = String.join("\r\n",
-//                    "HTTP/1.1 200 OK ",
-//                    "Content-Type: text/html;charset=utf-8 ",
-//                    "Content-Length: " + responseBody.getBytes().length + " ",
-//                    "",
-//                    responseBody);
+            Response response = delegateController(controller, method, url);
 
             outputStream.write(response.toString().getBytes());
             outputStream.flush();
-        } catch (IOException | UncheckedServletException e) {
+        } catch (IOException | UncheckedServletException | ClassNotFoundException | InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
             log.error(e.getMessage(), e);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
         }
     }
 
-    private Response delegateController(Object controller) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Method handleRequestMethod = controller.getClass().getMethod("handleRequest");
-        return (Response) handleRequestMethod.invoke(controller);
+    private Response delegateController(Object controller, String method, String url) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method handleRequestMethod = controller.getClass().getMethod("handleRequest", String.class, String.class);
+        return (Response) handleRequestMethod.invoke(controller, method, url);
     }
 
     private String parsingHttpRequestMessage(InputStream inputStream) throws IOException {
