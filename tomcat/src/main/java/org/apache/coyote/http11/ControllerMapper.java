@@ -1,13 +1,9 @@
 package org.apache.coyote.http11;
 
 import nextstep.jwp.Response.Response;
-import nextstep.jwp.Response.ResponseBody;
-import nextstep.jwp.Response.ResponseHeader;
 import nextstep.jwp.controller.IndexController;
 import nextstep.jwp.controller.LoginController;
 import nextstep.jwp.request.Request;
-import nextstep.jwp.util.ResourceFinder;
-import org.apache.util.HttpResponseCode;
 
 import java.io.IOException;
 
@@ -27,14 +23,8 @@ public class ControllerMapper {
             return new Response();
 
         } else {
-            ResourceFinder resourceFinder = new ResourceFinder();
+            return new Response();
 
-            ResponseBody responseBody = new ResponseBody(resourceFinder.getResource(path));
-            ResponseHeader responseHeader = new ResponseHeader(HttpResponseCode.OK.toString(),
-                    HttpResponseCode.OK.getReasonPhrase(),
-                    resourceFinder.getContentType(resourceFinder.getFileExtension(path)),
-                    responseBody.getLength());
-            return new Response(responseHeader, responseBody);
         }
     }
 }
