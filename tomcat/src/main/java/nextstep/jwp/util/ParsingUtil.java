@@ -1,16 +1,44 @@
 package nextstep.jwp.util;
 
+import nextstep.jwp.request.Request;
 import nextstep.jwp.request.RequestBody;
 import nextstep.jwp.request.RequestHeader;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 
 public class ParsingUtil {
-    public RequestHeader parseRequestHeader(InputStream inputStream) throws IOException {
+    public Request parseRequest(InputStream inputStream) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String requestLine = reader.readLine();
+
+        String[] requestParts = requestLine.split(" ");
+        String method = requestParts[0];
+        String path = requestParts[1];
+        String contentType = "";
+        int contentLength = 0;
+
+        String line;
+        while ((line = reader.readLine()) != null && !line.isEmpty()) {
+            if (line.startsWith("Content-Type: ")) {
+                contentType = line.substring("Content-Type: ".length());
+            } else if (line.startsWith("Content-Length: ")) {
+                contentLength = Integer.parseInt(line.substring("Content-Length: ".length()));
+            }
+        }
+
+        RequestHeader requestHeader = new RequestHeader(method, path, contentType, contentLength);
+
+        StringBuilder bodyBuilder = new StringBuilder();
+        while ((line = reader.readLine()) != null) {
+            bodyBuilder.append(line).append("\r\n");
+        }
+
+        RequestBody requestBody = new RequestBody(bodyBuilder.toString());
+
+        return new Request(requestHeader, requestBody);
+    }
+
+    public RequestHeader parseRequestHeader(BufferedReader reader) throws IOException {
         String requestLine = reader.readLine();
 
         String[] requestParts = requestLine.split(" ");
@@ -31,15 +59,20 @@ public class ParsingUtil {
         return new RequestHeader(method, path, contentType, contentLength);
     }
 
-    public RequestBody parseRequestBody(InputStream inputStream, RequestHeader requestHeader) throws IOException {
+    public RequestBody parseRequestBody(BufferedReader reader, RequestHeader requestHeader) throws IOException {
         int contentLength = requestHeader.getContentLength();
         if (contentLength > 0) {
-            byte[] bodyBytes = new byte[contentLength];
-            int bytesRead = inputStream.read(bodyBytes, 0, contentLength);
-            if (bytesRead == contentLength) {
-                String requestBody = new String(bodyBytes, "UTF-8");
-                return new RequestBody(requestBody);
+            // 헤더를 모두 읽어옴
+            String line;
+            while ((line = reader.readLine()) != null && !line.isEmpty()) { }
+
+            // 나머지를 바디로 처리
+            StringBuilder bodyBuilder = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                bodyBuilder.append(line).append("\r\n");
             }
+
+            return new RequestBody(bodyBuilder.toString());
         }
         return new RequestBody("");
     }
