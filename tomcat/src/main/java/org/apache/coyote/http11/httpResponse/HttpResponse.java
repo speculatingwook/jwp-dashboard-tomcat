@@ -64,4 +64,8 @@ public class HttpResponse {
         headers.put("Content-Length", String.valueOf(body.getBytes().length));
     }
 
+    public void sendRedirect(String substring) {
+        this.status = HttpStatus.FOUND;
+        headers.put("Location", substring);
+    }
 }

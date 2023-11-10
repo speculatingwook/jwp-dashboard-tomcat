@@ -21,6 +21,11 @@ public class ControllerHandlerAdapter implements HandlerAdapter {
             return response;
         }
 
+        if (viewName.startsWith("redirect:")) {
+            response.sendRedirect(viewName.substring(9));
+            return response;
+        }
+
         FileFinder fileFinder = new FileFinder();
         try {
             String fileContent = fileFinder.fromPath(viewName);

@@ -4,8 +4,8 @@ import org.apache.coyote.http11.exception.ErrorCode;
 
 public class NotFoundException extends BaseRuntimeException {
 
-    public NotFoundException() {
-        super(ErrorCode.NOT_FOUND_RESOURCE);
+    public NotFoundException(ErrorCode errorCode) {
+        super(errorCode);
     }
 
     public NotFoundException(String message) {
