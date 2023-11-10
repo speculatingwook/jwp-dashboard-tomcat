@@ -58,7 +58,7 @@ public class HttpResponseWrapper {
     private void login(String path, HttpRequestWrapper request) {
         log.info(path);
         if (Paths.LOGIN.getPath().contains(path)) {
-            LoginHandler login = new LoginHandler(request.getQueryData().get("account"), request.getQueryData().get("password"));
+            LoginHandler login = new LoginHandler(request.getRequestBody().getValue("account"), request.getRequestBody().getValue("password"));
             if (login.checkUser()) {
                 body = HttpResponseBody.of(Paths.INDEX.createPath());
                 header = new HttpResponseHeader(StatusCode.FOUND.getStatus())

@@ -18,6 +18,7 @@ public class HttpRequestWrapper {
     String path;
     String query;
     private Map<String, String> queryData;
+    private HttpRequestBody requestBody;
 
 
     public HttpRequestWrapper(BufferedReader reader) throws IOException {
@@ -26,7 +27,6 @@ public class HttpRequestWrapper {
             throw new NoSuchElementException(EMPTY_REQUEST);
         }
         this.lines = lines;
-        log.info(lines.toString());
         if(lines.get(0).contains("?")){
             String[] firstLineSplit = lines.get(0).split(" ");
             this.method = firstLineSplit[0];
@@ -37,7 +37,13 @@ public class HttpRequestWrapper {
             this.method = firstLineSplit[0];
             this.path = firstLineSplit[1];
         }
-
+        for (String line : lines) {
+            if (line.startsWith("Content-Length:")) {
+                int contentLength = Integer.parseInt(line.split(":")[1].trim());
+                System.out.println(contentLength);
+                this.requestBody = new HttpRequestBody(readBody(reader, contentLength));
+            }
+        }
     }
 
     public String getMethod() {
@@ -63,6 +69,7 @@ public class HttpRequestWrapper {
             line = reader.readLine();
             lines.add(line);
         }
+        log.info(lines.toString());
         return lines;
     }
 
@@ -95,5 +102,14 @@ public class HttpRequestWrapper {
             return path + fileType;
         }
         return path;
+    }
+    public HttpRequestBody getRequestBody() {
+        return requestBody;
+    }
+
+    private String readBody(BufferedReader reader, int contentLength) throws IOException {
+        char[] buffer = new char[contentLength];
+        reader.read(buffer, 0, contentLength);
+        return new String(buffer);
     }
 }
