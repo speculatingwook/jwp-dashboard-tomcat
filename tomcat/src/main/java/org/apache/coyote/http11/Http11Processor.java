@@ -68,8 +68,4 @@ public class Http11Processor implements Runnable, Processor {
             log.error(e.getMessage(), e);
         }
     }
-    private String parsingMethod(String requestLine) throws MalformedURLException {
-        String[] requestParts = requestLine.split(" ");
-        return requestParts[0];
-    }
 }
