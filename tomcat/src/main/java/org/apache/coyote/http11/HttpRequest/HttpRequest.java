@@ -42,8 +42,9 @@ public class HttpRequest {
 		return bufferedReader.readLine();
 	}
 
-	private void parseRequestLine(String requestline) {
-		String[] splittedRequestLine = requestline.split(BLANK_SPACE);
+	private void parseRequestLine(BufferedReader bufferedReader) throws IOException {
+		String requestLine = getRequestLine(bufferedReader);
+		String[] splittedRequestLine = requestLine.split(BLANK_SPACE);
 		this.httpMethod = HttpMethod.valueOf(splittedRequestLine[0]);
 		this.uri = splittedRequestLine[1];
 		this.httpVersion = splittedRequestLine[2];
