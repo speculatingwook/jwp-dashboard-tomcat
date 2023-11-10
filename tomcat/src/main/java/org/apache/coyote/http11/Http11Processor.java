@@ -7,10 +7,9 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.coyote.Processor;
+import org.apache.coyote.http11.HttpRequest.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,65 +46,8 @@ public class Http11Processor implements Runnable, Processor {
 			// HTTP Request
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
-			String line = bufferedReader.readLine();
-			String[] splittedRequestLine = line.split(BLANK_SPACE);
-
-			HttpMethod httpMethod;
-			try {
-				httpMethod = HttpMethod.valueOf(splittedRequestLine[HTTP_METHOD]);
-			} catch (IllegalArgumentException e) {
-				httpMethod = null;
-			}
-			String uri = splittedRequestLine[HTTP_URI];
-
-			// if `uri` contains `?`
-			Map<String, String> queryParams = new HashMap<>();
-			if (uri.contains("?")) {
-				String[] splittedQuery = uri.split("\\?")[1].split("\\&");
-				uri = uri.split("\\?")[0];
-				for (int i = 0; i < splittedQuery.length; i++) {
-					String[] values = splittedQuery[i].split("\\=");
-					queryParams.put(values[0], values[1]);
-				}
-			}
-
-			log.info("queryParams: {}", queryParams);
-
-			String httpVersion = splittedRequestLine[HTTP_VERSION];
-			log.info("httpMethod: {}, uri: {}, httpVersion: {}", httpMethod, uri, httpVersion);
-
-			Map<String, String> requestHeaders = new HashMap<>();
-
-			line = bufferedReader.readLine();
-			while (!line.equals("")) {
-				String[] splittedHeaderLine = line.split(HEADER_SPLITTER);
-				requestHeaders.put(splittedHeaderLine[HEADER_KEY], splittedHeaderLine[HEADER_VALUE]);
-				line = bufferedReader.readLine();
-			}
-
-			log.info("requestHeaders: {}", requestHeaders);
-
-			String requestBody;
-			if (requestHeaders.containsKey("Content-Length")) {
-				int contentLength = Integer.parseInt(requestHeaders.get("Content-Length"));
-				char[] bodyChars = new char[contentLength];
-				bufferedReader.read(bodyChars, 0, contentLength);
-				requestBody = new String(bodyChars);
-			} else if (requestHeaders.containsKey("Transfer-Encoding") && requestHeaders.get("Transfer-Encoding")
-				.equals("chunked")) {
-				StringBuilder chunkRequestBody = new StringBuilder();
-				while ((line = bufferedReader.readLine()) != null) {
-					int chunkSize = Integer.parseInt(line, 16);
-					if (chunkSize == 0) {
-						break;
-					}
-					char[] chunk = new char[chunkSize];
-					bufferedReader.read(chunk, 0, chunkSize);
-					chunkRequestBody.append(chunk);
-					bufferedReader.readLine();
-				}
-				requestBody = chunkRequestBody.toString();
-			}
+			HttpRequest httpRequest = HttpRequest.from(bufferedReader);
+			log.info("httpRequest: {}", httpRequest);
 
 			// HTTP Response
 			HttpStatus httpStatus = null;
