@@ -17,6 +17,7 @@ public class HttpRequest {
 	private static final String BLANK_SPACE = " ";
 	private static final String CONTENT_LENGTH = "Content-Length";
 	private static final String TRANSFER_ENCODING = "Transfer-Encoding";
+	private static final String CHUNKED = "chunked";
 	private HttpMethod httpMethod;
 	private String uri;
 	private String httpVersion;
