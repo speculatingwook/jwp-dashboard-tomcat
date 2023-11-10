@@ -37,27 +37,29 @@ public class Http11Processor implements Runnable, Processor {
         try (final var inputStream = connection.getInputStream();
              final var outputStream = connection.getOutputStream()) {
 
-            BufferedReader request = new BufferedReader(new InputStreamReader(inputStream));
-            String[] contexts = request.readLine().split(" ");
-            String method = contexts[0];
-            String path = contexts[1];
+            final BufferedReader request = new BufferedReader(new InputStreamReader(inputStream));
+            final String[] contexts = request.readLine().split(" ");
+            final String method = contexts[0];
+            final String path = contexts[1];
+            final String fileType;
+            if (path.contains(".")) {
+                fileType = path.substring(path.lastIndexOf(".") + 1);
+            } else {
+                fileType = "html";
+            }
             final String responseBody;
-
             if (Objects.equals(path, "/")) {
                 responseBody = "Hello world!";
             } else {
                 URL resource = getClass().getClassLoader()
                     .getResource(String.format("static/%s", path));
-                if (resource == null) {
-                    resource = getClass().getClassLoader().getResource("static/404.html");
-                }
                 assert resource != null;
                 responseBody = new String(
                     Files.readAllBytes(new File(resource.getFile()).toPath()));
             }
             final var response = String.join("\r\n",
                     "HTTP/1.1 200 OK ",
-                    "Content-Type: text/html;charset=utf-8 ",
+                    String.format("Content-Type: text/%s;charset=utf-8 ", fileType),
                     "Content-Length: " + responseBody.getBytes().length + " ",
                     "",
                     responseBody);
@@ -66,23 +68,6 @@ public class Http11Processor implements Runnable, Processor {
             outputStream.flush();
         } catch (IOException | UncheckedServletException e) {
             log.error(e.getMessage(), e);
-            try {
-                URL resource = getClass().getClassLoader()
-                    .getResource(String.format("static/%s", "500.html"));
-                final String responseBody = new String(
-                    Files.readAllBytes(new File(resource.getFile()).toPath()));
-                String response = String.join("\r\n",
-                        "HTTP/1.1 500 Internal Server Error ",
-                        "Content-Type: text/html;charset=utf-8 ",
-                        "Content-Length: "+ responseBody.getBytes().length + " ",
-                    "",
-                    responseBody);
-                connection.getOutputStream().write(response.getBytes());
-                connection.getOutputStream().flush();
-            } catch (IOException ioException) {
-                log.error(ioException.getMessage(), ioException);
-            }
-
         }
     }
 }
