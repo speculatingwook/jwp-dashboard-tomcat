@@ -47,7 +47,12 @@ public class Http11Processor implements Runnable, Processor {
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
 			HttpRequest httpRequest = HttpRequest.from(bufferedReader);
-			log.info("httpRequest: {}", httpRequest);
+
+			log.info("httpRequest.getHttpMethod(): {}", httpRequest.getHttpMethod());
+			log.info("httpRequest.getUri(): {}", httpRequest.getUri());
+			log.info("httpRequest.getHttpVersion(): {}", httpRequest.getHttpVersion());
+			log.info("httpRequest.getRequestHeaders(): {}", httpRequest.getRequestHeaders());
+			log.info("httpRequest.getRequestBody(): {}", httpRequest.getRequestBody());
 
 			// HTTP Response
 			HttpStatus httpStatus = null;
