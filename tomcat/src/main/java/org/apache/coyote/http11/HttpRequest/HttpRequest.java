@@ -24,7 +24,14 @@ public class HttpRequest {
 	private Map<String, String> requestHeaders;
 	private String requestBody;
 
-	private HttpRequest(String requestLine, String requestHeader, String requestBody) {
+	private HttpRequest(BufferedReader bufferedReader) throws IOException {
+		parseRequestLine(bufferedReader);
+		parseRequestHeaders(bufferedReader);
+		if (requestHeaders.containsKey(CONTENT_LENGTH)) {
+			parseContentLengthRequestBody(bufferedReader);
+		} else if (requestHeaders.containsKey(TRANSFER_ENCODING)) {
+			parseTransferEncodingRequestBody(bufferedReader);
+		}
 	}
 
 	public static HttpRequest from(BufferedReader bufferedReader) throws IOException {
