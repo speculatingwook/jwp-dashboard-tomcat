@@ -10,6 +10,8 @@ import nextstep.jwp.controller.IndexController;
 import nextstep.jwp.controller.JavaScriptController;
 import nextstep.jwp.controller.LoginController;
 import nextstep.jwp.controller.LoginFormController;
+import nextstep.jwp.controller.RegisterController;
+import nextstep.jwp.controller.RegisterFormController;
 import nextstep.jwp.controller.RootController;
 import org.apache.coyote.http11.HttpMethod;
 import org.apache.coyote.http11.HttpStatus;
@@ -29,6 +31,8 @@ public class DispatcherServlet {
         handlerMappingMap.put(new RequestMapping("/", HttpMethod.GET), new RootController());
         handlerMappingMap.put(new RequestMapping("/login", HttpMethod.GET), new LoginFormController());
         handlerMappingMap.put(new RequestMapping("/login", HttpMethod.POST), new LoginController());
+        handlerMappingMap.put(new RequestMapping("/register", HttpMethod.GET), new RegisterFormController());
+        handlerMappingMap.put(new RequestMapping("/register", HttpMethod.POST), new RegisterController());
 
         handlerAdapters.add(new ControllerHandlerAdapter());
     }
