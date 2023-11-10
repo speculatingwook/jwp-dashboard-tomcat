@@ -51,7 +51,8 @@ public class HttpRequest {
 		return requestHeaderBuilder.toString();
 	}
 
-	private void parseRequestHeaders(String requestHeader) {
+	private void parseRequestHeaders(BufferedReader bufferedReader) throws IOException {
+		String requestHeader = getRequestHeader(bufferedReader);
 		this.requestHeaders = Arrays.stream(requestHeader.split(REGEX_CRLF))
 			.filter(line -> line.contains(":"))
 			.map(line -> line.split(":", 2))
