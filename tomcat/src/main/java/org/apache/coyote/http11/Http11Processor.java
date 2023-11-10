@@ -56,7 +56,7 @@ public class Http11Processor implements Runnable, Processor {
 			// creating HTTP Response
 			String response = String.join("\r\n",
 				"HTTP/1.1 " + httpStatus.getCode() + " " + httpStatus.getStatus(),
-				"Content-Type: " + ContentType.findByExtension(uri.split("\\.")[1]).getMimeType(),
+				"Content-Type: " + ContentType.findByExtension(httpRequest.getUri().split("\\.")[1]).getMimeType(),
 				"Content-Length: " + responseBody.getBytes().length,
 				"",
 				responseBody);
