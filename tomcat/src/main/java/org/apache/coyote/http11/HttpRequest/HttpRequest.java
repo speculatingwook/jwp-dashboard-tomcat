@@ -69,4 +69,18 @@ public class HttpRequest {
 		}
 		return requestBodyBuilder.toString();
 	}
+
+	private void parseTransferEncodingRequestBody(BufferedReader bufferedReader) throws IOException {
+		StringBuilder requestBodyBuilder = new StringBuilder();
+		String chunkSizeLine;
+		while (!(chunkSizeLine = bufferedReader.readLine()).equals("0")) {
+			int chunkSize = Integer.parseInt(chunkSizeLine, 16);
+			char[] chunkData = new char[chunkSize];
+			int bytesRead = bufferedReader.read(chunkData, 0, chunkSize);
+			requestBodyBuilder.append(chunkData, 0, bytesRead);
+			bufferedReader.readLine();
+		}
+		bufferedReader.readLine();
+		this.requestBody = requestBodyBuilder.toString();
+	}
 }
