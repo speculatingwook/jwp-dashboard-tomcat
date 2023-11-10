@@ -22,7 +22,7 @@ public class HttpRequest {
 	private String uri;
 	private String httpVersion;
 	private Map<String, String> requestHeaders;
-	private String requestBody;
+	private String requestBody = null;
 
 	private HttpRequest(BufferedReader bufferedReader) throws IOException {
 		parseRequestLine(bufferedReader);
