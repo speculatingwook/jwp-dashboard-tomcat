@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import nextstep.jwp.controller.CSSController;
 import nextstep.jwp.controller.IndexController;
 import nextstep.jwp.controller.JavaScriptController;
@@ -42,6 +43,11 @@ public class DispatcherServlet {
     }
 
     public HttpResponse service(HttpRequest request, HttpResponse response) {
+
+        if (request.getCookie().getValue("JSESSIONID") == null) {
+            response.addCookie("JSESSIONID", UUID.randomUUID().toString());
+        }
+
         Object handler = getHandler(request);
         if (handler == null) {
             System.err.println("Not found handler");

@@ -14,15 +14,17 @@ public class HttpRequest {
     private final Map<String, String> headers;
     private final Map<String, String> queryParams;
     private final String body;
+    private final Cookie cookie;
 
     private HttpRequest(HttpMethod method, String path, String version, Map<String, String> headers,
-                        Map<String, String> queryParams, String body) {
+                        Map<String, String> queryParams, String body, Cookie cookie) {
         this.method = method;
         this.path = path;
         this.version = version;
         this.headers = headers;
         this.body = body;
         this.queryParams = queryParams;
+        this.cookie = cookie;
     }
 
     public static HttpRequest parse(BufferedReader reader) {
@@ -52,7 +54,10 @@ public class HttpRequest {
             reader.read(buffer, 0, contentLength);
             String body = new String(buffer);
 
-            return new HttpRequest(httpMethod, path, version, headers, queryParams, body);
+            // 4. cookie
+            Cookie cookie = Cookie.parse(headers.getOrDefault("Cookie", ""));
+
+            return new HttpRequest(httpMethod, path, version, headers, queryParams, body, cookie);
         } catch (Exception e) {
             throw new RequestParseException();
         }
@@ -116,5 +121,9 @@ public class HttpRequest {
             }
         }
         return params;
+    }
+
+    public Cookie getCookie() {
+        return cookie;
     }
 }

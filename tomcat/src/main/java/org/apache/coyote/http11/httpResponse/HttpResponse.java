@@ -68,4 +68,8 @@ public class HttpResponse {
         this.status = HttpStatus.FOUND;
         headers.put("Location", substring);
     }
+
+    public void addCookie(String key, String value) {
+        headers.put("Set-Cookie", key + "=" + value);
+    }
 }
