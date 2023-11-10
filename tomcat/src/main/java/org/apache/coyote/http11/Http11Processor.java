@@ -36,7 +36,7 @@ public class Http11Processor implements Runnable, Processor {
     public void process(final Socket connection) {
         try (final var inputStream = connection.getInputStream();
              final var outputStream = connection.getOutputStream()) {
-            // dataInputStream은 deprecated 되었으니, BufferedReader 사용
+
             BufferedReader request = new BufferedReader(new InputStreamReader(inputStream));
             String[] contexts = request.readLine().split(" ");
             String method = contexts[0];
@@ -77,7 +77,6 @@ public class Http11Processor implements Runnable, Processor {
                         "Content-Length: "+ responseBody.getBytes().length + " ",
                     "",
                     responseBody);
-
                 connection.getOutputStream().write(response.getBytes());
                 connection.getOutputStream().flush();
             } catch (IOException ioException) {
