@@ -1,18 +1,15 @@
 package org.apache.coyote.http11;
 
-import org.apache.coyote.Processor;
-import org.apache.coyote.http11.exception.base.BadRequestException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.Socket;
 import org.apache.coyote.http11.handler.ExceptionHandler;
-import org.apache.coyote.http11.handler.Handler;
-import org.apache.coyote.http11.handler.HandlerAdapter;
+import org.apache.coyote.Processor;
+import org.apache.coyote.http11.handler.DispatcherServlet;
 import org.apache.coyote.http11.httpResponse.HttpResponse;
 import org.apache.coyote.http11.httprequest.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.Socket;
 
 public class Http11Processor implements Runnable, Processor {
 
@@ -36,23 +33,17 @@ public class Http11Processor implements Runnable, Processor {
              final var reader = new InputStreamReader(inputStream);
              final var bufferedReader = new BufferedReader(reader)) {
 
-            HttpResponse httpResponse;
+            HttpResponse httpResponse = new HttpResponse();
             try {
                 HttpRequest httpRequest = HttpRequest.parse(bufferedReader);
-
-                Handler handler = HandlerAdapter.getHandler(httpRequest);
-                if (handler == null) {
-                    throw new BadRequestException("Handler not found");
-                }
-                httpResponse = handler.handle(httpRequest);
+                DispatcherServlet dispatcherServlet = DispatcherServlet.getInstance();
+                httpResponse = dispatcherServlet.service(httpRequest, httpResponse);
             } catch (Exception e) {
                 log.error(e.getMessage());
                 httpResponse = ExceptionHandler.handle(e);
             }
-
             outputStream.write(httpResponse.toString().getBytes());
             outputStream.flush();
-
         } catch (Exception e) {
             log.error(e.getMessage());
         }
