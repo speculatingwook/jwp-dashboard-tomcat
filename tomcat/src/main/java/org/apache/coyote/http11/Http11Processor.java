@@ -68,13 +68,6 @@ public class Http11Processor implements Runnable, Processor {
             log.error(e.getMessage(), e);
         }
     }
-
-
-    private Response delegateController(Object controller, String method, String url) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Method handleRequestMethod = controller.getClass().getMethod("handleRequest", String.class, String.class);
-        return (Response) handleRequestMethod.invoke(controller, method, url);
-    }
-
     private String parsingHttpRequestMessage(InputStream inputStream) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         return reader.readLine();
