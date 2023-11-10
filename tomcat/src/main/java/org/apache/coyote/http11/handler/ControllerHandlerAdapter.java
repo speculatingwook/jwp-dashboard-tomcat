@@ -31,6 +31,7 @@ public class ControllerHandlerAdapter implements HandlerAdapter {
             String fileContent = fileFinder.fromPath(viewName);
             response.setBody(fileContent);
         } catch (Exception e) {
+            System.err.println("Not found file. viewName = " + viewName);
             response.sendError(HttpStatus.NOT_FOUND, "Not Found");
         }
         return response;

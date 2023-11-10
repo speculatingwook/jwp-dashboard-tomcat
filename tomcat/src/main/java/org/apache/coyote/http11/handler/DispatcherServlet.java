@@ -5,11 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import nextstep.jwp.controller.CSSHandler;
-import nextstep.jwp.controller.IndexHandler;
-import nextstep.jwp.controller.JavaScriptHandler;
-import nextstep.jwp.controller.LoginHandler;
-import nextstep.jwp.controller.RootHandler;
+import nextstep.jwp.controller.CSSController;
+import nextstep.jwp.controller.IndexController;
+import nextstep.jwp.controller.JavaScriptController;
+import nextstep.jwp.controller.LoginController;
+import nextstep.jwp.controller.LoginFormController;
+import nextstep.jwp.controller.RootController;
 import org.apache.coyote.http11.HttpMethod;
 import org.apache.coyote.http11.HttpStatus;
 import org.apache.coyote.http11.httpResponse.HttpResponse;
@@ -22,11 +23,12 @@ public class DispatcherServlet {
     private final Map<RequestMapping, Object> handlerMappingMap = new HashMap<>();
 
     private DispatcherServlet() {
-        handlerMappingMap.put(new RequestMapping("*.css", HttpMethod.GET), new CSSHandler());
-        handlerMappingMap.put(new RequestMapping("*.js", HttpMethod.GET), new JavaScriptHandler());
-        handlerMappingMap.put(new RequestMapping("/index.html", HttpMethod.GET), new IndexHandler());
-        handlerMappingMap.put(new RequestMapping("/", HttpMethod.GET), new RootHandler());
-        handlerMappingMap.put(new RequestMapping("/login", HttpMethod.GET), new LoginHandler());
+        handlerMappingMap.put(new RequestMapping("*.css", HttpMethod.GET), new CSSController());
+        handlerMappingMap.put(new RequestMapping("*.js", HttpMethod.GET), new JavaScriptController());
+        handlerMappingMap.put(new RequestMapping("/index.html", HttpMethod.GET), new IndexController());
+        handlerMappingMap.put(new RequestMapping("/", HttpMethod.GET), new RootController());
+        handlerMappingMap.put(new RequestMapping("/login", HttpMethod.GET), new LoginFormController());
+        handlerMappingMap.put(new RequestMapping("/login", HttpMethod.POST), new LoginController());
 
         handlerAdapters.add(new ControllerHandlerAdapter());
     }
@@ -38,6 +40,7 @@ public class DispatcherServlet {
     public HttpResponse service(HttpRequest request, HttpResponse response) {
         Object handler = getHandler(request);
         if (handler == null) {
+            System.err.println("Not found handler");
             response.sendError(HttpStatus.NOT_FOUND, "Not Found");
             return response;
         }

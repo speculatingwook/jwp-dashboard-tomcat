@@ -1,12 +1,11 @@
 package org.apache.coyote.http11.httprequest;
 
-import org.apache.coyote.http11.exception.RequestParseException;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.coyote.http11.HttpMethod;
-
 import java.io.BufferedReader;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.coyote.http11.HttpMethod;
+import org.apache.coyote.http11.exception.RequestParseException;
 
 public class HttpRequest {
     private final HttpMethod method;
@@ -48,12 +47,12 @@ public class HttpRequest {
             }
 
             // 3. body
-            StringBuilder body = new StringBuilder();
-            while (reader.ready()) {
-                body.append(reader.readLine());
-                body.append("\n");
-            }
-            return new HttpRequest(httpMethod, path, version, headers, queryParams, body.toString());
+            int contentLength = Integer.parseInt(headers.getOrDefault("Content-Length", "0"));
+            final char[] buffer = new char[contentLength];
+            reader.read(buffer, 0, contentLength);
+            String body = new String(buffer);
+
+            return new HttpRequest(httpMethod, path, version, headers, queryParams, body);
         } catch (Exception e) {
             throw new RequestParseException();
         }
@@ -67,7 +66,11 @@ public class HttpRequest {
             String[] paramSplit = split[1].split("&");
             for (String param : paramSplit) {
                 String[] keyValue = param.split("=");
-                params.put(keyValue[0], keyValue[1]);
+                if (keyValue.length == 2) {
+                    params.put(keyValue[0], keyValue[1]);
+                } else {
+                    params.put(keyValue[0], "");
+                }
             }
         }
         return params;
@@ -99,5 +102,19 @@ public class HttpRequest {
 
     public String getQueryParam(String key) {
         return queryParams.get(key);
+    }
+
+    public Map<String, String> bodyToMap() {
+        String[] split = body.split("&");
+        Map<String, String> params = new HashMap<>();
+        for (String param : split) {
+            String[] keyValue = param.split("=");
+            if (keyValue.length == 2) {
+                params.put(keyValue[0], keyValue[1]);
+            } else {
+                params.put(keyValue[0], "");
+            }
+        }
+        return params;
     }
 }

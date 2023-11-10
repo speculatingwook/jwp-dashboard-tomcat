@@ -4,12 +4,10 @@ import org.apache.coyote.http11.handler.Controller;
 import org.apache.coyote.http11.httpResponse.HttpResponse;
 import org.apache.coyote.http11.httprequest.HttpRequest;
 
-public class RootHandler implements Controller {
+public class IndexController implements Controller {
 
     @Override
     public String process(HttpRequest request, HttpResponse response) {
-        response.setBody("Hello World!");
-        return null;
+        return request.getPath();
     }
-
 }
