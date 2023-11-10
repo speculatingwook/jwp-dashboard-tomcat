@@ -61,13 +61,11 @@ public class HttpRequest {
 				(value1, value2) -> value1));
 	}
 
-	private static String getRequestBody(BufferedReader bufferedReader) throws IOException {
-		StringBuilder requestBodyBuilder = new StringBuilder();
-		String bodyLine;
-		while ((bodyLine = bufferedReader.readLine()) != null) {
-			requestBodyBuilder.append(bodyLine).append(CRLF);
-		}
-		return requestBodyBuilder.toString();
+	private void parseContentLengthRequestBody(BufferedReader bufferedReader) throws IOException {
+		int contentLength = Integer.parseInt(requestHeaders.get(CONTENT_LENGTH));
+		char[] charRequestBody = new char[contentLength];
+		int bytesRead = bufferedReader.read(charRequestBody, 0, contentLength);
+		this.requestBody = new String(charRequestBody, 0, bytesRead);
 	}
 
 	private void parseTransferEncodingRequestBody(BufferedReader bufferedReader) throws IOException {
