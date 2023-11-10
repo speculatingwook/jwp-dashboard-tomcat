@@ -45,15 +45,15 @@ public class Http11Processor implements Runnable, Processor {
             if(request.getRequestHeader().getPath().contains(".")) {
                 ResourceFinder resourceFinder = new ResourceFinder();
                 ResponseBody responseBody = new ResponseBody(resourceFinder.getResource(request.getRequestHeader().getPath()));
-                ResponseHeader responseHeader = new ResponseHeader(HttpResponseCode.OK.toString(),
+                ResponseHeader responseHeader = new ResponseHeader(String.valueOf(HttpResponseCode.OK.getCode()),
                         HttpResponseCode.OK.getReasonPhrase(),
                         resourceFinder.getContentType(resourceFinder.getFileExtension(request.getRequestHeader().getPath())),
                         responseBody.getLength());
-                log.info("Resource not found: " + responseBody.toString());
                 response = new Response(responseHeader, responseBody);
+                log.info(response.toString());
             } else {
-
                 response = controllerMapper.findController(request);
+                log.info(response.toString());
             }
 
             outputStream.write(response.toString().getBytes());
