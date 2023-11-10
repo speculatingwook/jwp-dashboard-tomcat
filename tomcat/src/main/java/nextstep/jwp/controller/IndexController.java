@@ -1,27 +1,27 @@
-package nextstep.jwp.conrtroller;
+package nextstep.jwp.controller;
 
+import nextstep.jwp.Response.ResponseBody;
+import nextstep.jwp.Response.ResponseHeader;
+import nextstep.jwp.request.Request;
 import nextstep.jwp.service.IndexService;
-import org.apache.coyote.http11.Response;
+import nextstep.jwp.Response.Response;
+import nextstep.jwp.util.ResourceFinder;
 import org.apache.util.HttpResponseCode;
 
+import java.io.IOException;
+
 public class IndexController {
-    private String requestMethod;
-    private String requestUrl;
     private IndexService indexService = new IndexService();
 
-    public IndexController(String requestMethod, String requestUrl) {
-        this.requestMethod = requestMethod;
-        this.requestUrl = requestUrl;
-    }
-
-    Response generateResponse() {
-        switch(requestUrl) {
-            case "/index.html":
-
-                return new Response(responseCode, responseStatus, contentType, fileContent);
-                break;
-            default:
-        }
+    // url: /index
+    public Response handleRequest(Request request) throws IOException {
+        ResourceFinder resourceFinder = new ResourceFinder();
+        ResponseBody responseBody = new ResponseBody(resourceFinder.getResource("/index.html"));
+        ResponseHeader responseHeader = new ResponseHeader(HttpResponseCode.OK.toString(),
+                HttpResponseCode.OK.getReasonPhrase(),
+                resourceFinder.getContentType(resourceFinder.getFileExtension("/index.html")),
+                responseBody.getLength());
+        return new Response(responseHeader, responseBody);
     }
 
 }
