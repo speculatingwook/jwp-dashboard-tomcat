@@ -1,5 +1,7 @@
 package org.apache.coyote.http11.response;
 
+import org.apache.coyote.http11.Cookie;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,14 @@ public class HttpResponseHeader {
 
     public HttpResponseHeader addContentLength(int contentLength) {
         headers.add("Content-Length: " + contentLength + " ");
+        return this;
+    }
+
+    public HttpResponseHeader setCookie(Cookie cookie) {
+        if (!cookie.isKeyExist("JSESSIONID")) {
+            cookie.setJSessionId();
+            headers.add("Set-Cookie: " + cookie.toRaw("JSESSIONID"));
+        }
         return this;
     }
 

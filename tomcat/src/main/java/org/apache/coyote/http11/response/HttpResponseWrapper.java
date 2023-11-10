@@ -1,10 +1,8 @@
 package org.apache.coyote.http11.response;
 
 import java.util.NoSuchElementException;
-import org.apache.coyote.http11.Http11Processor;
-import org.apache.coyote.http11.HttpMethod;
-import org.apache.coyote.http11.Paths;
-import org.apache.coyote.http11.StatusCode;
+
+import org.apache.coyote.http11.*;
 import org.apache.coyote.http11.login.LoginHandler;
 import org.apache.coyote.http11.request.HttpRequestWrapper;
 import org.slf4j.Logger;
@@ -20,6 +18,7 @@ public class HttpResponseWrapper {
     private HttpResponseHeader header;
     private HttpResponseBody body;
     private Paths paths;
+    private Cookie cookie;
 
 
     public HttpResponseWrapper(HttpRequestWrapper request) {
@@ -33,6 +32,7 @@ public class HttpResponseWrapper {
     private void parseResponse(HttpRequestWrapper request) {
         HttpMethod method = HttpMethod.valueOf(request.getMethod());
         String path= request.getPath();
+        this.cookie = request.getCookie();
         switch (method) {
             case GET:
                 response(path);
@@ -50,7 +50,8 @@ public class HttpResponseWrapper {
             body = HttpResponseBody.of(Paths.NOT_FOUND.createPath());
             header = new HttpResponseHeader(StatusCode.NOT_FOUND.getStatus())
                     .addContentType(Paths.NOT_FOUND.getContentType())
-                    .addContentLength(body.getContentLength());
+                    .addContentLength(body.getContentLength())
+                    .setCookie(cookie);
             throw new NoSuchElementException("해당 페이지를 찾을 수 없습니다: " + path);
         }
     }
@@ -63,13 +64,15 @@ public class HttpResponseWrapper {
                 body = HttpResponseBody.of(Paths.INDEX.createPath());
                 header = new HttpResponseHeader(StatusCode.FOUND.getStatus())
                         .addContentType(Paths.INDEX.getContentType())
-                        .addContentLength(body.getContentLength());
+                        .addContentLength(body.getContentLength())
+                        .setCookie(cookie);
             }
             else{
                 body = HttpResponseBody.of(Paths.UNAUTHORIZED.createPath());
                 header = new HttpResponseHeader(StatusCode.UNAUTHORIZED.getStatus())
                         .addContentType(Paths.UNAUTHORIZED.getContentType())
-                        .addContentLength(body.getContentLength());
+                        .addContentLength(body.getContentLength())
+                        .setCookie(cookie);
             }
         }
     }
@@ -78,7 +81,8 @@ public class HttpResponseWrapper {
                 body = HttpResponseBody.of(Paths.INDEX.createPath());
                 header = new HttpResponseHeader(StatusCode.OK.getStatus())
                         .addContentType(Paths.INDEX.getContentType())
-                        .addContentLength(body.getContentLength());
+                        .addContentLength(body.getContentLength())
+                        .setCookie(cookie);
             }
     }
 
@@ -89,7 +93,8 @@ public class HttpResponseWrapper {
                     body = HttpResponseBody.of(paths.createPath());
                     header = new HttpResponseHeader(StatusCode.OK.getStatus())
                             .addContentType(paths.getContentType())
-                            .addContentLength(body.getContentLength());
+                            .addContentLength(body.getContentLength())
+                            .setCookie(cookie);
                 }
             }
     }

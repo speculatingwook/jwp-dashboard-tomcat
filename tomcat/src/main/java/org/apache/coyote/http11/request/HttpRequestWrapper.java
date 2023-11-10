@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.*;
 
+import org.apache.coyote.http11.Cookie;
 import org.apache.coyote.http11.Http11Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ public class HttpRequestWrapper {
     String query;
     private Map<String, String> queryData;
     private HttpRequestBody requestBody;
+    private Cookie cookie;
 
 
     public HttpRequestWrapper(BufferedReader reader) throws IOException {
@@ -43,7 +45,11 @@ public class HttpRequestWrapper {
                 System.out.println(contentLength);
                 this.requestBody = new HttpRequestBody(readBody(reader, contentLength));
             }
+            if (line.startsWith("Cookie:")) {
+                this.cookie = new Cookie(line);
+            }
         }
+        log.info(cookie.getCookieString());
     }
 
     public String getMethod() {
@@ -52,6 +58,10 @@ public class HttpRequestWrapper {
 
     public String getPath() {
         return path;
+    }
+
+    public Cookie getCookie() {
+        return cookie;
     }
 
     public Map<String, String> getQueryData() {
