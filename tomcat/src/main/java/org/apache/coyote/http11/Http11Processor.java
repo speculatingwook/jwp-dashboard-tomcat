@@ -44,11 +44,23 @@ public class Http11Processor implements Runnable, Processor {
         try (final var inputStream = connection.getInputStream();
              final var outputStream = connection.getOutputStream()) {
 
-            RequestHeader requestHeader = parsingUtil.parseRequestHeader(inputStream);
-            RequestBody requestBody = parsingUtil.parseRequestBody(inputStream, requestHeader);
-            Request request = new Request(requestHeader, requestBody);
+            Request request = parsingUtil.parseRequest(inputStream);
 
-            Response response = controllerMapper.findController(request);
+            Response response;
+
+            if(request.getRequestHeader().getPath().contains(".")) {
+                ResourceFinder resourceFinder = new ResourceFinder();
+                ResponseBody responseBody = new ResponseBody(resourceFinder.getResource(request.getRequestHeader().getPath()));
+                ResponseHeader responseHeader = new ResponseHeader(HttpResponseCode.OK.toString(),
+                        HttpResponseCode.OK.getReasonPhrase(),
+                        resourceFinder.getContentType(resourceFinder.getFileExtension(request.getRequestHeader().getPath())),
+                        responseBody.getLength());
+                log.info("Resource not found: " + responseBody.toString());
+                response = new Response(responseHeader, responseBody);
+            } else {
+
+                response = controllerMapper.findController(request);
+            }
 
             outputStream.write(response.toString().getBytes());
             outputStream.flush();
