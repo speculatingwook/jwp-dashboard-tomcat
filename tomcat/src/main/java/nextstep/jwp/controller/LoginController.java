@@ -2,6 +2,7 @@ package nextstep.jwp.controller;
 
 import nextstep.jwp.Response.ResponseBody;
 import nextstep.jwp.Response.ResponseHeader;
+import nextstep.jwp.request.Request;
 import nextstep.jwp.service.LoginService;
 import nextstep.jwp.util.ResourceFinder;
 import nextstep.jwp.Response.Response;
@@ -19,47 +20,53 @@ public class LoginController {
     private ResponseBody responseBody = new ResponseBody();
 
     // url: /login
-    public Response handleRequest(String method, String url) throws IOException {
-        if(url.startsWith("/login?")) {
-            // url: /login?account=gugu&password=password
-            String query = url.substring("/login?".length());
+    public Response handleRequest(Request request) throws IOException {
+        String path = request.getRequestHeader().getPath();
+        String method = request.getRequestHeader().getMethod();
+        String body = request.getRequestBody().getContent();
 
-            Map<String, String> queryParameters = parseQueryParameters(query);
+        if(path.startsWith("/login")) {
+            switch (method) {
+                case "POST":
+                    Map<String, String> queryParameters = parseQueryParameters(body);
 
-            if(loginService.login(queryParameters.get("account"), queryParameters.get("password"))) {
-                // login 성공
-                responseBody.setFileContent(resourceFinder.getResource("/index.html")); // todo: 리다이렉션으로 바꿀 것
+                    if(loginService.login(queryParameters.get("account"), queryParameters.get("password"))) {
+                        // login 성공
+                        responseBody.setFileContent(resourceFinder.getResource("/index.html")); // todo: 리다이렉션으로 바꿀 것
 
-                responseHeader.setResponseCode(HttpResponseCode.FOUND.toString());
-                responseHeader.setResponseStatus(HttpResponseCode.FOUND.getReasonPhrase());
-                responseHeader.setContentType(resourceFinder.getContentType(resourceFinder.getFileExtension("/index.html")));
-                responseHeader.setContentLength(responseBody.getLength());
-                responseHeader.setLocation("/index.html");
-            } else {
-                // login 실패
-                responseBody.setFileContent(resourceFinder.getResource("/401.html")); // todo: 리다이렉션으로 바꿀 것
+                        responseHeader.setResponseCode(HttpResponseCode.FOUND.toString());
+                        responseHeader.setResponseStatus(HttpResponseCode.FOUND.getReasonPhrase());
+                        responseHeader.setContentType(resourceFinder.getContentType(resourceFinder.getFileExtension("/index.html")));
+                        responseHeader.setContentLength(responseBody.getLength());
+                        responseHeader.setLocation("/index.html");
+                    } else {
+                        // login 실패
+                        responseBody.setFileContent(resourceFinder.getResource("/401.html")); // todo: 리다이렉션으로 바꿀 것
 
-                responseHeader.setResponseCode(HttpResponseCode.UNAUTHORIZED.toString());
-                responseHeader.setResponseStatus(HttpResponseCode.UNAUTHORIZED.getReasonPhrase());
-                responseHeader.setContentType(resourceFinder.getContentType(resourceFinder.getFileExtension("/401.html")));
-                responseHeader.setContentLength(responseBody.getLength());
-                responseHeader.setLocation("/404.html");
+                        responseHeader.setResponseCode(HttpResponseCode.UNAUTHORIZED.toString());
+                        responseHeader.setResponseStatus(HttpResponseCode.UNAUTHORIZED.getReasonPhrase());
+                        responseHeader.setContentType(resourceFinder.getContentType(resourceFinder.getFileExtension("/401.html")));
+                        responseHeader.setContentLength(responseBody.getLength());
+                        responseHeader.setLocation("/404.html");
+                    }
+                    break;
 
+                case "GET":
+                    // url: /login
+                    responseBody.setFileContent(resourceFinder.getResource(path + ".html"));
+
+                    responseHeader.setResponseCode(HttpResponseCode.OK.toString());
+                    responseHeader.setResponseStatus(HttpResponseCode.OK.getReasonPhrase());
+                    responseHeader.setContentType(resourceFinder.getContentType(resourceFinder.getFileExtension(path + ".html")));
+                    responseHeader.setContentLength(responseBody.getLength());
+
+                    return new Response(responseHeader, responseBody);
+
+                default:
+                    return new Response();
             }
-
-            return new Response(responseHeader, responseBody);
-
-        } else {
-            // url: /login
-            responseBody.setFileContent(resourceFinder.getResource(url + ".html"));
-
-            responseHeader.setResponseCode(HttpResponseCode.OK.toString());
-            responseHeader.setResponseStatus(HttpResponseCode.OK.getReasonPhrase());
-            responseHeader.setContentType(resourceFinder.getContentType(resourceFinder.getFileExtension(url + ".html")));
-            responseHeader.setContentLength(responseBody.getLength());
-
-            return new Response(responseHeader, responseBody);
         }
+        return null;
     }
 
     public Map<String, String> parseQueryParameters(String query) throws UnsupportedEncodingException {
