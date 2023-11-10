@@ -6,6 +6,8 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.coyote.http11.HttpMethod;
 import org.apache.coyote.http11.exception.RequestParseException;
+import org.apache.coyote.http11.session.Session;
+import org.apache.coyote.http11.session.SessionManager;
 
 public class HttpRequest {
     private final HttpMethod method;
@@ -125,5 +127,19 @@ public class HttpRequest {
 
     public Cookie getCookie() {
         return cookie;
+    }
+
+    public Session getSession(boolean create) {
+        String sessionId = cookie.getValue("JSESSIONID");
+        Session session = SessionManager.findSession(sessionId);
+        if (session == null && create) {
+            session = new Session(sessionId);
+            SessionManager.add(session);
+        }
+        return session;
+    }
+
+    public void addSessionId(String sessionId) {
+        cookie.addCookie("JSESSIONID", sessionId);
     }
 }

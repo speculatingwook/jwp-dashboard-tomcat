@@ -45,7 +45,9 @@ public class DispatcherServlet {
     public HttpResponse service(HttpRequest request, HttpResponse response) {
 
         if (request.getCookie().getValue("JSESSIONID") == null) {
-            response.addCookie("JSESSIONID", UUID.randomUUID().toString());
+            String sessionId = UUID.randomUUID().toString();
+            request.addSessionId(sessionId);
+            response.addCookie("JSESSIONID", sessionId);
         }
 
         Object handler = getHandler(request);
