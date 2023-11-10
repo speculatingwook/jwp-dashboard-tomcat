@@ -69,12 +69,6 @@ public class Http11Processor implements Runnable, Processor {
         }
     }
 
-    private String parsingDomain(String url) {
-        String domain = url;
-        if(url.contains("?")) domain = url.substring(0, url.indexOf("?"));
-        if(url.contains("/")) domain = domain.split("/")[1];
-        return domain;
-    }
 
     private Response delegateController(Object controller, String method, String url) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method handleRequestMethod = controller.getClass().getMethod("handleRequest", String.class, String.class);
