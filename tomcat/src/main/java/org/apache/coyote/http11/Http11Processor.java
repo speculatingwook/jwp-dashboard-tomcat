@@ -68,11 +68,6 @@ public class Http11Processor implements Runnable, Processor {
             log.error(e.getMessage(), e);
         }
     }
-    private String parsingHttpRequestMessage(InputStream inputStream) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        return reader.readLine();
-    }
-
     private String parsingUrl(String requestLine) throws MalformedURLException {
         String[] requestParts = requestLine.split(" ");
         return requestParts[1];
