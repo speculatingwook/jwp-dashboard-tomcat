@@ -2,6 +2,7 @@ package org.apache.coyote.http11.controller;
 
 import org.apache.coyote.http11.HttpRequest;
 import org.apache.coyote.http11.HttpResponse;
+import org.apache.coyote.http11.enums.ContentType;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,15 +22,16 @@ public class StaticController implements Controller {
         CONTENT_TYPES.put("js", ContentType.JS);
     }
 
-
     @Override
     public void handleRequest(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-        String requestPath = httpRequest.getRequestPath();
-        File resourceFile = new File("/Users/hayoon/spring/jwp-dashboard-http-mission/tomcat/src/main/resources/static" + requestPath);
+        getStaticResourceFile(httpRequest.getRequestPath(), httpResponse);
+    }
+    public void getStaticResourceFile(String path, HttpResponse httpResponse) throws IOException {
+        File resourceFile = new File("/Users/hayoon/spring/jwp-dashboard-http-mission/tomcat/src/main/resources/static" + path);
         if (resourceFile.exists()) {
             byte[] content = Files.readAllBytes(Path.of(resourceFile.getAbsolutePath()));
             String responseBody = new String(content);
-            String fileExtension = getFileExtension(requestPath);
+            String fileExtension = getFileExtension(path);
             httpResponse.setResponseBody(responseBody);
             httpResponse.setStatusCode(200); // HTTP 상태코드 200 (OK)
             httpResponse.setContentType(CONTENT_TYPES.get(fileExtension));

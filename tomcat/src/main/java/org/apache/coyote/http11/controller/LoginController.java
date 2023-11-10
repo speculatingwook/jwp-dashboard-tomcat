@@ -1,59 +1,62 @@
 package org.apache.coyote.http11.controller;
 
+import jakarta.servlet.http.Cookie;
 import nextstep.jwp.db.InMemoryUserRepository;
 import nextstep.jwp.model.User;
 import org.apache.coyote.http11.HttpRequest;
 import org.apache.coyote.http11.HttpResponse;
-
-import java.io.File;
+import org.apache.coyote.http11.Session.Session;
+import org.apache.coyote.http11.enums.ContentType;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 public class LoginController implements Controller {
-
     User user;
+
+    Cookie cookie;
     @Override
     public void handleRequest(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-        Map<String, String> params = httpRequest.getParams();
+        String method = httpRequest.getMethod();
         String path = httpRequest.getRequestPath();
-        if (!params.isEmpty()){
-            System.out.println(params.size());
+        if (method.equals("POST")) {
             handleLoginRequest(httpRequest, httpResponse);
         } else {
-            File resourceFile = new File("/Users/hayoon/spring/jwp-dashboard-http-mission/tomcat/src/main/resources/static" + path + ".html");
-            if (resourceFile.exists()) {
-                byte[] content = Files.readAllBytes(Path.of(resourceFile.getAbsolutePath()));
-                String responseBody = new String(content);
-                System.out.println(responseBody);
-                httpResponse.setResponseBody(responseBody);
-                httpResponse.setStatusCode(200);
+            if(checkLogin(httpRequest)) {
+                httpResponse.setStatusCode(302);
+                httpResponse.addHeader("Location", "/index.html");
             } else {
-                String responseBody = "Resource not found.";
-                httpResponse.setResponseBody(responseBody);
-                httpResponse.setStatusCode(404); // HTTP 상태코드 404 (Not Found)
+                StaticController staticController = new StaticController();
+                staticController.getStaticResourceFile(path + ".html", httpResponse);
             }
         }
+
+        httpResponse.setContentType(ContentType.HTML);
     }
     private void handleLoginRequest(HttpRequest httpRequest, HttpResponse httpResponse) {
-        String account = httpRequest.getParams().get("account");
-        String password = httpRequest.getParams().get("password");
-
+        String account = httpRequest.getBody().get("account");
+        String password = httpRequest.getBody().get("password");
         Optional<User> loginUser = authenticate(account, password);
 
         if (loginUser.isPresent()) {
-            user = loginUser.orElse(null);
-            String responseBody = "Login successful! : " + user.toString();
-            httpResponse.setResponseBody(responseBody);
-            httpResponse.setStatusCode(200); // HTTP 상태코드 200 (OK)
+            user = loginUser.get();
+            String sessionId = generateUniqueSessionId();
+            Session.loginUser(sessionId, user);
+            setCookie(httpResponse, sessionId);
+            httpResponse.setStatusCode(302);
+            httpResponse.addHeader("Location", "/index.html");
         } else {
-            String responseBody = "Authentication failed. Please check your credentials.";
-            httpResponse.setResponseBody(responseBody);
-            httpResponse.setStatusCode(401); // HTTP 상태코드 401 (Unauthorized)
+            httpResponse.setStatusCode(302);
+            httpResponse.addHeader("Location", "/401.html");// HTTP 상태코드 401 (Unauthorized)
         }
     }
+
+    public static String generateUniqueSessionId() {
+        // 랜덤한 UUID 생성
+        UUID uuid = UUID.randomUUID();
+        return uuid.toString();
+    }
+
     private Optional<User> authenticate(String account, String password) {
         Optional<User> optionalUser = InMemoryUserRepository.findByAccount(account);
         if (optionalUser.isPresent()) {
@@ -65,11 +68,15 @@ public class LoginController implements Controller {
         return Optional.empty(); // 인증 실패
     }
 
-    private String getFileExtension(String fileName) {
-        int dotIndex = fileName.lastIndexOf('.');
-        if (dotIndex != -1 && dotIndex < fileName.length() - 1) {
-            return fileName.substring(dotIndex + 1).toLowerCase();
-        }
-        return "";
+    private void setCookie(HttpResponse httpResponse, String sessionId) {
+        System.out.println("setCookie");
+        cookie = new Cookie(user.getAccount(), sessionId);
+        httpResponse.addHeader("Set-Cookie", "JSESSIONID=" + cookie.getValue());
+    }
+
+    private boolean checkLogin(HttpRequest httpRequest) {
+        String sessionId = httpRequest.getCookie().get("JSESSIONID");
+        user = Session.getUser(sessionId);
+        return (user != null);
     }
 }

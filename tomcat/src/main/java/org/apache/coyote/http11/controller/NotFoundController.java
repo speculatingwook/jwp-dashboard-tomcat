@@ -2,6 +2,7 @@ package org.apache.coyote.http11.controller;
 
 import org.apache.coyote.http11.HttpRequest;
 import org.apache.coyote.http11.HttpResponse;
+import org.apache.coyote.http11.enums.ContentType;
 
 import java.io.IOException;
 

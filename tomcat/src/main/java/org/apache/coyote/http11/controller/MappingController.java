@@ -15,6 +15,7 @@ public class MappingController {
     public MappingController() {
         controllerMap = new HashMap<>();
         controllerMap.put("/login", new LoginController());
+        controllerMap.put("/register", new RegisterController());
     }
 
     public Controller match(HttpRequest httpRequest) {

@@ -1,9 +1,9 @@
-package org.apache.coyote.http11.controller;
+package org.apache.coyote.http11.enums;
 
 public enum ContentType {
     HTML("text/html"),
     CSS("text/css"),
-    JS("application/javascript")
+    JS("/js/scripts.js")
     ;
 
     private final String value;
