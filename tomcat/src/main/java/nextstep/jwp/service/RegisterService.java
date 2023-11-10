@@ -1,2 +1,5 @@
-package nextstep.jwp.service;public class RegisterService {
+package nextstep.jwp.service;
+
+public class RegisterService {
+
 }
