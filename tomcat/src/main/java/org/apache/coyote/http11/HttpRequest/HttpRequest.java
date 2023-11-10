@@ -7,6 +7,9 @@ import java.util.stream.Collectors;
 
 import org.apache.coyote.http11.HttpMethod;
 
+import lombok.Getter;
+
+@Getter
 public class HttpRequest {
 
 	private static final String CRLF = "\r\n";
