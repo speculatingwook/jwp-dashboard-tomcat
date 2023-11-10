@@ -53,7 +53,7 @@ public class HttpRequest {
 	private static String getRequestHeader(BufferedReader bufferedReader) throws IOException {
 		StringBuilder requestHeaderBuilder = new StringBuilder();
 		String headerLine;
-		while ((headerLine = bufferedReader.readLine()) != null && !headerLine.equals("")) {
+		while ((headerLine = bufferedReader.readLine()) != null && !headerLine.isEmpty()) {
 			requestHeaderBuilder.append(headerLine).append(CRLF);
 		}
 		return requestHeaderBuilder.toString();
