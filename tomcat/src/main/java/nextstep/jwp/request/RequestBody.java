@@ -8,4 +8,8 @@ public class RequestBody {
     public RequestBody(String content) {
         this.content = content;
     }
+
+    public String getContent() {
+        return content;
+    }
 }
