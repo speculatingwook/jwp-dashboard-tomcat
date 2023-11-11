@@ -1,20 +1,11 @@
 package org.apache.coyote.http11.handler;
 
+import org.apache.coyote.http11.httpResponse.HttpResponse;
 import org.apache.coyote.http11.httprequest.HttpRequest;
 
-import java.util.List;
+public interface HandlerAdapter {
+    HttpResponse handle(HttpRequest request, HttpResponse response, Object handler);
 
-public class HandlerAdapter {
+    boolean supports(Object httpRequest);
 
-    static List<Handler> handlers
-            = List.of(new RootHandler(), new IndexHandler(), new LoginHandler(), new JavaScriptHandler(), new CSSHandler());
-
-    public static Handler getHandler(HttpRequest httpRequest) {
-        for (Handler handler : handlers) {
-            if (handler.supports(httpRequest)) {
-                return handler;
-            }
-        }
-        return null;
-    }
 }
