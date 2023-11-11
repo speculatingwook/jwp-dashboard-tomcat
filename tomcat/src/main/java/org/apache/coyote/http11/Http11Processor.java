@@ -1,14 +1,17 @@
 package org.apache.coyote.http11;
 
+import static java.net.HttpURLConnection.HTTP_OK;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.zip.GZIPOutputStream;
 import nextstep.jwp.exception.UncheckedServletException;
 import org.apache.coyote.Processor;
 import org.slf4j.Logger;
@@ -39,24 +42,62 @@ public class Http11Processor implements Runnable, Processor {
             final InputStream bufferedInputStream = new BufferedInputStream(inputStream);
             final InputStreamReader inputStreamReader = new InputStreamReader(bufferedInputStream);
             final BufferedReader bf = new BufferedReader(inputStreamReader);
+            String header = bf.readLine();
 
-            final var response = outPutBuilder(bf.readLine());
+            if (header.split(" ")[1].contains("/assets/img")) {
+                var responseImage = handleImageRequest(header);
+                outputStream.write(responseImage.getHeader().getBytes());
+                outputStream.write(responseImage.getImageData());
+            } else {
+                final var response = handleRequest(header);
+                outputStream.write(response.getBytes());
+            }
 
-            outputStream.write(response.getBytes());
             outputStream.flush();
         } catch (IOException | UncheckedServletException e) {
             log.error(e.getMessage(), e);
         }
     }
+    private ImageResponseDto handleImageRequest(String requestSourceHeader) throws IOException {
+        String[] info = requestSourceHeader.split(" ");
+        URL resource = getClass().getClassLoader().getResource("static" + info[1]);
+        final Path path = new File(resource.getFile()).toPath();
+        byte[] filesIO = Files.readAllBytes(path);
+        ByteArrayOutputStream obj = new ByteArrayOutputStream();
+        try (GZIPOutputStream gzip = new GZIPOutputStream(obj)) {
+            gzip.write(filesIO);
+            gzip.flush();
+        }
+        byte[] compressedData = obj.toByteArray();
+        int contentLength = compressedData.length;
+        String header = String.join("\r\n",
+                "HTTP/1.1 " + HTTP_OK + " " + "OK",
+                "Content-Type: image/svg+xml", // 이미지 파일의 실제 MIME 타입 사용
+                "Content-Encoding: gzip",
+                "Content-Length: " + contentLength,
+                "",
+                "");
+        return new ImageResponseDto(header,compressedData);
+    }
+    public String handleRequest(String requestSourceHeader) throws IOException {
+        log.info("request url : {}",requestSourceHeader);
+        String[] info = requestSourceHeader.split(" "); // GET /login?account=gugu&password=pass HTTP/1.1
+        if (info[1].contains("/login?")) {
+            return info[0] + info[1];
+        }
+        return responseBuilder(info[1]);
+    }
     public String responseBuilder(String requestSourcePath) throws IOException {
-        String contentTypeFile = "text/html;";
+        String contentTypeFile = "text/html";
         Integer responseHeaderCode = 200;
         String responseHeaderMessage = "OK";
         if (requestSourcePath.equals("/")) {
             requestSourcePath ="/Home.txt";
-        }
-        else if(requestSourcePath.contains(".html") || requestSourcePath.contains("/js/scripts.js") || requestSourcePath.contains("/assets")||requestSourcePath.contains(".css")) {
-            contentTypeFile ="text/"+requestSourcePath.substring(requestSourcePath.lastIndexOf(".")+1)+";";
+        } else if (requestSourcePath.contains("/assets/img")) {
+            contentTypeFile = "image/webp";
+        } else if(requestSourcePath.contains(".html") || requestSourcePath.contains("/js/scripts.js") || requestSourcePath.contains("/assets")||requestSourcePath.contains(".css")) {
+            String contentTypeFileForm = requestSourcePath.substring(requestSourcePath.lastIndexOf(".")+1);
+            contentTypeFile ="text/"+contentTypeFileForm;
         }
         else if(requestSourcePath.equals("/register")||requestSourcePath.equals("/login")) {
             requestSourcePath =requestSourcePath+".html";
@@ -69,22 +110,14 @@ public class Http11Processor implements Runnable, Processor {
         URL resource = getClass().getClassLoader().getResource("static"+requestSourcePath);
         final Path path = new File(resource.getFile()).toPath();
         byte[] filesIO = Files.readAllBytes(path);
-        final String fileResponseData = new String(filesIO);
-        final var contentLength = filesIO.length;
+        var contentLength = filesIO.length;
+        String fileResponseData = new String(filesIO);
 
         return String.join("\r\n",
                 "HTTP/1.1 "+responseHeaderCode+" "+responseHeaderMessage+" ",
-                "Content-Type: "+contentTypeFile+"charset=utf-8 ",
+                "Content-Type: "+contentTypeFile+";charset=utf-8 ",
                 "Content-Length: " +contentLength+ " ",
                 "",
                 fileResponseData);
-    }
-    public String outPutBuilder(String requestSourceHeader) throws IOException {
-        log.info("request url : {}",requestSourceHeader);
-        String[] info = requestSourceHeader.split(" "); // GET /login?account=gugu&password=pass HTTP/1.1
-        if (info[1].contains("/login?")) {
-            return info[0] + info[1];
-        }
-        return responseBuilder(info[1]);
     }
 }
