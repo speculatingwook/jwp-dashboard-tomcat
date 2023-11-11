@@ -32,8 +32,8 @@ Host: localhost:8080
 Connection: keep-alive
 Accept: */*
 ```
-- [] process 의 socket 의 inputstream 의 buffer 를 읽어와 String 으로 변환한다.
-- []
+- [x] process 의 socket 의 inputstream 의 buffer 를 읽어와 String 으로 변환한다.
+- [x] request resource 경로를 파악하여 응답값을 생성한다.
 
 
 

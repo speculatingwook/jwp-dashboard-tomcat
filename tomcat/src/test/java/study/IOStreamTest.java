@@ -112,6 +112,7 @@ class IOStreamTest {
             final InputStream inputStream = new ByteArrayInputStream(bytes);
 
             final String actual = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            final String actual2 = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
             assertThat(actual).isEqualTo("🤩");
             assertThat(inputStream.read()).isEqualTo(-1);
