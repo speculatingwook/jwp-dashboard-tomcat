@@ -60,7 +60,7 @@ public class Connector implements Runnable {
         }
     }
 
-    private void process(final Socket connection) {
+    private void process(final Socket connection) throws IOException {
         if (connection == null) {
             return;
         }

@@ -25,9 +25,10 @@ public class Http11Processor implements Runnable, Processor {
 
     @Override
     public void process(final Socket connection) {
-        try (final var inputStream = connection.getInputStream();
-             final var outputStream = connection.getOutputStream()) {
-
+        try (
+                final var inputStream = connection.getInputStream();
+             final var outputStream = connection.getOutputStream())
+        {
             final var responseBody = "Hello world!";
 
             final var response = String.join("\r\n",
