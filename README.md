@@ -66,7 +66,9 @@ http://localhost:8080/login?account=gugu&password=password으로 접속하면 �
 
 그리고 로그인 페이지에 접속했을 때 Query String을 파싱해서 아이디, 비밀번호가 일치하면 회원을 조회한 결과가 나오도록 만들자.
 
--[x] index.html 에서 요청하는 js,asset 를 반환환다.
+- [x] index.html 에서 요청하는 js,asset 를 반환환다.
+- [x] login.html 의 최초 진입시 html 의 반환한다.
+
 
 ## ✏️ 미션 진행 요구 사항
 

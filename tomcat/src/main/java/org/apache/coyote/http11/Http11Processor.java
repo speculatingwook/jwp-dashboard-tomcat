@@ -66,9 +66,25 @@ public class Http11Processor implements Runnable, Processor {
             return response;
         }
         if (info[1].equals("/index.html")) {
-
             log.info("Home page in");
             final URL resource = getClass().getClassLoader().getResource("static/index.html");
+            final Path path = new File(resource.getFile()).toPath();
+            byte[] filesIO = Files.readAllBytes(path);
+            String fileResponseData = new String(filesIO);
+
+            final var response = String.join("\r\n",
+                    "HTTP/1.1 200 Ok ",
+                    "Connection: keep-alive",
+                    "Content-Type: text/html;charset=utf-8 ",
+                    "Content-Length: " + filesIO.length + " ",
+                    "",
+                    fileResponseData);
+
+            return response;
+        }
+        if (info[1].equals("/login.html")) {
+            log.info("login page in");
+            final URL resource = getClass().getClassLoader().getResource("static/login.html");
             final Path path = new File(resource.getFile()).toPath();
             byte[] filesIO = Files.readAllBytes(path);
             String fileResponseData = new String(filesIO);
