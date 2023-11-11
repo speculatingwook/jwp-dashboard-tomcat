@@ -7,11 +7,16 @@ import nextstep.jwp.model.User;
 import java.util.Optional;
 
 public class LoginHandler {
-    private final String account;
-    private final String password;
+    private String account;
+    private String password;
+    private String sessionId;
     public LoginHandler(String account, String password) {
         this.account = account;
         this.password = password;
+    }
+
+    public LoginHandler(String sessionId) {
+        this.sessionId = sessionId;
     }
 
     public boolean checkUser() {

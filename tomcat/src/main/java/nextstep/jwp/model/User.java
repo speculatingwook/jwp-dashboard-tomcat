@@ -6,16 +6,18 @@ public class User {
     private final String account;
     private final String password;
     private final String email;
+    private final String JSESSIONID;
 
-    public User(Long id, String account, String password, String email) {
+    public User(Long id, String account, String password, String email, String sessionId) {
         this.id = id;
         this.account = account;
         this.password = password;
         this.email = email;
+        this.JSESSIONID = sessionId;
     }
 
-    public User(String account, String password, String email) {
-        this(null, account, password, email);
+    public User(String account, String password, String email, String sessionId) {
+        this(null, account, password, email, sessionId);
     }
 
     public boolean checkPassword(String password) {
@@ -26,6 +28,10 @@ public class User {
         return account;
     }
 
+    public String getSessionId() {
+        return JSESSIONID;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -33,6 +39,7 @@ public class User {
                 ", account='" + account + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
+                ",JSSESIONID='" + JSESSIONID + '\'' +
                 '}';
     }
 }

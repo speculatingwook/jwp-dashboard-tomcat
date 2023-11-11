@@ -49,7 +49,6 @@ public class HttpRequestWrapper {
                 this.cookie = new Cookie(line);
             }
         }
-        log.info(cookie.getCookieString());
     }
 
     public String getMethod() {
@@ -79,12 +78,10 @@ public class HttpRequestWrapper {
             line = reader.readLine();
             lines.add(line);
         }
-        log.info(lines.toString());
         return lines;
     }
 
     private void parseQueryString(String urlString) {
-        log.info("url String"+urlString);
         Map<String, String> parameters = new HashMap<>();
         String[] splitResult = urlString.split("[?]");
         this.query = splitResult[1];

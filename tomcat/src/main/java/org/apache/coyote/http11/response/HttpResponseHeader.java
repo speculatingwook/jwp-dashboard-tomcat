@@ -35,4 +35,9 @@ public class HttpResponseHeader {
         return this;
     }
 
+    public HttpResponseHeader addLocation(String location) {
+        headers.add("Location: " + location + " ");
+        return this;
+    }
+
 }

@@ -19,19 +19,19 @@ public class Cookie {
     private Map<String, String> getParameters(String line) {
         Map<String, String> parameters = new HashMap<>();
         String[] data = line.split(":");
-        String[] parameterList = data[1].split(";");
+        String[] parameterList = data[1].split("; ");
         for (String param : parameterList) {
             String[] keyValuePair = param.split("=");
-            if (keyValuePair.length == 2) {
-                parameters.put(keyValuePair[0], keyValuePair[1]);
-            }
+            parameters.put(keyValuePair[0], keyValuePair[1]);
         }
         return parameters;
     }
 
     public String getValue(String key) {
-        if (parameters.containsKey(key)) {
-            return parameters.get(key);
+        String value = parameters.get(key);
+        if (value != null) {
+            System.out.println(value);
+            return value;
         }
         return "";
     }

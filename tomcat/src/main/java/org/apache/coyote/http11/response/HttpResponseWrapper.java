@@ -2,14 +2,12 @@ package org.apache.coyote.http11.response;
 
 import java.util.NoSuchElementException;
 
+import org.apache.coyote.http11.Session;
 import org.apache.coyote.http11.*;
 import org.apache.coyote.http11.login.LoginHandler;
 import org.apache.coyote.http11.request.HttpRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.apache.coyote.http11.HttpMethod.GET;
-import static org.apache.coyote.http11.HttpMethod.POST;
 
 public class HttpResponseWrapper {
 
@@ -19,6 +17,7 @@ public class HttpResponseWrapper {
     private HttpResponseBody body;
     private Paths paths;
     private Cookie cookie;
+    private Session session;
 
 
     public HttpResponseWrapper(HttpRequestWrapper request) {
@@ -33,31 +32,30 @@ public class HttpResponseWrapper {
         HttpMethod method = HttpMethod.valueOf(request.getMethod());
         String path= request.getPath();
         this.cookie = request.getCookie();
+        this.session = new Session(cookie.getValue("JSESSIONID"));
         switch (method) {
-            case GET:
-                response(path);
-                break;
-            case POST:
-                login(path, request);
-                register(path);
-                break;
+                case GET:
+                    response(path);
+                    sessionLogin();
+                    break;
+                case POST:
+                    login(path, request);
+                    register(path);
+                    break;
         }
         invalidRequest(path);
     }
-
     private void invalidRequest(String path) {
         if (header == null || body == null) {
             body = HttpResponseBody.of(Paths.NOT_FOUND.createPath());
             header = new HttpResponseHeader(StatusCode.NOT_FOUND.getStatus())
                     .addContentType(Paths.NOT_FOUND.getContentType())
-                    .addContentLength(body.getContentLength())
-                    .setCookie(cookie);
+                    .addContentLength(body.getContentLength());
             throw new NoSuchElementException("해당 페이지를 찾을 수 없습니다: " + path);
         }
     }
 
     private void login(String path, HttpRequestWrapper request) {
-        log.info(path);
         if (Paths.LOGIN.getPath().contains(path)) {
             LoginHandler login = new LoginHandler(request.getRequestBody().getValue("account"), request.getRequestBody().getValue("password"));
             if (login.checkUser()) {
@@ -71,9 +69,17 @@ public class HttpResponseWrapper {
                 body = HttpResponseBody.of(Paths.UNAUTHORIZED.createPath());
                 header = new HttpResponseHeader(StatusCode.UNAUTHORIZED.getStatus())
                         .addContentType(Paths.UNAUTHORIZED.getContentType())
-                        .addContentLength(body.getContentLength())
-                        .setCookie(cookie);
+                        .addContentLength(body.getContentLength());
             }
+        }
+    }
+    private void sessionLogin() {
+        if (session.isSessionValid()) {
+            body = HttpResponseBody.of(Paths.INDEX.createPath());
+            header = new HttpResponseHeader(StatusCode.OK.getStatus())
+                    .addLocation(Paths.INDEX.getPath())
+                    .addContentType(Paths.INDEX.getContentType())
+                    .addContentLength(body.getContentLength());
         }
     }
     private void register(String path) {
@@ -81,8 +87,7 @@ public class HttpResponseWrapper {
                 body = HttpResponseBody.of(Paths.INDEX.createPath());
                 header = new HttpResponseHeader(StatusCode.OK.getStatus())
                         .addContentType(Paths.INDEX.getContentType())
-                        .addContentLength(body.getContentLength())
-                        .setCookie(cookie);
+                        .addContentLength(body.getContentLength());
             }
     }
 
@@ -93,8 +98,7 @@ public class HttpResponseWrapper {
                     body = HttpResponseBody.of(paths.createPath());
                     header = new HttpResponseHeader(StatusCode.OK.getStatus())
                             .addContentType(paths.getContentType())
-                            .addContentLength(body.getContentLength())
-                            .setCookie(cookie);
+                            .addContentLength(body.getContentLength());
                 }
             }
     }
