@@ -13,6 +13,8 @@ public enum ErrorCode {
     // Request
     FAIL_REQUEST_PARSE(HttpStatus.BAD_REQUEST, "R001", "Request를 파싱하는데 실패"),
 
+    // User
+    NOT_FOUND_USER(HttpStatus.NOT_FOUND, "U001", "사용자를 찾을 수 없습니다."),
     ;
 
 
