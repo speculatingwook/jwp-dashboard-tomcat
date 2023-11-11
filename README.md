@@ -45,6 +45,11 @@ Accept: */*
 
 사용자가 페이지를 열었을 때 CSS 파일도 호출하도록 기능을 추가하자.
 
+- [] 302 redirection 을 추가한다.  : 리다리렉션을 구현하지 않는다.
+- 파싱을 하면서 DOM Tree를 만들게 되는데, 파싱 도중에 link태그를 만나면 서버로 CSS파일 요청을 보낸다.
+  다운받은 CSS를 파싱해서 CSSOM Tree를 만든다.
+- [x] /css/styles.css 로 들어온 요청의 응답하는 css를 반환한다.
+
 ```text
 GET /css/styles.css HTTP/1.1
 Host: localhost:8080

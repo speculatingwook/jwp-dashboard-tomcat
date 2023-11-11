@@ -34,9 +34,8 @@ public class Http11Processor implements Runnable, Processor {
 
     @Override
     public void process(final Socket connection) {
-        try (final var inputStream = connection.getInputStream(); final var outputStream = connection.getOutputStream())
-        {
-             //buffer reader 로 뽑으면 막힘이 없음 but inputStream.readAllBytes() 호출시 정지. -> 다른 곳에서도 input Stream 을 호출 ?
+        try (final var inputStream = connection.getInputStream(); final var outputStream = connection.getOutputStream()) {
+            //buffer reader 로 뽑으면 막힘이 없음 but inputStream.readAllBytes() 호출시 정지. -> 다른 곳에서도 input Stream 을 호출 ?
 
             final InputStream bufferedInputStream = new BufferedInputStream(inputStream);
             final InputStreamReader inputStreamReader = new InputStreamReader(bufferedInputStream);
@@ -50,10 +49,13 @@ public class Http11Processor implements Runnable, Processor {
             log.error(e.getMessage(), e);
         }
     }
+
     public String outPutBuilder(String requestSourceHeader) throws IOException {
         String[] info = requestSourceHeader.split(" ");
-        if(info[1].equals("/"))
-        {
+
+        log.info("{} , {}",info[0],info[1]);
+
+        if (info[1].equals("/")) {
             final var responseBody = "Hello world!";
             final var response = String.join("\r\n",
                     "HTTP/1.1 200 OK ",
@@ -63,19 +65,46 @@ public class Http11Processor implements Runnable, Processor {
                     responseBody);
             return response;
         }
-        if(info[1].equals("/index.html")){
+        if (info[1].equals("/index.html")) {
+
+            log.info("Home page in");
             final URL resource = getClass().getClassLoader().getResource("static/index.html");
             final Path path = new File(resource.getFile()).toPath();
             byte[] filesIO = Files.readAllBytes(path);
             String fileResponseData = new String(filesIO);
 
+//            final var response = String.join("\r\n",
+//                    "HTTP/1.1 302 Found ",
+//                    "Connection: keep-alive",
+//                    "Content-Type: text/html;charset=utf-8 ",
+//                    "Content-Length: " + filesIO.length + " ",
+//                    "Location: " + "localhost:8080/css/styles.css"+ " ",
+//                    "",
+//                    fileResponseData);
             final var response = String.join("\r\n",
-                    "HTTP/1.1 200 OK ",
+                    "HTTP/1.1 200 Ok ",
+                    "Connection: keep-alive",
                     "Content-Type: text/html;charset=utf-8 ",
-                    "Content-Length: " + filesIO.length+ " ",
+                    "Content-Length: " + filesIO.length + " ",
                     "",
                     fileResponseData);
 
+            return response;
+        }
+
+        if (info[1].equals("/css/styles.css")) {
+            log.info("Redirected Requested");
+            final URL resource = getClass().getClassLoader().getResource("static/css/styles.css");
+            final Path path = new File(resource.getFile()).toPath();
+            byte[] filesIO = Files.readAllBytes(path);
+            String fileResponseData = new String(filesIO);
+            final var response = String.join("\r\n",
+                    "HTTP/1.1 200 OK ",
+                    "Connection: keep-alive",
+                    "Content-Type: "+"text/css;charset=utf-8 ",
+                    "Content-Length: " + filesIO.length + " ",
+                    "",
+                    fileResponseData);
             return response;
         }
 
@@ -86,7 +115,7 @@ public class Http11Processor implements Runnable, Processor {
         final var response = String.join("\r\n",
                 "HTTP/1.1 404 OK ",
                 "Content-Type: text/html;charset=utf-8 ",
-                "Content-Length: " + filesIO.length+ " ",
+                "Content-Length: " + filesIO.length + " ",
                 "",
                 fileResponseData);
         return response;
