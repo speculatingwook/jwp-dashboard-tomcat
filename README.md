@@ -34,7 +34,7 @@ Accept: */*
 ```
 - [x] process 의 socket 의 inputstream 의 buffer 를 읽어와 String 으로 변환한다.
 - [x] request resource 경로를 파악하여 응답값을 생성한다.
-
+- [x] 잘못된 경로 일시 404 를 반환한다.
 
 
 ### 2. CSS 지원하기

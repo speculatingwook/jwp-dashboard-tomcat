@@ -78,6 +78,17 @@ public class Http11Processor implements Runnable, Processor {
 
             return response;
         }
-        return "404";
+
+        final URL resource = getClass().getClassLoader().getResource("static/404.html");
+        final Path path = new File(resource.getFile()).toPath();
+        byte[] filesIO = Files.readAllBytes(path);
+        String fileResponseData = new String(filesIO);
+        final var response = String.join("\r\n",
+                "HTTP/1.1 404 OK ",
+                "Content-Type: text/html;charset=utf-8 ",
+                "Content-Length: " + filesIO.length+ " ",
+                "",
+                fileResponseData);
+        return response;
     }
 }
