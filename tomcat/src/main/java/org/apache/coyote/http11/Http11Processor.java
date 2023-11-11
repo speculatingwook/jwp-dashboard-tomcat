@@ -41,18 +41,25 @@ public class Http11Processor implements Runnable, Processor {
             final String[] contexts = request.readLine().split(" ");
             final String method = contexts[0];
             final String path = contexts[1];
+            final String fileName;
+            if (path.contains(".")) {
+                fileName = path.substring(path.indexOf("/") + 1, path.lastIndexOf("."));
+            } else {
+                fileName = path.substring(path.indexOf("/") + 1);
+            }
             final String fileType;
             if (path.contains(".")) {
                 fileType = path.substring(path.lastIndexOf(".") + 1);
             } else {
                 fileType = "html";
             }
+            log.debug("method: {}, path: {}, fileName: {}, fileType: {}", method, path, fileName, fileType);
             final String responseBody;
             if (Objects.equals(path, "/")) {
                 responseBody = "Hello world!";
             } else {
                 URL resource = getClass().getClassLoader()
-                    .getResource(String.format("static/%s", path));
+                    .getResource(String.format("static/%s.%s", fileName, fileType));
                 assert resource != null;
                 responseBody = new String(
                     Files.readAllBytes(new File(resource.getFile()).toPath()));
