@@ -5,8 +5,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import nextstep.jwp.exception.UncheckedServletException;
@@ -49,138 +49,39 @@ public class Http11Processor implements Runnable, Processor {
             log.error(e.getMessage(), e);
         }
     }
+    public String responseBuilder(String requestSourcePath) throws IOException {
+        String contentTypeFile = "text/html;";
+        Integer responseHeaderCode = 200;
+        String responseHeaderMessage = "OK";
+        if (requestSourcePath.equals("/")) {
+            requestSourcePath ="/Home.txt";
+        }
+        else if(requestSourcePath.contains(".html") || requestSourcePath.contains("/js/scripts.js") || requestSourcePath.contains("/assets")||requestSourcePath.contains(".css")) {
+            contentTypeFile ="text/"+requestSourcePath.substring(requestSourcePath.lastIndexOf(".")+1)+";";
+        }
+        else {
+            requestSourcePath ="/404.html";
+            responseHeaderCode = 404;
+            responseHeaderMessage ="NOT FOUND";
+        }
+        URL resource = getClass().getClassLoader().getResource("static"+requestSourcePath);
+        final Path path = new File(resource.getFile()).toPath();
+        byte[] filesIO = Files.readAllBytes(path);
+        final String fileResponseData = new String(filesIO);
+        final var contentLength = filesIO.length;
+        final var response = String.join("\r\n",
+                "HTTP/1.1 "+responseHeaderCode+" "+responseHeaderMessage+" ",
+                "Content-Type: "+contentTypeFile+"charset=utf-8 ",
+                "Content-Length: " +contentLength+ " ",
+                "",
+                fileResponseData);
 
+        return response;
+
+    }
     public String outPutBuilder(String requestSourceHeader) throws IOException {
         String[] info = requestSourceHeader.split(" ");
 
-        log.info("{} , {}",info[0],info[1]);
-
-        if (info[1].equals("/")) {
-            final var responseBody = "Hello world!";
-            final var response = String.join("\r\n",
-                    "HTTP/1.1 200 OK ",
-                    "Content-Type: text/html;charset=utf-8 ",
-                    "Content-Length: " + responseBody.getBytes().length + " ",
-                    "",
-                    responseBody);
-            return response;
-        }
-        if (info[1].equals("/index.html")) {
-            log.info("Home page in");
-            final URL resource = getClass().getClassLoader().getResource("static/index.html");
-            final Path path = new File(resource.getFile()).toPath();
-            byte[] filesIO = Files.readAllBytes(path);
-            String fileResponseData = new String(filesIO);
-
-            final var response = String.join("\r\n",
-                    "HTTP/1.1 200 Ok ",
-                    "Connection: keep-alive",
-                    "Content-Type: text/html;charset=utf-8 ",
-                    "Content-Length: " + filesIO.length + " ",
-                    "",
-                    fileResponseData);
-
-            return response;
-        }
-        if (info[1].equals("/login.html")) {
-            log.info("login page in");
-            final URL resource = getClass().getClassLoader().getResource("static/login.html");
-            final Path path = new File(resource.getFile()).toPath();
-            byte[] filesIO = Files.readAllBytes(path);
-            String fileResponseData = new String(filesIO);
-
-            final var response = String.join("\r\n",
-                    "HTTP/1.1 200 Ok ",
-                    "Connection: keep-alive",
-                    "Content-Type: text/html;charset=utf-8 ",
-                    "Content-Length: " + filesIO.length + " ",
-                    "",
-                    fileResponseData);
-
-            return response;
-        }
-
-        if (info[1].equals("/css/styles.css")) {
-            log.info("Redirected Requested");
-            final URL resource = getClass().getClassLoader().getResource("static/css/styles.css");
-            final Path path = new File(resource.getFile()).toPath();
-            byte[] filesIO = Files.readAllBytes(path);
-            String fileResponseData = new String(filesIO);
-            final var response = String.join("\r\n",
-                    "HTTP/1.1 200 OK ",
-                    "Connection: keep-alive",
-                    "Content-Type: "+"text/css;charset=utf-8 ",
-                    "Content-Length: " + filesIO.length + " ",
-                    "",
-                    fileResponseData);
-            return response;
-        }
-        if (info[1].equals("/js/scripts.js")) {
-            final URL resource = getClass().getClassLoader().getResource("static/js/scripts.js");
-            final Path path = new File(resource.getFile()).toPath();
-            byte[] filesIO = Files.readAllBytes(path);
-            String fileResponseData = new String(filesIO);
-            final var response = String.join("\r\n",
-                    "HTTP/1.1 200 OK ",
-                    "Connection: keep-alive",
-                    "Content-Type: "+"text/js;charset=utf-8 ",
-                    "Content-Length: " + filesIO.length + " ",
-                    "",
-                    fileResponseData);
-            return response;
-        }
-        if (info[1].equals("/assets/chart-area.js")) {
-            final URL resource = getClass().getClassLoader().getResource("static/assets/chart-area.js");
-            final Path path = new File(resource.getFile()).toPath();
-            byte[] filesIO = Files.readAllBytes(path);
-            String fileResponseData = new String(filesIO);
-            final var response = String.join("\r\n",
-                    "HTTP/1.1 200 OK ",
-                    "Connection: keep-alive",
-                    "Content-Type: "+"text/js;charset=utf-8 ",
-                    "Content-Length: " + filesIO.length + " ",
-                    "",
-                    fileResponseData);
-            return response;
-        }
-        if (info[1].equals("/assets/chart-bar.js")) {
-            final URL resource = getClass().getClassLoader().getResource("static/assets/chart-bar.js");
-            final Path path = new File(resource.getFile()).toPath();
-            byte[] filesIO = Files.readAllBytes(path);
-            String fileResponseData = new String(filesIO);
-            final var response = String.join("\r\n",
-                    "HTTP/1.1 200 OK ",
-                    "Connection: keep-alive",
-                    "Content-Type: "+"text/js;charset=utf-8 ",
-                    "Content-Length: " + filesIO.length + " ",
-                    "",
-                    fileResponseData);
-            return response;
-        }
-        if (info[1].equals("/assets/chart-pie.js")) {
-            final URL resource = getClass().getClassLoader().getResource("static/assets/chart-pie.js");
-            final Path path = new File(resource.getFile()).toPath();
-            byte[] filesIO = Files.readAllBytes(path);
-            String fileResponseData = new String(filesIO);
-            final var response = String.join("\r\n",
-                    "HTTP/1.1 200 OK ",
-                    "Connection: keep-alive",
-                    "Content-Type: "+"text/js;charset=utf-8 ",
-                    "Content-Length: " + filesIO.length + " ",
-                    "",
-                    fileResponseData);
-            return response;
-        }
-        final URL resource = getClass().getClassLoader().getResource("static/404.html");
-        final Path path = new File(resource.getFile()).toPath();
-        byte[] filesIO = Files.readAllBytes(path);
-        String fileResponseData = new String(filesIO);
-        final var response = String.join("\r\n",
-                "HTTP/1.1 404 OK ",
-                "Content-Type: text/html;charset=utf-8 ",
-                "Content-Length: " + filesIO.length + " ",
-                "",
-                fileResponseData);
-        return response;
+        return responseBuilder(info[1]);
     }
 }
