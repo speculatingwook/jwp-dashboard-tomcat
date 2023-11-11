@@ -73,14 +73,6 @@ public class Http11Processor implements Runnable, Processor {
             byte[] filesIO = Files.readAllBytes(path);
             String fileResponseData = new String(filesIO);
 
-//            final var response = String.join("\r\n",
-//                    "HTTP/1.1 302 Found ",
-//                    "Connection: keep-alive",
-//                    "Content-Type: text/html;charset=utf-8 ",
-//                    "Content-Length: " + filesIO.length + " ",
-//                    "Location: " + "localhost:8080/css/styles.css"+ " ",
-//                    "",
-//                    fileResponseData);
             final var response = String.join("\r\n",
                     "HTTP/1.1 200 Ok ",
                     "Connection: keep-alive",
@@ -107,7 +99,62 @@ public class Http11Processor implements Runnable, Processor {
                     fileResponseData);
             return response;
         }
-
+        if (info[1].equals("/js/scripts.js")) {
+            final URL resource = getClass().getClassLoader().getResource("static/js/scripts.js");
+            final Path path = new File(resource.getFile()).toPath();
+            byte[] filesIO = Files.readAllBytes(path);
+            String fileResponseData = new String(filesIO);
+            final var response = String.join("\r\n",
+                    "HTTP/1.1 200 OK ",
+                    "Connection: keep-alive",
+                    "Content-Type: "+"text/js;charset=utf-8 ",
+                    "Content-Length: " + filesIO.length + " ",
+                    "",
+                    fileResponseData);
+            return response;
+        }
+        if (info[1].equals("/assets/chart-area.js")) {
+            final URL resource = getClass().getClassLoader().getResource("static/assets/chart-area.js");
+            final Path path = new File(resource.getFile()).toPath();
+            byte[] filesIO = Files.readAllBytes(path);
+            String fileResponseData = new String(filesIO);
+            final var response = String.join("\r\n",
+                    "HTTP/1.1 200 OK ",
+                    "Connection: keep-alive",
+                    "Content-Type: "+"text/js;charset=utf-8 ",
+                    "Content-Length: " + filesIO.length + " ",
+                    "",
+                    fileResponseData);
+            return response;
+        }
+        if (info[1].equals("/assets/chart-bar.js")) {
+            final URL resource = getClass().getClassLoader().getResource("static/assets/chart-bar.js");
+            final Path path = new File(resource.getFile()).toPath();
+            byte[] filesIO = Files.readAllBytes(path);
+            String fileResponseData = new String(filesIO);
+            final var response = String.join("\r\n",
+                    "HTTP/1.1 200 OK ",
+                    "Connection: keep-alive",
+                    "Content-Type: "+"text/js;charset=utf-8 ",
+                    "Content-Length: " + filesIO.length + " ",
+                    "",
+                    fileResponseData);
+            return response;
+        }
+        if (info[1].equals("/assets/chart-pie.js")) {
+            final URL resource = getClass().getClassLoader().getResource("static/assets/chart-pie.js");
+            final Path path = new File(resource.getFile()).toPath();
+            byte[] filesIO = Files.readAllBytes(path);
+            String fileResponseData = new String(filesIO);
+            final var response = String.join("\r\n",
+                    "HTTP/1.1 200 OK ",
+                    "Connection: keep-alive",
+                    "Content-Type: "+"text/js;charset=utf-8 ",
+                    "Content-Length: " + filesIO.length + " ",
+                    "",
+                    fileResponseData);
+            return response;
+        }
         final URL resource = getClass().getClassLoader().getResource("static/404.html");
         final Path path = new File(resource.getFile()).toPath();
         byte[] filesIO = Files.readAllBytes(path);
