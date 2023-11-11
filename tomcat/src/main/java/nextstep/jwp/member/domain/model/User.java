@@ -1,4 +1,4 @@
-package nextstep.jwp.model;
+package nextstep.jwp.member.domain.model;
 
 public class User {
 
@@ -16,6 +16,10 @@ public class User {
 
     public User(String account, String password, String email) {
         this(null, account, password, email);
+    }
+
+    public User(Long usersSize, User user) {
+        this(usersSize, user.account,user.password,user.email);
     }
 
     public boolean checkPassword(String password) {

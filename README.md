@@ -32,6 +32,10 @@ Host: localhost:8080
 Connection: keep-alive
 Accept: */*
 ```
+- [x] process 의 socket 의 inputstream 의 buffer 를 읽어와 String 으로 변환한다.
+- [x] request resource 경로를 파악하여 응답값을 생성한다.
+- [x] 잘못된 경로 일시 404 를 반환한다.
+- [x] 오류 메시지인 svg 이미지를 gzip 후 반환한다.
 
 ### 2. CSS 지원하기
 
@@ -40,6 +44,14 @@ Accept: */*
 개발자 도구를 열어서 에러 메시지를 체크해보니 브라우저가 CSS를 못 찾고 있다.
 
 사용자가 페이지를 열었을 때 CSS 파일도 호출하도록 기능을 추가하자.
+
+
+- 리다리렉션을 구현하지 않는다. :  많은 웹 페이지들이 최초요청 200 으로 응답받아 css, html 을 전부 처리한다.
+
+- 파싱을 하면서 DOM Tree를 만들게 되는데, 파싱 도중에 link태그를 만나면 서버로 CSS파일 요청을 보낸다.
+  다운받은 CSS를 파싱해서 CSSOM Tree를 만든다.
+
+- [x] /css/styles.css 로 들어온 요청의 응답하는 css를 반환한다.
 
 ```text
 GET /css/styles.css HTTP/1.1
@@ -53,6 +65,17 @@ Connection: keep-alive
 http://localhost:8080/login?account=gugu&password=password으로 접속하면 로그인 페이지(login.html)를 보여주도록 만들자.
 
 그리고 로그인 페이지에 접속했을 때 Query String을 파싱해서 아이디, 비밀번호가 일치하면 회원을 조회한 결과가 나오도록 만들자.
+
+- [x] index.html 에서 요청하는 js,asset 를 반환환다.
+- [x] login.html 의 최초 진입시 html 의 반환한다.
+- [x] 회원 가입 페이지, 로그인 페이지로 이동한다.
+- [x] 쿼리스트링의 사용자 입력정보를 받아 DB 와 비교한다. 
+
+- 유저 관련 기능
+- [x] 유저의 id 를 생성한다.
+- [x] 유저를 저장한다.
+- [x] 유저를 조회하고 없으면 문자열을 반환한다.
+
 
 ## ✏️ 미션 진행 요구 사항
 

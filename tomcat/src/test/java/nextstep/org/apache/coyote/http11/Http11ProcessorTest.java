@@ -49,7 +49,7 @@ class Http11ProcessorTest {
         // when
         processor.process(socket);
 
-        // then
+        // then  "bytes size and string size is different"
         final URL resource = getClass().getClassLoader().getResource("static/index.html");
         var expected = "HTTP/1.1 200 OK \r\n" +
                 "Content-Type: text/html;charset=utf-8 \r\n" +

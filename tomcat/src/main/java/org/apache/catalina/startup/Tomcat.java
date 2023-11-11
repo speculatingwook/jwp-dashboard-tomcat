@@ -15,7 +15,6 @@ public class Tomcat {
         connector.start();
 
         try {
-            // make the application wait until we press any key.
             System.in.read();
         } catch (IOException e) {
             log.error(e.getMessage(), e);
