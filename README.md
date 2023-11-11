@@ -68,7 +68,8 @@ http://localhost:8080/login?account=gugu&password=password으로 접속하면 �
 
 - [x] index.html 에서 요청하는 js,asset 를 반환환다.
 - [x] login.html 의 최초 진입시 html 의 반환한다.
-
+- [x] 회원 가입 페이지, 로그인 페이지로 이동한다.
+- [] 쿼리스트링의 사용자 입력정보를 받아 DB 와 비교한다. 
 
 ## ✏️ 미션 진행 요구 사항
 

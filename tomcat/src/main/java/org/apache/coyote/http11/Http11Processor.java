@@ -35,7 +35,6 @@ public class Http11Processor implements Runnable, Processor {
     @Override
     public void process(final Socket connection) {
         try (final var inputStream = connection.getInputStream(); final var outputStream = connection.getOutputStream()) {
-            //buffer reader 로 뽑으면 막힘이 없음 but inputStream.readAllBytes() 호출시 정지. -> 다른 곳에서도 input Stream 을 호출 ?
 
             final InputStream bufferedInputStream = new BufferedInputStream(inputStream);
             final InputStreamReader inputStreamReader = new InputStreamReader(bufferedInputStream);
@@ -59,6 +58,9 @@ public class Http11Processor implements Runnable, Processor {
         else if(requestSourcePath.contains(".html") || requestSourcePath.contains("/js/scripts.js") || requestSourcePath.contains("/assets")||requestSourcePath.contains(".css")) {
             contentTypeFile ="text/"+requestSourcePath.substring(requestSourcePath.lastIndexOf(".")+1)+";";
         }
+        else if(requestSourcePath.equals("/register")||requestSourcePath.equals("/login")) {
+            requestSourcePath =requestSourcePath+".html";
+        }
         else {
             requestSourcePath ="/404.html";
             responseHeaderCode = 404;
@@ -69,19 +71,20 @@ public class Http11Processor implements Runnable, Processor {
         byte[] filesIO = Files.readAllBytes(path);
         final String fileResponseData = new String(filesIO);
         final var contentLength = filesIO.length;
-        final var response = String.join("\r\n",
+
+        return String.join("\r\n",
                 "HTTP/1.1 "+responseHeaderCode+" "+responseHeaderMessage+" ",
                 "Content-Type: "+contentTypeFile+"charset=utf-8 ",
                 "Content-Length: " +contentLength+ " ",
                 "",
                 fileResponseData);
-
-        return response;
-
     }
     public String outPutBuilder(String requestSourceHeader) throws IOException {
-        String[] info = requestSourceHeader.split(" ");
-
+        log.info("request url : {}",requestSourceHeader);
+        String[] info = requestSourceHeader.split(" "); // GET /login?account=gugu&password=pass HTTP/1.1
+        if (info[1].contains("/login?")) {
+            return info[0] + info[1];
+        }
         return responseBuilder(info[1]);
     }
 }
