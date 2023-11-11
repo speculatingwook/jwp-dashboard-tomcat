@@ -43,22 +43,21 @@ public class Http11Processor implements Runnable, Processor {
             final InputStreamReader inputStreamReader = new InputStreamReader(bufferedInputStream);
             final BufferedReader bf = new BufferedReader(inputStreamReader);
             String header = bf.readLine();
-
+            ResponseDto response;
             if (header.split(" ")[1].contains("/assets/img")) {
-                var responseImage = handleImageRequest(header);
-                outputStream.write(responseImage.getHeader().getBytes());
-                outputStream.write(responseImage.getImageData());
-            } else {
-                final var response = handleRequest(header);
-                outputStream.write(response.getBytes());
-            }
+                response = handleImageRequest(header);
 
+            } else {
+                response = handleRequest(header);
+            }
+            outputStream.write(response.getHeader());
+            outputStream.write(response.getData());
             outputStream.flush();
         } catch (IOException | UncheckedServletException e) {
             log.error(e.getMessage(), e);
         }
     }
-    private ImageResponseDto handleImageRequest(String requestSourceHeader) throws IOException {
+    private ResponseDto handleImageRequest(String requestSourceHeader) throws IOException {
         String[] info = requestSourceHeader.split(" ");
         URL resource = getClass().getClassLoader().getResource("static" + info[1]);
         final Path path = new File(resource.getFile()).toPath();
@@ -72,30 +71,32 @@ public class Http11Processor implements Runnable, Processor {
         int contentLength = compressedData.length;
         String header = String.join("\r\n",
                 "HTTP/1.1 " + HTTP_OK + " " + "OK",
-                "Content-Type: image/svg+xml", // 이미지 파일의 실제 MIME 타입 사용
+                "Content-Type: image/svg+xml",
                 "Content-Encoding: gzip",
                 "Content-Length: " + contentLength,
                 "",
                 "");
-        return new ImageResponseDto(header,compressedData);
+        return new ResponseDto(header,compressedData);
     }
-    public String handleRequest(String requestSourceHeader) throws IOException {
+    public ResponseDto handleRequest(String requestSourceHeader) throws IOException {
         log.info("request url : {}",requestSourceHeader);
         String[] info = requestSourceHeader.split(" "); // GET /login?account=gugu&password=pass HTTP/1.1
-        if (info[1].contains("/login?")) {
-            return info[0] + info[1];
+        final String RequestMethod = info[0];
+        final String requestSourcePath = info[1];
+
+        if (requestSourcePath.contains("/login?")) {
+//            return info[0] + info[1];
         }
-        return responseBuilder(info[1]);
+        return responseBuilderStaticPage(requestSourcePath);
     }
-    public String responseBuilder(String requestSourcePath) throws IOException {
+    public ResponseDto responseBuilderStaticPage(String requestSourcePath) throws IOException {
         String contentTypeFile = "text/html";
         Integer responseHeaderCode = 200;
         String responseHeaderMessage = "OK";
         if (requestSourcePath.equals("/")) {
             requestSourcePath ="/Home.txt";
-        } else if (requestSourcePath.contains("/assets/img")) {
-            contentTypeFile = "image/webp";
-        } else if(requestSourcePath.contains(".html") || requestSourcePath.contains("/js/scripts.js") || requestSourcePath.contains("/assets")||requestSourcePath.contains(".css")) {
+        }
+        else if(requestSourcePath.contains(".html") || requestSourcePath.contains("/js/scripts.js") || requestSourcePath.contains("/assets")||requestSourcePath.contains(".css")) {
             String contentTypeFileForm = requestSourcePath.substring(requestSourcePath.lastIndexOf(".")+1);
             contentTypeFile ="text/"+contentTypeFileForm;
         }
@@ -111,13 +112,12 @@ public class Http11Processor implements Runnable, Processor {
         final Path path = new File(resource.getFile()).toPath();
         byte[] filesIO = Files.readAllBytes(path);
         var contentLength = filesIO.length;
-        String fileResponseData = new String(filesIO);
-
-        return String.join("\r\n",
+        String responseHeader =  String.join("\r\n",
                 "HTTP/1.1 "+responseHeaderCode+" "+responseHeaderMessage+" ",
                 "Content-Type: "+contentTypeFile+";charset=utf-8 ",
                 "Content-Length: " +contentLength+ " ",
                 "",
-                fileResponseData);
+                "");
+        return new ResponseDto(responseHeader,filesIO);
     }
 }
