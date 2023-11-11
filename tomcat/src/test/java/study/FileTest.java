@@ -3,9 +3,15 @@ package study;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,10 +30,8 @@ class FileTest {
     @Test
     void resource_디렉터리에_있는_파일의_경로를_찾는다() {
         final String fileName = "nextstep.txt";
-
-        // todo
-        final String actual = "";
-
+        URL resource = getClass().getClassLoader().getResource(fileName);
+        final String actual = resource.getFile();
         assertThat(actual).endsWith(fileName);
     }
 
@@ -37,14 +41,12 @@ class FileTest {
      */
     @Test
     void 파일의_내용을_읽는다() {
-        final String fileName = "nextstep.txt";
-
-        // todo
-        final Path path = null;
-
-        // todo
-        final List<String> actual = Collections.emptyList();
-
-        assertThat(actual).containsOnly("nextstep");
+        String fileName = "nextstep.txt";
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
+            List<String> actual = bufferedReader.lines().collect(Collectors.toList());
+            assertThat(actual).containsOnly("nextstep");
+        } catch (Exception e) {
+        }
     }
 }
