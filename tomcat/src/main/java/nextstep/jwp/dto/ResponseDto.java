@@ -1,4 +1,4 @@
-package nextstep.jwp;
+package nextstep.jwp.dto;
 
 public class ResponseDto {
     private final byte[] header;
@@ -8,7 +8,10 @@ public class ResponseDto {
         this.header = header.getBytes();
         this.data = imageData;
     }
-
+    public ResponseDto(String header, String imageData) {
+        this.header = header.getBytes();
+        this.data = imageData.getBytes();
+    }
     public byte[] getHeader() {
         return header;
     }

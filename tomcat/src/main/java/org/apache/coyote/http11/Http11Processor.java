@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 
 import java.net.Socket;
 
-import nextstep.jwp.RequestHandler;
+import nextstep.jwp.handler.RequestHandler;
 import nextstep.jwp.exception.UncheckedServletException;
 
 import org.apache.coyote.Processor;
@@ -22,11 +22,11 @@ public class Http11Processor implements Runnable, Processor {
     private static final Logger log = LoggerFactory.getLogger(Http11Processor.class);
 
     private final Socket connection;
-    private final RequestHandler requsetHandler;
+    private final RequestHandler requestHandler;
 
     public Http11Processor(final Socket connection) {
         this.connection = connection;
-        this.requsetHandler = new RequestHandler();
+        this.requestHandler = new RequestHandler();
     }
 
     @Override
@@ -41,7 +41,7 @@ public class Http11Processor implements Runnable, Processor {
             final InputStreamReader inputStreamReader = new InputStreamReader(bufferedInputStream);
             final BufferedReader bf = new BufferedReader(inputStreamReader);
             String header = bf.readLine();
-            final var response = requsetHandler.getResponse(header);
+            final var response = requestHandler.getResponse(header);
             outputStream.write(response.getHeader());
             outputStream.write(response.getData());
             outputStream.flush();

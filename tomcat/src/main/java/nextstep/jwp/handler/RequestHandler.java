@@ -1,4 +1,4 @@
-package nextstep.jwp;
+package nextstep.jwp.handler;
 
 import static java.net.HttpURLConnection.HTTP_OK;
 
@@ -9,6 +9,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.zip.GZIPOutputStream;
+import nextstep.jwp.dto.ResponseDto;
 import nextstep.jwp.controller.RequestController;
 import org.apache.coyote.http11.Http11Processor;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ public class RequestHandler {
         final String requestMethod = info[0];
         final String requestSourcePath = info[1];
         if (requestSourcePath.contains("/login?") ||requestSourcePath.contains("/register?") ) {
-            return null;
+            return requestController.handleMember(requestMethod,requestSourcePath);
         }
         if (requestMethod.equals("GET") && requestSourcePath.contains("/assets/img")) {
             return handleImageRequest(requestSourcePath);

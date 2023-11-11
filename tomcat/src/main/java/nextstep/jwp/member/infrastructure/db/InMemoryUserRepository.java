@@ -1,12 +1,12 @@
-package nextstep.jwp.db;
+package nextstep.jwp.member.infrastructure.db;
 
-import nextstep.jwp.model.User;
+import nextstep.jwp.member.domain.model.User;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class InMemoryUserRepository {
+public class InMemoryUserRepository  {
 
     private static final Map<String, User> database = new ConcurrentHashMap<>();
 
@@ -16,6 +16,8 @@ public class InMemoryUserRepository {
     }
 
     public static void save(User user) {
+        Long usersSize = (long)database.size();
+        user = new User(usersSize,user);
         database.put(user.getAccount(), user);
     }
 
