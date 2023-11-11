@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.coyote.http11.HttpHeader;
 import org.apache.coyote.http11.HttpMethod;
 import org.apache.coyote.http11.exception.RequestParseException;
 import org.apache.coyote.http11.session.Session;
@@ -51,13 +52,13 @@ public class HttpRequest {
             }
 
             // 3. body
-            int contentLength = Integer.parseInt(headers.getOrDefault("Content-Length", "0"));
+            int contentLength = Integer.parseInt(headers.getOrDefault(HttpHeader.ContentLength.getHeaderName(), "0"));
             final char[] buffer = new char[contentLength];
             reader.read(buffer, 0, contentLength);
             String body = new String(buffer);
 
             // 4. cookie
-            Cookie cookie = Cookie.parse(headers.getOrDefault("Cookie", ""));
+            Cookie cookie = Cookie.parse(headers.getOrDefault(HttpHeader.Cookie.getHeaderName(), ""));
 
             return new HttpRequest(httpMethod, path, version, headers, queryParams, body, cookie);
         } catch (Exception e) {

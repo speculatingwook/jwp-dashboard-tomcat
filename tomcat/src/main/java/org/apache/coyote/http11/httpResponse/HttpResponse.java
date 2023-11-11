@@ -2,6 +2,7 @@ package org.apache.coyote.http11.httpResponse;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.coyote.http11.HttpHeader;
 import org.apache.coyote.http11.HttpStatus;
 
 public class HttpResponse {
@@ -16,15 +17,15 @@ public class HttpResponse {
     private HttpResponse(HttpStatus status, String body) {
         this.status = status;
         this.body = body;
-        headers.put("Content-Type", "text/html;charset=utf-8");
-        headers.put("Content-Length", String.valueOf(body.getBytes().length));
+        headers.put(HttpHeader.ContentType.getHeaderName(), "text/html;charset=utf-8");
+        headers.put(HttpHeader.ContentLength.getHeaderName(), String.valueOf(body.getBytes().length));
     }
 
     public HttpResponse() {
         this.status = HttpStatus.OK;
         this.body = "";
-        headers.put("Content-Type", "text/html;charset=utf-8");
-        headers.put("Content-Length", String.valueOf(body.getBytes().length));
+        headers.put(HttpHeader.ContentType.getHeaderName(), "text/html;charset=utf-8");
+        headers.put(HttpHeader.ContentLength.getHeaderName(), String.valueOf(body.getBytes().length));
     }
 
     public static HttpResponse of(HttpStatus status, String body) {
@@ -56,20 +57,20 @@ public class HttpResponse {
     public void sendError(HttpStatus status, String msg) {
         this.status = status;
         this.body = msg;
-        headers.put("Content-Length", String.valueOf(body.getBytes().length));
+        headers.put(HttpHeader.ContentLength.getHeaderName(), String.valueOf(body.getBytes().length));
     }
 
     public void setBody(String body) {
         this.body = body;
-        headers.put("Content-Length", String.valueOf(body.getBytes().length));
+        headers.put(HttpHeader.ContentLength.getHeaderName(), String.valueOf(body.getBytes().length));
     }
 
     public void sendRedirect(String substring) {
         this.status = HttpStatus.FOUND;
-        headers.put("Location", substring);
+        headers.put(HttpHeader.Location.getHeaderName(), substring);
     }
 
     public void addCookie(String key, String value) {
-        headers.put("Set-Cookie", key + "=" + value);
+        headers.put(HttpHeader.SetCookie.getHeaderName(), key + "=" + value);
     }
 }

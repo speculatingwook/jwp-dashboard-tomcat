@@ -14,6 +14,7 @@ public class ControllerHandlerAdapter implements HandlerAdapter {
 
     @Override
     public HttpResponse handle(HttpRequest request, HttpResponse response, Object handler) {
+
         Controller controller = (Controller) handler;
 
         String viewName = controller.process(request, response);
@@ -29,7 +30,7 @@ public class ControllerHandlerAdapter implements HandlerAdapter {
         FileFinder fileFinder = new FileFinder();
         try {
             String fileContent = fileFinder.fromPath(viewName);
-            response.setBody(fileContent);
+                response.setBody(fileContent);
         } catch (Exception e) {
             System.err.println("Not found file. viewName = " + viewName);
             response.sendError(HttpStatus.NOT_FOUND, "Not Found");

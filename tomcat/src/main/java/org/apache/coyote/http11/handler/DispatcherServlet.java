@@ -24,6 +24,7 @@ public class DispatcherServlet {
     private static final DispatcherServlet INSTANCE = new DispatcherServlet();
     private final List<HandlerAdapter> handlerAdapters = new ArrayList<>();
     private final Map<RequestMapping, Object> handlerMappingMap = new HashMap<>();
+    private final String sessionKey = "JSESSIONID";
 
     private DispatcherServlet() {
         handlerMappingMap.put(new RequestMapping("*.css", HttpMethod.GET), new CSSController());
@@ -44,15 +45,15 @@ public class DispatcherServlet {
 
     public HttpResponse service(HttpRequest request, HttpResponse response) {
 
-        if (request.getCookie().getValue("JSESSIONID") == null) {
+        if (request.getCookie().getValue(sessionKey) == null) {
             String sessionId = UUID.randomUUID().toString();
             request.addSessionId(sessionId);
-            response.addCookie("JSESSIONID", sessionId);
+            response.addCookie(sessionKey, sessionId);
         }
 
         Object handler = getHandler(request);
         if (handler == null) {
-            System.err.println("Not found handler");
+            System.err.println("Not found controller");
             response.sendError(HttpStatus.NOT_FOUND, "Not Found");
             return response;
         }
