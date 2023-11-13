@@ -1,5 +1,6 @@
 package org.apache.coyote.query;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -18,6 +19,10 @@ public class QueryParams {
         return new QueryParams(Stream.of(queryParams.split(QUERY_STRING_DELIMITER))
                 .map(QueryParam::from)
                 .collect(toList()));
+    }
+
+    public static QueryParams empty() {
+        return new QueryParams(new ArrayList<>());
     }
 
     public String getValueFromKey(String key) {

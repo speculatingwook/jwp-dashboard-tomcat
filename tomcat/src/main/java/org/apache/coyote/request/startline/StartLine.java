@@ -1,5 +1,6 @@
 package org.apache.coyote.request.startline;
 
+import org.apache.coyote.query.QueryParams;
 import org.apache.coyote.request.HttpRequestPath;
 
 public class StartLine {
@@ -9,25 +10,44 @@ public class StartLine {
     private static final int URI_INDEX = 1;
     private static final int METHOD_INDEX = 0;
     private static final int HTTP_VERSION_INDEX = 2;
+    private static final int PATH_INDEX = 0;
+    private static final int QUERY_INDEX = 1;
     private static final String START_LINE_DELIMITER = " ";
+    private static final String QUERY_DELIMITER = "\\?";
+    private static final int NO_QUERY_LENGTH = 1;
 
     private final HttpMethod method;
     private final HttpRequestPath requestPath;
+    private final QueryParams queryParams;
     private final HttpVersion httpVersion;
 
-    private StartLine(HttpMethod method, String requestUri, String httpVersion) {
-        this.method = method;
-        this.requestPath = HttpRequestPath.from(requestUri);
-        this.httpVersion = HttpVersion.from(httpVersion);
-    }
+    private StartLine(final HttpMethod method, final HttpRequestPath requestPath, final QueryParams queryParams,
+                      final HttpVersion httpVersion)  {
+            this.method = method;
+            this.requestPath = requestPath;
+            this.queryParams = queryParams;
+            this.httpVersion = httpVersion;
+        }
 
     public static StartLine from(String startLine) {
         final String[] startLineElements = splitStartLine(startLine);
         final HttpMethod httpMethod = HttpMethod.from(startLineElements[METHOD_INDEX]);
         final String requestUri = startLineElements[URI_INDEX];
-        final String httpVersion = startLineElements[HTTP_VERSION_INDEX];
 
-        return new StartLine(httpMethod, requestUri, httpVersion);
+        final String[] requestUriElements = requestUri.split(QUERY_DELIMITER);
+
+        final HttpRequestPath requestPath = HttpRequestPath.from(requestUriElements[PATH_INDEX]);
+        final QueryParams queryParams = extractQueryParams(requestUriElements);
+        final HttpVersion httpVersion = HttpVersion.from(startLineElements[HTTP_VERSION_INDEX]);
+
+        return new StartLine(httpMethod, requestPath, queryParams, httpVersion);
+    }
+
+    private static QueryParams extractQueryParams(final String[] requestUriElements) {
+        if (requestUriElements.length == NO_QUERY_LENGTH) {
+            return QueryParams.empty();
+        }
+        return QueryParams.from(requestUriElements[QUERY_INDEX]);
     }
 
     public HttpMethod getMethod() {
@@ -36,6 +56,10 @@ public class StartLine {
 
     public String getRequestPath() {
         return requestPath.getUri();
+    }
+
+    public QueryParams getQueryParams() {
+        return queryParams;
     }
 
     private static String[] splitStartLine(String startLine) {
