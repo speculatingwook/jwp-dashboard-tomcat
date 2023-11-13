@@ -3,7 +3,7 @@ package org.apache.coyote.handler;
 import nextstep.jwp.db.InMemoryUserRepository;
 import nextstep.jwp.exception.badrequest.ExistUserException;
 import nextstep.jwp.model.User;
-import org.apache.coyote.request.QueryParams;
+import org.apache.coyote.query.QueryParams;
 import org.apache.coyote.response.HttpResponse;
 import org.apache.coyote.response.Location;
 import org.slf4j.Logger;
