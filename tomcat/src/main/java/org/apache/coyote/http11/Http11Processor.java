@@ -4,29 +4,23 @@ import nextstep.jwp.exception.UncheckedServletException;
 import org.apache.coyote.Processor;
 import org.apache.coyote.handler.LoginHandler;
 import org.apache.coyote.handler.SignUpHandler;
-import org.apache.coyote.request.HttpMethod;
+import org.apache.coyote.request.startline.HttpMethod;
 import org.apache.coyote.request.HttpRequest;
 import org.apache.coyote.response.ContentType;
 import org.apache.coyote.response.HttpResponse;
-import org.apache.coyote.response.StatusCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
-import java.net.URL;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.coyote.request.HttpMethod.GET;
-import static org.apache.coyote.request.HttpMethod.POST;
-import static org.apache.coyote.response.StatusCode.FOUND;
+import static org.apache.coyote.request.startline.HttpMethod.GET;
+import static org.apache.coyote.request.startline.HttpMethod.POST;
 import static org.apache.coyote.response.StatusCode.OK;
 
 public class Http11Processor implements Runnable, Processor {
