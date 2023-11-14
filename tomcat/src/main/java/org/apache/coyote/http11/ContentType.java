@@ -2,6 +2,8 @@ package org.apache.coyote.http11;
 
 import java.util.Arrays;
 
+import lombok.Getter;
+
 public enum ContentType {
 
 	HTML("html", "text/html;charset=utf-8"),
@@ -14,15 +16,12 @@ public enum ContentType {
 	DEFAULT("", "text/plain;charset=utf-8");
 
 	private final String extension;
+	@Getter
 	private final String mimeType;
 
 	ContentType(String extension, String mimeType) {
 		this.extension = extension;
 		this.mimeType = mimeType;
-	}
-
-	public String getMimeType() {
-		return mimeType;
 	}
 
 	public static ContentType findByExtension(String extension) {
