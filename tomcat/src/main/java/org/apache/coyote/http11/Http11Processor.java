@@ -2,10 +2,17 @@ package org.apache.coyote.http11;
 
 import nextstep.jwp.exception.UncheckedServletException;
 import org.apache.coyote.Processor;
+import org.apache.coyote.request.HttpRequest;
+import org.apache.coyote.response.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.directory.NoSuchAttributeException;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 
 public class Http11Processor implements Runnable, Processor {
@@ -27,20 +34,40 @@ public class Http11Processor implements Runnable, Processor {
     public void process(final Socket connection) {
         try (final var inputStream = connection.getInputStream();
              final var outputStream = connection.getOutputStream()) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+            HttpRequest httpRequest = new HttpRequest(br); //HttpRequest 객체 생성
 
-            final var responseBody = "Hello world!";
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(outputStream));
+            HttpResponse httpResponse = new HttpResponse(); // HttpResponse 객체 생성
 
-            final var response = String.join("\r\n",
-                    "HTTP/1.1 200 OK ",
-                    "Content-Type: text/html;charset=utf-8 ",
-                    "Content-Length: " + responseBody.getBytes().length + " ",
-                    "",
-                    responseBody);
-
-            outputStream.write(response.getBytes());
-            outputStream.flush();
+            String responseContent = process(httpRequest, httpResponse);
+            response(responseContent, bw);
         } catch (IOException | UncheckedServletException e) {
             log.error(e.getMessage(), e);
+        } catch (NoSuchAttributeException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    private String process(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+        String httpMethod = httpRequest.getHttpMethod();
+        switch (httpMethod) {
+            case "GET": {
+                return getProcess(httpRequest, httpResponse);
+            }
+            default: {
+                return null;
+            }
+        }
+    }
+
+    private String getProcess(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+        String response = httpResponse.getResponse(httpRequest);
+        return response;
+    }
+
+    private void response(String response, BufferedWriter bw) throws IOException {
+        bw.write(response);
+        bw.flush();
     }
 }
