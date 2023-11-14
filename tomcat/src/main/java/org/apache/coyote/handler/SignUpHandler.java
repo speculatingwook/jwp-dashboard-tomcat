@@ -4,6 +4,7 @@ import nextstep.jwp.db.InMemoryUserRepository;
 import nextstep.jwp.exception.badrequest.ExistUserException;
 import nextstep.jwp.model.User;
 import org.apache.coyote.query.QueryParams;
+import org.apache.coyote.request.HttpRequest;
 import org.apache.coyote.response.HttpResponse;
 import org.apache.coyote.response.Location;
 import org.slf4j.Logger;
@@ -21,8 +22,8 @@ public class SignUpHandler {
     private SignUpHandler() {
     }
 
-    public static HttpResponse register(final String requestBody) throws URISyntaxException {
-        final QueryParams queryParams = QueryParams.from(requestBody);
+    public static HttpResponse register(final HttpRequest request) throws URISyntaxException {
+        final QueryParams queryParams = request.getQueryParams();
 
         final String account = queryParams.getValueFromKey("account");
         final String password = queryParams.getValueFromKey("password");

@@ -23,9 +23,9 @@ public class HttpRequest {
     private final StartLine startLine;
     private final HttpHeader headers;
     private final Cookies cookies;
-    private final String requestBody;
+    private final HttpRequestBody requestBody;
 
-    public HttpRequest(StartLine startLine, HttpHeader headers, Cookies cookies, String requestBody) {
+    public HttpRequest(StartLine startLine, HttpHeader headers, Cookies cookies, HttpRequestBody requestBody) {
         this.startLine = startLine;
         this.headers = headers;
         this.cookies = cookies;
@@ -35,7 +35,8 @@ public class HttpRequest {
     public static HttpRequest of(final String startLine, final Map<String, String> headers, final String requestBody) {
         final String cookie = headers.get(COOKIE_HEADER);
 
-        return new HttpRequest(StartLine.from(startLine), HttpHeader.from(headers), Cookies.from(cookie), requestBody);
+        return new HttpRequest(StartLine.from(startLine), HttpHeader.from(headers), Cookies.from(cookie),
+                HttpRequestBody.from(requestBody));
     }
 
     public String getRequestUrlWithoutQuery() {
@@ -75,7 +76,7 @@ public class HttpRequest {
     }
 
     public String getRequestBody() {
-        return requestBody;
+        return requestBody.getRequestBody();
     }
 
     public HttpMethod getRequestMethod() {
@@ -94,6 +95,6 @@ public class HttpRequest {
         if (startLine.getMethod().equals(GET)) {
             return startLine.getQueryParams();
         }
-        return QueryParams.from(requestBody);
+        return requestBody.getBodyWithQueryParam();
     }
 }
