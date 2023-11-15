@@ -14,7 +14,7 @@ public class Application {
 	public static void main(String[] args) {
 		log.info("web server start.");
 
-		ControllerScanner controllerScanner = new ControllerScanner();
+		ControllerScanner controllerScanner = ControllerScanner.getInstance();
 		controllerScanner.start(BASE_PACKAGE);
 		log.info("controllerScanner: {}", controllerScanner.getUriToMethodMap());
 
