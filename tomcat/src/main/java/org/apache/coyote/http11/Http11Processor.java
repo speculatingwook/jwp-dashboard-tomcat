@@ -4,9 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.apache.coyote.Processor;
 import org.apache.coyote.http11.HttpRequest.HttpRequest;
@@ -65,16 +62,4 @@ public class Http11Processor implements Runnable, Processor {
 		}
 	}
 
-	private String findResources(String uri) {
-		try {
-			Path filePath = Paths.get(System.getProperty("user.dir"), "tomcat/src/main/resources/static" + uri);
-			log.info("filePath: {}", filePath);
-			if (Files.exists(filePath) && !Files.isDirectory(filePath)) {
-				return Files.readString(filePath);
-			}
-		} catch (IOException e) {
-			log.error("Error reading resource: " + uri, e);
-		}
-		return null;
-	}
 }
