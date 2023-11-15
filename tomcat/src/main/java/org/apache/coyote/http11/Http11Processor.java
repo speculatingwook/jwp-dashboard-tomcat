@@ -7,6 +7,7 @@ import java.net.Socket;
 
 import org.apache.coyote.Processor;
 import org.apache.coyote.http11.HttpRequest.HttpRequest;
+import org.apache.coyote.http11.common.ControllerScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,9 +44,7 @@ public class Http11Processor implements Runnable, Processor {
 			log.info("httpRequest.getRequestHeaders(): {}", httpRequest.getRequestHeaders());
 			log.info("httpRequest.getRequestBody(): {}", httpRequest.getRequestBody());
 
-			// HTTP Response
-			HttpStatus httpStatus = null;
-			String responseBody = null;
+			ControllerScanner controllerScanner = ControllerScanner.getInstance();
 
 
 			outputStream.flush();
