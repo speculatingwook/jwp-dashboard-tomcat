@@ -16,6 +16,7 @@ public class Application {
 
 		ControllerScanner controllerScanner = new ControllerScanner();
 		controllerScanner.start(BASE_PACKAGE);
+		log.info("controllerScanner: {}", controllerScanner.getUriToMethodMap());
 
 		final var tomcat = new Tomcat();
 		tomcat.start();
