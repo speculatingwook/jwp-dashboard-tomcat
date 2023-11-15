@@ -47,15 +47,7 @@ public class Http11Processor implements Runnable, Processor {
 			HttpStatus httpStatus = null;
 			String responseBody = null;
 
-			// creating HTTP Response
-			String response = String.join("\r\n",
-				"HTTP/1.1 " + httpStatus.getCode() + " " + httpStatus.getStatus(),
-				"Content-Type: " + ContentType.findByExtension(httpRequest.getUri().split("\\.")[1]).getMimeType(),
-				"Content-Length: " + responseBody.getBytes().length,
-				"",
-				responseBody);
 
-			outputStream.write(response.getBytes());
 			outputStream.flush();
 		} catch (IOException | UncheckedServletException e) {
 			log.error(e.getMessage(), e);
