@@ -17,14 +17,6 @@ import nextstep.jwp.exception.UncheckedServletException;
 
 public class Http11Processor implements Runnable, Processor {
 
-	private static final int HTTP_METHOD = 0;
-	private static final int HTTP_URI = 1;
-	private static final int HTTP_VERSION = 2;
-	private static final int HEADER_KEY = 0;
-	private static final int HEADER_VALUE = 1;
-	private static final String BLANK_SPACE = " ";
-	private static final String HEADER_SPLITTER = ": ";
-
 	private static final Logger log = LoggerFactory.getLogger(Http11Processor.class);
 
 	private final Socket connection;
