@@ -4,8 +4,6 @@ import org.apache.coyote.http11.request.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,19 +17,14 @@ public class FrontController {
         controllerMap.put("/index.html", new IndexController());
     }
 
-    public void processRequest(Socket connection) {
-        try {
-            HttpRequest httpRequest = new HttpRequest(connection.getInputStream());
-            String path = httpRequest.getPath();
-            Controller controller = controllerMap.get(path);
+    public void processRequest(HttpRequest httpRequest) {
+        String path = httpRequest.getPath();
+        Controller controller = controllerMap.get(path);
 
-            if (controller != null) {
-                controller.handleRequest(httpRequest, connection.getOutputStream());
-            } else {
-                log.warn("No controller found for path: {}", path);
-            }
-        } catch (IOException e) {
-            log.error("Error processing request: {}", e.getMessage(), e);
+        if (controller != null) {
+            controller.handleRequest(httpRequest);
+        } else {
+            log.warn("No controller found for path: {}", path);
         }
     }
 }
