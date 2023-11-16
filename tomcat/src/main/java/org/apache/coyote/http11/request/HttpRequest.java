@@ -9,7 +9,9 @@ import java.util.Map;
 
 public class HttpRequest {
 
-    private String startLine;
+    private String method;
+    private String path;
+    private String httpVersion;
     private Map<String, String> headers;
     private String body;
 
@@ -21,7 +23,13 @@ public class HttpRequest {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
         // Read start line
-        startLine = reader.readLine();
+        String startLine = reader.readLine();
+        String[] startLineParts = startLine.split(" ");
+        if (startLineParts.length == 3) {
+            method = startLineParts[0];
+            path = startLineParts[1];
+            httpVersion = startLineParts[2];
+        }
 
         // Read headers
         headers = new HashMap<>();
@@ -41,8 +49,16 @@ public class HttpRequest {
         body = bodyBuilder.toString();
     }
 
-    public String getStartLine() {
-        return startLine;
+    public String getMethod() {
+        return method;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public String getHttpVersion() {
+        return httpVersion;
     }
 
     public Map<String, String> getHeaders() {
