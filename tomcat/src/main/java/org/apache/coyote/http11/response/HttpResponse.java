@@ -1,5 +1,6 @@
 package org.apache.coyote.http11.response;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,13 +51,14 @@ public class HttpResponse {
         headers.put(name, value);
     }
 
-    @Override
-    public String toString() {
-        return "HttpResponse{" +
-                "statusCode=" + statusCode +
-                ", statusMessage='" + statusMessage + '\'' +
-                ", headers=" + headers +
-                ", body='" + body + '\'' +
-                '}';
+    public String generateHttpResponse() throws IOException {
+        // 상태 라인 및 헤더
+        String response = "HTTP/1.1 " + statusCode + " " + statusMessage + "\r\n";
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            response += entry.getKey() + ": " + entry.getValue() + "\r\n";
+        }
+
+        // 바디
+        return response += "\r\n" + body;
     }
 }
