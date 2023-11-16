@@ -15,40 +15,20 @@ public class HttpResponse {
         this.headers = new HashMap<>();
     }
 
-    public int getStatusCode() {
-        return statusCode;
-    }
-
     public void setStatusCode(int statusCode) {
         this.statusCode = statusCode;
-    }
-
-    public String getStatusMessage() {
-        return statusMessage;
     }
 
     public void setStatusMessage(String statusMessage) {
         this.statusMessage = statusMessage;
     }
 
-    public Map<String, String> getHeaders() {
-        return headers;
-    }
-
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
     }
 
-    public String getBody() {
-        return body;
-    }
-
     public void setBody(String body) {
         this.body = body;
-    }
-
-    public void addHeader(String name, String value) {
-        headers.put(name, value);
     }
 
     public String generateHttpResponse() throws IOException {
@@ -60,5 +40,35 @@ public class HttpResponse {
 
         // 바디
         return response += "\r\n" + body;
+    }
+
+    // 빌더 패턴 메소드
+    public HttpResponse statusCode(int statusCode) {
+        this.statusCode = statusCode;
+        return this;
+    }
+
+    public HttpResponse statusMessage(String statusMessage) {
+        this.statusMessage = statusMessage;
+        return this;
+    }
+
+    public HttpResponse addHeader(String name, String value) {
+        this.headers.put(name, value);
+        return this;
+    }
+
+    public HttpResponse body(String body) {
+        this.body = body;
+        return this;
+    }
+
+    public HttpResponse build() {
+        HttpResponse httpResponse = new HttpResponse();
+        httpResponse.setStatusCode(statusCode);
+        httpResponse.setStatusMessage(statusMessage);
+        httpResponse.setHeaders(headers);
+        httpResponse.setBody(body);
+        return httpResponse;
     }
 }
