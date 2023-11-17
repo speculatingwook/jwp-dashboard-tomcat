@@ -14,4 +14,8 @@ public class HttpResponse {
 	private Map<String, String> responseHeaders;
 	private String responseBody = null;
 
+	public HttpResponse() {
+
+	}
+
 }
