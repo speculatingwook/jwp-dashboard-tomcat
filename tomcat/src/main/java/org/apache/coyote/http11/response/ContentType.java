@@ -9,7 +9,8 @@ public enum ContentType {
     JPG("jpg", "image/jpeg"),
     JPEG("jpeg", "image/jpeg"),
     PNG("png", "image/png"),
-    GIF("gif", "image/gif");
+    GIF("gif", "image/gif"),
+    SVG("svg", "image/svg+xml");
 
     private final String extension;
     private final String contentType;
