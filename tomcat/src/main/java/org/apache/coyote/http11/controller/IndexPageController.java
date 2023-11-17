@@ -1,12 +1,12 @@
 package org.apache.coyote.http11.controller;
 
 import org.apache.coyote.http11.annotation.Controller;
-import org.apache.coyote.http11.annotation.RequestMapping;
+import org.apache.coyote.http11.annotation.GetMapping;
 
 @Controller
 public class IndexPageController {
 
-	@RequestMapping("/")
+	@GetMapping("/")
 	public String showIndexPage() {
 		return "hello world !!";
 	}
