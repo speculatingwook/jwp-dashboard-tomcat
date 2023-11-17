@@ -1,5 +1,7 @@
 package org.apache.coyote.http11.response;
 
+import org.apache.coyote.http11.session.Cookie;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,9 +12,11 @@ public class HttpResponse {
     private String statusMessage;
     private Map<String, String> headers;
     private String body;
+    private Map<String, Cookie> cookies;  // 추가된 부분
 
     public HttpResponse() {
         this.headers = new HashMap<>();
+        this.cookies = new HashMap<>();  // 추가된 부분
     }
 
     public void setStatusCode(int statusCode) {
@@ -31,11 +35,22 @@ public class HttpResponse {
         this.body = body;
     }
 
+    public void addCookie(String name, String value) {
+        Cookie cookie = new Cookie();
+        cookie.setValue(name, value);
+        cookies.put(name, cookie);
+    }
+
     public String generateHttpResponse() throws IOException {
         // 상태 라인 및 헤더
         String response = "HTTP/1.1 " + statusCode + " " + statusMessage + "\r\n";
         for (Map.Entry<String, String> entry : headers.entrySet()) {
             response += entry.getKey() + ": " + entry.getValue() + "\r\n";
+        }
+
+        // 쿠키
+        for (Map.Entry<String, Cookie> entry : cookies.entrySet()) {
+            response += "Set-Cookie: " + entry.getKey() + "=" + entry.getValue().getValue(entry.getKey()) + "\r\n";
         }
 
         // 바디
