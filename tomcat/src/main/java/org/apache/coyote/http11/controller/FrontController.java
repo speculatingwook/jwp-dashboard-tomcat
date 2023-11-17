@@ -17,12 +17,8 @@ public class FrontController {
 
     public FrontController() {
         controllers = new HashMap<>();
-        controllers.put("/index", new IndexController());
         controllers.put("/login", new LoginController());
         controllers.put("/register", new RegisterController());
-        controllers.put("/assets", new StaticResourceController());
-        controllers.put("/js", new StaticResourceController());
-        controllers.put("/css", new StaticResourceController());
     }
 
     public HttpResponse processRequest(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
@@ -35,18 +31,10 @@ public class FrontController {
             }
         }
 
-        if (controller != null) {
-            httpResponse = controller.handleRequest(httpRequest, httpResponse);
-        } else {
-            log.warn("No controller found for path: {}", path);
-            httpResponse = new HttpResponse()
-                    .statusCode(HttpStatusCode.NOT_FOUND.getCode())
-                    .statusMessage(HttpStatusCode.NOT_FOUND.getMessage())
-                    .addHeader("Content-Type", "text/html;charset=utf-8")
-                    .addHeader("Content-Length", String.valueOf(0))
-                    .body("<html><body><h1>Hello world!</h1></body></html>")
-                    .build();
+        if (controller == null) {
+            controller = new StaticResourceController();
         }
-        return httpResponse;
+
+        return controller.handleRequest(httpRequest, httpResponse);
     }
 }
