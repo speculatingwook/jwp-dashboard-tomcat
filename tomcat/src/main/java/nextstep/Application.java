@@ -16,6 +16,7 @@ public class Application {
 		log.info("web server start.");
 		ControllerScanner controllerScanner = new ControllerScanner(BASE_PACKAGE);
 		MethodScanner methodScanner = MethodScanner.getInstance();
+		methodScanner.scan(controllerScanner.getControllerClasses());
 		final var tomcat = new Tomcat();
 		tomcat.start();
 	}
