@@ -18,6 +18,7 @@ public class HttpResponse {
     private HttpResponseBody body;
     private Session session;
     private Cookie cookie;
+    private Controller controller;
 
     public HttpResponse(HttpRequest request) {
         try {
@@ -32,7 +33,6 @@ public class HttpResponse {
         this.session = new Session(request.getHttpRequestHeader().getSessionId());
         this.cookie = request.getCookie();
 
-        Controller controller;
         if (method.equals(HttpMethod.GET)) {
             controller = new GetController();
         } else if (method.equals(HttpMethod.POST)) {
@@ -46,7 +46,6 @@ public class HttpResponse {
         } else {
             invalidRequest(path);
         }
-        invalidRequest(path);
     }
 
     public void login(String path, HttpRequest request) {
