@@ -43,6 +43,10 @@ public class Cookie {
         parameters.put("JSESSIONID","656cef62-e3c4-40bc-a8df-94732920ed46");
     }
 
+    public String getSessionId() {
+        return parameters.get("JSESSIONID");
+    }
+
     public String toRaw(String key) {
         return key + "=" + parameters.get(key);
     }
