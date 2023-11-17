@@ -1,9 +1,11 @@
-package org.apache.coyote.handler;
+package nextstep.jwp.controller;
 
 import nextstep.jwp.db.InMemoryUserRepository;
 import nextstep.jwp.exception.badrequest.ExistUserException;
 import nextstep.jwp.model.User;
-import org.apache.coyote.request.QueryParams;
+import org.apache.coyote.query.QueryParams;
+import org.apache.coyote.request.HttpRequest;
+import org.apache.coyote.response.ContentType;
 import org.apache.coyote.response.HttpResponse;
 import org.apache.coyote.response.Location;
 import org.slf4j.Logger;
@@ -14,15 +16,14 @@ import java.util.Optional;
 
 import static org.apache.coyote.response.ContentType.HTML;
 import static org.apache.coyote.response.StatusCode.FOUND;
+import static org.apache.coyote.response.StatusCode.OK;
 
-public class SignUpHandler {
-    private static final Logger log = LoggerFactory.getLogger(SignUpHandler.class);
+public class SignUpController extends AbstractController {
+    private static final Logger log = LoggerFactory.getLogger(SignUpController.class);
 
-    private SignUpHandler() {
-    }
-
-    public static HttpResponse register(final String requestBody) throws URISyntaxException {
-        final QueryParams queryParams = QueryParams.from(requestBody);
+    @Override
+    protected HttpResponse doPost(final HttpRequest request) throws URISyntaxException {
+        final QueryParams queryParams = request.getQueryParams();
 
         final String account = queryParams.getValueFromKey("account");
         final String password = queryParams.getValueFromKey("password");
@@ -38,6 +39,12 @@ public class SignUpHandler {
         log.info("회원가입 성공! : {}", userInformation);
 
         return HttpResponse.of(FOUND, HTML, Location.from("/index.html"));
+    }
+
+    @Override
+    protected HttpResponse doGet(final HttpRequest request) throws URISyntaxException {
+        final String requestPath = request.getRequestPath();
+        return HttpResponse.of(OK, ContentType.from(requestPath), requestPath);
     }
 
     private static void checkAlreadyExistUser(String account) {
