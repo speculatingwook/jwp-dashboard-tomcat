@@ -6,6 +6,9 @@ import org.apache.coyote.http11.response.ContentType;
 import org.apache.coyote.http11.response.HttpMethod;
 import org.apache.coyote.http11.response.HttpResponse;
 import org.apache.coyote.http11.response.HttpStatusCode;
+import org.apache.coyote.http11.session.Cookie;
+import org.apache.coyote.http11.session.Session;
+import org.apache.coyote.http11.session.SessionUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +17,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class LoginController implements Controller{
     private static final String INDEX_PAGE_URL = "index.html";
@@ -28,6 +32,17 @@ public class LoginController implements Controller{
 
 
         if(httpMethod.equals(HttpMethod.GET.getMethod())) {
+            Cookie cookie = httpRequest.getCookie();
+            String jSessionId = cookie.getValue("JSESSIONID");
+            Optional<Session> session = SessionUtil.findSession(jSessionId);
+            if (session.isPresent()) {
+                return new HttpResponse()
+                        .statusCode(HttpStatusCode.FOUND.getCode())
+                        .statusMessage(HttpStatusCode.FOUND.getMessage())
+                        .addHeader("Location", INDEX_PAGE_URL)
+                        .build();
+            }
+
             URL resource = getClass()
                     .getClassLoader()
                     .getResource(LOGIN__PAGE_URL);
@@ -42,6 +57,7 @@ public class LoginController implements Controller{
                     .addHeader("Content-Length", String.valueOf(responseBody.getBytes().length))
                     .body(responseBody)
                     .build();
+
         } else if(httpMethod.equals(HttpMethod.POST.getMethod())) {
             String requestBody = httpRequest.getBody();
             Map<String, String> queryParameters = parseQueryParameters(requestBody);
@@ -49,11 +65,19 @@ public class LoginController implements Controller{
             String password = queryParameters.get("password");
 
             if(loginService.login(account, password)) {
-                return httpResponse = new HttpResponse()
+                String jSessionId = SessionUtil.generateJSessionId();
+                Session session = Session.createSession(jSessionId);
+                SessionUtil.add(session);
+
+                httpResponse = new HttpResponse()
                         .statusCode(HttpStatusCode.FOUND.getCode())
                         .statusMessage(HttpStatusCode.FOUND.getMessage())
                         .addHeader("Location", INDEX_PAGE_URL)
                         .build();
+
+                httpResponse.addCookie("JSESSIONID", jSessionId);
+
+                return httpResponse;
             }
             return httpResponse = new HttpResponse()
                     .statusCode(HttpStatusCode.UNAUTHORIZED.getCode())
