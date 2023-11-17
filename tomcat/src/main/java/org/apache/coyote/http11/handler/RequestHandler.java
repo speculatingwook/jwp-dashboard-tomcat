@@ -11,17 +11,19 @@ public class RequestHandler {
 
 	private HttpRequest httpRequest;
 	private HttpResponse httpResponse;
-	private Map<String, Method> uriToMethodMap;
+	private Map<String, Method> uriToGetMethodMap;
+	private Map<String, Method> uriToPostMethodMap;
 
 	private RequestHandler(HttpRequest httpRequest, HttpResponse httpResponse) {
 		this.httpRequest = httpRequest;
 		this.httpResponse = httpResponse;
-		this.uriToMethodMap = MethodScanner.getInstance().getUriToMethodMap();
+		MethodScanner methodScanner = MethodScanner.getInstance();
+		this.uriToGetMethodMap = methodScanner.getUriToGetMethodMap();
+		this.uriToPostMethodMap = methodScanner.getUriToPostMethodMap();
 	}
 
 	public static RequestHandler of(HttpRequest httpRequest, HttpResponse httpResponse) {
 		return new RequestHandler(httpRequest, httpResponse);
 	}
-
 
 }
