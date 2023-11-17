@@ -11,6 +11,8 @@ import java.net.URL;
 import java.nio.file.Files;
 
 public class StaticResourceController implements Controller {
+    private static final String NOT_FOUND_PAGE_URL = "404.html";
+
     @Override
     public HttpResponse handleRequest(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         String requestUri = httpRequest.getPath();
@@ -18,16 +20,27 @@ public class StaticResourceController implements Controller {
         URL resource = getClass()
                 .getClassLoader()
                 .getResource("static" + requestUri);
-        File file = new File(resource.getFile());
 
-        String responseBody = new String(Files.readAllBytes(file.toPath()));
+        try {
+            File file = new File(resource.getFile());
+            String responseBody = new String(Files.readAllBytes(file.toPath()));
 
-        return httpResponse = new HttpResponse()
-                .statusCode(HttpStatusCode.OK.getCode())
-                .statusMessage(HttpStatusCode.OK.getMessage())
-                .addHeader("Content-Type", ContentType.findContentTypeFromUri(requestUri).getContentType())
-                .addHeader("Content-Length", String.valueOf(responseBody.getBytes().length))
-                .body(responseBody)
-                .build();
+            return httpResponse = new HttpResponse()
+                    .statusCode(HttpStatusCode.OK.getCode())
+                    .statusMessage(HttpStatusCode.OK.getMessage())
+                    .addHeader("Content-Type", ContentType.findContentTypeFromUri(requestUri).getContentType())
+                    .addHeader("Content-Length", String.valueOf(responseBody.getBytes().length))
+                    .body(responseBody)
+                    .build();
+
+        } catch (NullPointerException e) {
+
+            // todo: 작동 안함
+            return httpResponse = new HttpResponse()
+                    .statusCode(HttpStatusCode.NOT_FOUND.getCode())
+                    .statusMessage(HttpStatusCode.NOT_FOUND.getMessage())
+                    .addHeader("Location", NOT_FOUND_PAGE_URL)
+                    .build();
+        }
     }
 }
