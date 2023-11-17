@@ -8,13 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpResponse {
-    //각 path, parameter에 따라 response 만들기
 
     private static final Logger log = LoggerFactory.getLogger(HttpResponse.class);
-
     int statusCode;
-    String responseBody;
     ContentType contentType;
+    String responseBody;
     private Map<String, String> headers = new HashMap<>();
 
     public void setStatusCode(int statusCode) {

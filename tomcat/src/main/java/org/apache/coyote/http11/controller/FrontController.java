@@ -6,26 +6,21 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-public class MappingController {
+public class FrontController {
 
-    private static final Logger log = LoggerFactory.getLogger(MappingController.class);
+    private static final Logger log = LoggerFactory.getLogger(FrontController.class);
     private Map<String, Controller> controllerMap;
-    public MappingController() {
+    public FrontController() {
         controllerMap = new HashMap<>();
         controllerMap.put("/login", new LoginController());
         controllerMap.put("/register", new RegisterController());
     }
 
     public Controller match(HttpRequest httpRequest) {
-        String path = httpRequest.getRequestPath();
-        if (path.endsWith(".css") || path.endsWith(".js") || path.endsWith(".html")) {
-            return new StaticController();
-        }
         Controller controller = controllerMap.get(httpRequest.getRequestPath());
         if (controller != null)
             return controller;
-        return new NotFoundController();
+        return new StaticController();
     }
 }

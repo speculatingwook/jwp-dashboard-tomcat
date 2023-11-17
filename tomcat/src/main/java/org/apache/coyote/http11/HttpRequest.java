@@ -4,10 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +16,6 @@ public class HttpRequest {
     private Map<String, String> header;
     private Map<String, String> params;
     private Map<String, String> body;
-
     private Map<String, String> cookies;
     HttpRequest (BufferedReader reader) throws IOException {
         StringBuilder headerBuilder = new StringBuilder();
@@ -31,7 +27,6 @@ public class HttpRequest {
         parseHeader(reader);
         parseBody(reader);
         parseCookie();
-        System.out.println(cookies);
     }
 
     private void parseMethod(String firstLine) {
@@ -50,6 +45,19 @@ public class HttpRequest {
             if (requestLineParts.length >= 2) {
                 requestPath = requestLineParts[1]; // 요청된 URI (/index.html 등
             }
+        }
+    }
+
+    private void parseHeader(BufferedReader reader) throws IOException {
+        header = new HashMap<>();
+        String line = reader.readLine();
+        while ((line != null && !line.isBlank())) {
+            System.out.println(line);
+            String[] split = line.split(":",2);
+            if (split.length == 2) {
+                header.put(split[0].trim(), split[1].trim());
+            }
+            line = reader.readLine();
         }
     }
     private void parseParameters() {
@@ -71,18 +79,6 @@ public class HttpRequest {
         }
     }
 
-    private void parseHeader(BufferedReader reader) throws IOException {
-        header = new HashMap<>();
-        String line = reader.readLine();
-        while ((line != null && !line.isBlank())) {
-            System.out.println(line);
-            String[] split = line.split(":",2);
-            if (split.length == 2) {
-                header.put(split[0].trim(), split[1].trim());
-            }
-            line = reader.readLine();
-        }
-    }
     private void parseBody(BufferedReader reader) throws IOException {
         String messageBody = "";
         body = new HashMap<>();
@@ -126,15 +122,9 @@ public class HttpRequest {
     public Map<String, String> getParams() {
         return this.params;
     }
-
     public Map<String, String> getBody() {
         return this.body;
     }
-
-    public boolean isCookie() {
-        return header.containsKey("JSESSIONID");
-    }
-
     public Map<String, String> getCookie() {
         return this.cookies;
     }
