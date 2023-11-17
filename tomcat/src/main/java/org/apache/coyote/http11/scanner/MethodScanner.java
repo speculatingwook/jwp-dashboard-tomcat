@@ -5,17 +5,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.coyote.http11.annotation.RequestMapping;
+import org.apache.coyote.http11.annotation.GetMapping;
+import org.apache.coyote.http11.annotation.PostMapping;
 
 import lombok.Getter;
 
 @Getter
 public class MethodScanner {
 
-	private Map<String, Method> uriToMethodMap;
+	private Map<String, Method> uriToGetMethodMap;
+	private Map<String, Method> uriToPostMethodMap;
 
 	private MethodScanner() {
-		this.uriToMethodMap = new HashMap<>();
+		this.uriToGetMethodMap = new HashMap<>();
+		this.uriToPostMethodMap = new HashMap<>();
 	}
 
 	public static MethodScanner getInstance() {
@@ -26,19 +29,26 @@ public class MethodScanner {
 		private static final MethodScanner INSTANCE = new MethodScanner();
 	}
 
-	public void scan(Set<Class<?>> controllerClasses) {
+	private void scanGetMapping(Set<Class<?>> controllerClasses) {
 		for (Class<?> controller : controllerClasses) {
 			for (Method method : controller.getDeclaredMethods()) {
-				if (method.isAnnotationPresent(RequestMapping.class)) {
-					RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-					this.uriToMethodMap.put(requestMapping.value(), method);
+				if (method.isAnnotationPresent(GetMapping.class)) {
+					GetMapping getMapping = method.getAnnotation(GetMapping.class);
+					this.uriToGetMethodMap.put(getMapping.value(), method);
 				}
 			}
 		}
 	}
 
-	public Map<String, Method> getUriToMethodMap() {
-		return uriToMethodMap;
+	private void scanPostMapping(Set<Class<?>> controllerClasses) {
+		for (Class<?> controller : controllerClasses) {
+			for (Method method : controller.getDeclaredMethods()) {
+				if (method.isAnnotationPresent(PostMapping.class)) {
+					PostMapping postMapping = method.getAnnotation(PostMapping.class);
+					this.uriToPostMethodMap.put(postMapping.value(), method);
+				}
+			}
+		}
 	}
 
 }
