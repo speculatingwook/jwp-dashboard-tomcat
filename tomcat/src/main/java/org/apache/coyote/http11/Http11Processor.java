@@ -5,7 +5,7 @@ import nextstep.jwp.exception.UncheckedServletException;
 import nextstep.jwp.model.User;
 import org.apache.coyote.Processor;
 import org.apache.coyote.http11.controller.Controller;
-import org.apache.coyote.http11.controller.MappingController;
+import org.apache.coyote.http11.controller.FrontController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ public class Http11Processor implements Runnable, Processor {
             HttpRequest httpRequest = new HttpRequest(reader);
             HttpResponse httpResponse = new HttpResponse();
 
-            MappingController CONTROLLER = new MappingController();
+            FrontController CONTROLLER = new FrontController();
             Controller controller =  CONTROLLER.match(httpRequest);
             System.out.println(controller.getClass());
             controller.handleRequest(httpRequest, httpResponse);

@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
-public class LoginController implements Controller {
+public class LoginController extends AbstractController{
     User user;
 
     Cookie cookie;
@@ -23,11 +23,9 @@ public class LoginController implements Controller {
             handleLoginRequest(httpRequest, httpResponse);
         } else {
             if(checkLogin(httpRequest)) {
-                httpResponse.setStatusCode(302);
-                httpResponse.addHeader("Location", "/index.html");
+                redirectToHome("/index.html",httpResponse);
             } else {
-                StaticController staticController = new StaticController();
-                staticController.getStaticResourceFile(path + ".html", httpResponse);
+                getStaticResourceFile(path + ".html", httpResponse);
             }
         }
 
@@ -43,18 +41,15 @@ public class LoginController implements Controller {
             String sessionId = generateUniqueSessionId();
             Session.loginUser(sessionId, user);
             setCookie(httpResponse, sessionId);
-            httpResponse.setStatusCode(302);
-            httpResponse.addHeader("Location", "/index.html");
+            redirectToHome("/index.html",httpResponse);
         } else {
-            httpResponse.setStatusCode(302);
-            httpResponse.addHeader("Location", "/401.html");// HTTP 상태코드 401 (Unauthorized)
+            redirectToHome("/401.html",httpResponse);
         }
     }
-
-    public static String generateUniqueSessionId() {
-        // 랜덤한 UUID 생성
-        UUID uuid = UUID.randomUUID();
-        return uuid.toString();
+    private boolean checkLogin(HttpRequest httpRequest) {
+        String sessionId = httpRequest.getCookie().get("JSESSIONID");
+        user = Session.getUser(sessionId);
+        return (user != null);
     }
 
     private Optional<User> authenticate(String account, String password) {
@@ -68,15 +63,15 @@ public class LoginController implements Controller {
         return Optional.empty(); // 인증 실패
     }
 
+    public static String generateUniqueSessionId() {
+        UUID uuid = UUID.randomUUID();
+        return uuid.toString();
+    }
+
     private void setCookie(HttpResponse httpResponse, String sessionId) {
         System.out.println("setCookie");
         cookie = new Cookie(user.getAccount(), sessionId);
         httpResponse.addHeader("Set-Cookie", "JSESSIONID=" + cookie.getValue());
     }
 
-    private boolean checkLogin(HttpRequest httpRequest) {
-        String sessionId = httpRequest.getCookie().get("JSESSIONID");
-        user = Session.getUser(sessionId);
-        return (user != null);
-    }
 }

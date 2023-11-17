@@ -16,7 +16,4 @@ public class Session {
         return sessionData.get(sessionId);
     }
 
-    public static void logoutUser(String sessionId) {
-        sessionData.remove(sessionId);
-    }
 }
