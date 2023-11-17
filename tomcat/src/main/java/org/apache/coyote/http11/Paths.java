@@ -33,4 +33,14 @@ public enum Paths {
         return contentType;
     }
 
+    public static Boolean containsPath(String pathToCheck) {
+        for (Paths path : Paths.values()) {
+            if (path.getPath().equals(pathToCheck)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }

@@ -1,6 +1,9 @@
 package org.apache.coyote.http11.response;
 
 import org.apache.coyote.http11.*;
+import org.apache.coyote.http11.controller.Controller;
+import org.apache.coyote.http11.controller.GetController;
+import org.apache.coyote.http11.controller.PostController;
 import org.apache.coyote.http11.login.LoginHandler;
 import org.apache.coyote.http11.request.HttpRequest;
 import org.slf4j.Logger;
@@ -28,18 +31,25 @@ public class HttpResponse {
         String path= request.getHttpRequestLine().getPath();
         this.session = new Session(request.getHttpRequestHeader().getSessionId());
         this.cookie = request.getCookie();
+
+        Controller controller;
         if (method.equals(HttpMethod.GET)) {
-            createResponse(path);
-//            sessionLogin();
+            controller = new GetController();
+        } else if (method.equals(HttpMethod.POST)) {
+            controller = new PostController();
+        } else {
+            throw new UnsupportedOperationException("Unsupported method: " + method);
         }
-        if (method.equals(HttpMethod.POST)) {
-            login(path, request);
-            register(path);
+
+        if (controller.canHandle(path)) {
+            controller.handleRequest(request, this);
+        } else {
+            invalidRequest(path);
         }
         invalidRequest(path);
     }
 
-    private void login(String path, HttpRequest request) {
+    public void login(String path, HttpRequest request) {
         if (Paths.LOGIN.getPath().contains(path)) {
             LoginHandler login = new LoginHandler(request.getHttpRequestBody().getValue("account"), request.getHttpRequestBody().getValue("password"));
             if (login.checkUser()) {
@@ -67,7 +77,7 @@ public class HttpResponse {
                     .addContentLength(body.getContentLength());
         }
     }
-    private void register(String path) {
+    public void register(String path) {
         if (path.equals("/register")) {
             body = HttpResponseBody.of(Paths.INDEX.createPath());
             header = new HttpResponseHeader(StatusCode.OK.getStatus())
@@ -76,7 +86,7 @@ public class HttpResponse {
         }
     }
 
-    private void createResponse(String path) {
+    public void createResponse(String path) {
         for (Paths paths : Paths.values()) {
             String convertedPath = pathConvert(path, paths.getContentType());
             if (convertedPath.equals(paths.getPath())) {
