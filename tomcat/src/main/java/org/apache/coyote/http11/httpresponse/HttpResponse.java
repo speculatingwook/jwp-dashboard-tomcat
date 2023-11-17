@@ -1,4 +1,4 @@
-package org.apache.coyote.http11.HttpResponse;
+package org.apache.coyote.http11.httpresponse;
 
 import lombok.Getter;
 
