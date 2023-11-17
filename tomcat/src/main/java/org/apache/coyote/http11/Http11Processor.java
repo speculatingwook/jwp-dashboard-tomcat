@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 import org.apache.coyote.Processor;
+import org.apache.coyote.http11.handler.RequestHandler;
+import org.apache.coyote.http11.httprequest.HttpRequest;
 import org.apache.coyote.http11.httpresponse.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,13 +40,7 @@ public class Http11Processor implements Runnable, Processor {
 			HttpRequest httpRequest = HttpRequest.from(bufferedReader);
 			HttpResponse httpResponse = new HttpResponse();
 
-			log.info("httpRequest.getHttpMethod(): {}", httpRequest.getHttpMethod());
-			log.info("httpRequest.getUri(): {}", httpRequest.getUri());
-			log.info("httpRequest.getHttpVersion(): {}", httpRequest.getHttpVersion());
-			log.info("httpRequest.getRequestHeaders(): {}", httpRequest.getRequestHeaders());
-			log.info("httpRequest.getRequestBody(): {}", httpRequest.getRequestBody());
-
-			ControllerScanner controllerScanner = ControllerScanner.getInstance();
+			RequestHandler requestHandler = RequestHandler.of(httpRequest, httpResponse);
 
 
 			outputStream.flush();
