@@ -7,6 +7,9 @@ import java.util.Set;
 
 import org.apache.coyote.http11.annotation.RequestMapping;
 
+import lombok.Getter;
+
+@Getter
 public class MethodScanner {
 
 	private Map<String, Method> uriToMethodMap;
