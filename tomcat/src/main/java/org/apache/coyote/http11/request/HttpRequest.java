@@ -1,5 +1,7 @@
 package org.apache.coyote.http11.request;
 
+import org.apache.coyote.http11.session.Cookie;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,5 +69,21 @@ public class HttpRequest {
 
     public String getBody() {
         return body;
+    }
+
+    public Cookie getCookie() {
+        String cookieHeader = headers.get("Cookie");
+        if (cookieHeader != null) {
+            Cookie cookie = new Cookie();
+            String[] cookieParts = cookieHeader.split("; ");
+            for (String part : cookieParts) {
+                String[] keyValue = part.split("=");
+                if (keyValue.length == 2) {
+                    cookie.setValue(keyValue[0], keyValue[1]);
+                }
+            }
+            return cookie;
+        }
+        return null;
     }
 }
