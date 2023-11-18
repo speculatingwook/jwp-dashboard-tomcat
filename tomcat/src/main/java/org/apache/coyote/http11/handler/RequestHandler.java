@@ -4,24 +4,21 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.apache.coyote.http11.httprequest.HttpRequest;
-import org.apache.coyote.http11.httpresponse.HttpResponse;
 import org.apache.coyote.http11.scanner.MethodScanner;
 
 public class RequestHandler {
 
 	private HttpRequest httpRequest;
-	private HttpResponse httpResponse;
 	private Map<String, Method> uriToGetMethodMap;
 	private Map<String, Method> uriToPostMethodMap;
 
-	private RequestHandler(HttpRequest httpRequest, HttpResponse httpResponse) {
+	private RequestHandler(HttpRequest httpRequest) {
 		this.httpRequest = httpRequest;
-		this.httpResponse = httpResponse;
 		createMethodMap(MethodScanner.getInstance());
 	}
 
-	public static RequestHandler of(HttpRequest httpRequest, HttpResponse httpResponse) {
-		return new RequestHandler(httpRequest, httpResponse);
+	public static RequestHandler of(HttpRequest httpRequest) {
+		return new RequestHandler(httpRequest);
 	}
 
 	private void createMethodMap(MethodScanner methodScanner) {
