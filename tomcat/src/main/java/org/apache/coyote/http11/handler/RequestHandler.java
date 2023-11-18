@@ -17,13 +17,15 @@ public class RequestHandler {
 	private RequestHandler(HttpRequest httpRequest, HttpResponse httpResponse) {
 		this.httpRequest = httpRequest;
 		this.httpResponse = httpResponse;
-		MethodScanner methodScanner = MethodScanner.getInstance();
-		this.uriToGetMethodMap = methodScanner.getUriToGetMethodMap();
-		this.uriToPostMethodMap = methodScanner.getUriToPostMethodMap();
+		createMethodMap(MethodScanner.getInstance());
 	}
 
 	public static RequestHandler of(HttpRequest httpRequest, HttpResponse httpResponse) {
 		return new RequestHandler(httpRequest, httpResponse);
 	}
 
+	private void createMethodMap(MethodScanner methodScanner) {
+		this.uriToGetMethodMap = methodScanner.getUriToGetMethodMap();
+		this.uriToPostMethodMap = methodScanner.getUriToPostMethodMap();
+	}
 }
