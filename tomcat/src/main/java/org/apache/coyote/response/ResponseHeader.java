@@ -1,7 +1,6 @@
 package org.apache.coyote.response;
 
-import org.apache.coyote.request.HttpRequest;
-import org.apache.coyote.util.Constant;
+import nextstep.util.Constant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +12,10 @@ public class ResponseHeader {
         header = new ArrayList<>();
     }
 
-    public static ResponseHeader of(HttpRequest httpRequest, ResponseBody responseBody) {
+    public static ResponseHeader of(String viewPath, ResponseBody responseBody, HttpStatus httpStatus) {
         ResponseHeader responseHeader = new ResponseHeader();
-        responseHeader.header.add(Constant.HTTP_VERSION + " " + HttpCode.OK.toString() + " ");
-        responseHeader.header.add("Content-Type: " + convertContentType(httpRequest));
+        responseHeader.header.add(Constant.HTTP_VERSION + " " + httpStatus.toString() + " ");
+        responseHeader.header.add("Content-Type: " + convertContentType(viewPath));
         responseHeader.header.add("Content-Length: " + convertLength(responseBody));
         return responseHeader;
     }
@@ -25,8 +24,9 @@ public class ResponseHeader {
         return String.valueOf(responseBody.length());
     }
 
-    private static String convertContentType(HttpRequest httpRequest) {
-        return ContentType.from(httpRequest.getPath()) + ";charset=utf-8";
+    private static String convertContentType(String viewPath) {
+        return ContentType.from(viewPath) + ";charset=utf-8";
+
     }
 
     @Override

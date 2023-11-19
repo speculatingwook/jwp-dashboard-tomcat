@@ -12,6 +12,7 @@ public class HttpRequest {
     private String httpMethod;
 
     private HttpRequestHeader header;
+
     public HttpRequest(Reader reader) throws NoSuchAttributeException, IOException {
         queryString = new QueryString();
         header = new HttpRequestHeader();
@@ -25,19 +26,20 @@ public class HttpRequest {
         return path;
     }
 
-    public String getHttpMethod(){
-        return httpMethod;
+    public QueryString getQueryString() {
+        return queryString;
     }
 
     public void addQueryStringValue(String key, String value) {
-        queryString.addQueryString(key, value);
+        queryString.put(key, value);
     }
 
     private void parseMethodAndPath(BufferedReader br) throws IOException, NoSuchAttributeException {
         //첫줄 Method & URI parsing
         String firstLine = br.readLine();
+        System.out.println(firstLine);
         if (firstLine == null)
-            throw new NoSuchAttributeException("없음");
+            throw new NoSuchAttributeException("요청이 잘못 들어옴");
 
         String[] methodPathSplit = firstLine.split(" ");
         this.httpMethod = methodPathSplit[0];

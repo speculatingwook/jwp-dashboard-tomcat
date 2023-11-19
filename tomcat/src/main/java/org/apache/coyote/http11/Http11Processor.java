@@ -1,5 +1,8 @@
 package org.apache.coyote.http11;
 
+import nextstep.exception.NotFoundControllerException;
+import nextstep.jwp.RequestMapping;
+import nextstep.jwp.controller.Controller;
 import nextstep.jwp.exception.UncheckedServletException;
 import org.apache.coyote.Processor;
 import org.apache.coyote.request.HttpRequest;
@@ -21,8 +24,11 @@ public class Http11Processor implements Runnable, Processor {
 
     private final Socket connection;
 
+    private final RequestMapping requestMapping;
+
     public Http11Processor(final Socket connection) {
         this.connection = connection;
+        requestMapping = new RequestMapping();
     }
 
     @Override
@@ -39,9 +45,8 @@ public class Http11Processor implements Runnable, Processor {
 
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(outputStream));
             HttpResponse httpResponse = new HttpResponse(); // HttpResponse 객체 생성
-
-            String responseContent = process(httpRequest, httpResponse);
-            response(responseContent, bw);
+            process(httpRequest, httpResponse);
+            response(httpResponse, bw);
         } catch (IOException | UncheckedServletException e) {
             log.error(e.getMessage(), e);
         } catch (NoSuchAttributeException e) {
@@ -49,25 +54,17 @@ public class Http11Processor implements Runnable, Processor {
         }
     }
 
-    private String process(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-        String httpMethod = httpRequest.getHttpMethod();
-        switch (httpMethod) {
-            case "GET": {
-                return getProcess(httpRequest, httpResponse);
-            }
-            default: {
-                return null;
-            }
+    private HttpResponse process(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+        String path = httpRequest.getPath();
+        Controller controller = requestMapping.getController(path);
+        if (controller == null) {
+            throw new NotFoundControllerException(httpRequest.getPath() + httpRequest.getQueryString() + " 처리불가한 요청");
         }
+        return controller.execute(httpRequest, httpResponse);
     }
 
-    private String getProcess(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-        String response = httpResponse.getResponse(httpRequest);
-        return response;
-    }
-
-    private void response(String response, BufferedWriter bw) throws IOException {
-        bw.write(response);
+    private void response(HttpResponse httpResponse, BufferedWriter bw) throws IOException {
+        bw.write(httpResponse.getResponse());
         bw.flush();
     }
 }

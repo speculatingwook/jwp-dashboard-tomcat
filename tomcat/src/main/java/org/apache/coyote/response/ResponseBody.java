@@ -20,11 +20,15 @@ public class ResponseBody {
         return body;
     }
 
-    public static ResponseBody from(HttpRequest httpRequest) throws IOException {
-        return new ResponseBody(readFile(httpRequest.getPath()));
+    public static ResponseBody from(String viewPath) throws IOException {
+        return new ResponseBody(readFile(viewPath));
     }
 
     private static String readFile(String uri) throws IOException {
+        System.out.println(uri);
+        if(uri.equals("/")){
+            uri = "/index.html";
+        }
         if(!uri.contains(".")){
             uri += ".html";
         }

@@ -10,8 +10,15 @@ public class QueryString {
         this.queryStringMap = new HashMap<>();
     }
 
-    public void addQueryString(String key, String value) {
+    public void put(String key, String value) {
         queryStringMap.put(key, value);
+    }
+
+    public String get(String key){
+        return queryStringMap.get(key);
+    }
+    public boolean hasQueryStrings(){
+        return !queryStringMap.isEmpty();
     }
 
     @Override
