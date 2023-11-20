@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class SessionUtil {
+public class SessionManager {
     public static String generateJSessionId() {
         return UUID.randomUUID().toString();
     }
@@ -16,15 +16,17 @@ public class SessionUtil {
         SESSIONS.put(session.getSessionId(), session);
     }
 
-    public static Optional<Session> findSession(String id) {
-        return Optional.ofNullable(SESSIONS.get(id));
+    public static Session findSession(String sessionId) {
+        return verifySession(sessionId);
     }
 
     public void remove(Session session) {
         SESSIONS.remove(session.getSessionId());
     }
 
-    private Session verifySession(String sessionId) {
+    private static Session verifySession(String sessionId) {
+        Optional<Session> findSession = Optional.of(SESSIONS.get(sessionId));
+        return findSession.orElseThrow(() -> new RuntimeException("not found Session"));
 
     }
 }
