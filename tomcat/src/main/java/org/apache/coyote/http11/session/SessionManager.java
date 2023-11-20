@@ -23,4 +23,8 @@ public class SessionUtil {
     public void remove(Session session) {
         SESSIONS.remove(session.getSessionId());
     }
+
+    private Session verifySession(String sessionId) {
+
+    }
 }
