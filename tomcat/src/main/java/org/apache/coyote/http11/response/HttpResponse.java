@@ -1,89 +1,82 @@
 package org.apache.coyote.http11.response;
 
+import lombok.Getter;
 import org.apache.coyote.http11.session.Cookie;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public class HttpResponse {
-
-    private int statusCode;
-    private String statusMessage;
-    private Map<String, String> headers;
-    private String body;
-    private Map<String, Cookie> cookies;  // 추가된 부분
+    private HttpResponseHeader httpResponseHeader;
+    private HttpResponseBody httpResponseBody;
 
     public HttpResponse() {
-        this.headers = new HashMap<>();
-        this.cookies = new HashMap<>();  // 추가된 부분
+
     }
 
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
+    public HttpResponse(HttpResponseHeader httpResponseHeader, HttpResponseBody httpResponseBody) {
+        this.httpResponseHeader = httpResponseHeader;
+        this.httpResponseBody = httpResponseBody;
     }
 
-    public void setStatusMessage(String statusMessage) {
-        this.statusMessage = statusMessage;
+    public static HttpResponseBuilder builder() {
+        return new HttpResponse().new HttpResponseBuilder();
     }
 
-    public void setHeaders(Map<String, String> headers) {
-        this.headers = headers;
+    @Override
+    public String toString() {
+        String header = httpResponseHeader.toString();
+        String body = httpResponseBody.toString();
+
+        return header + "\r\n" + body;
     }
 
-    public void setBody(String body) {
-        this.body = body;
-    }
+    public class HttpResponseBuilder {
+        private int statusCode;
+        private String statusMessage;
+        private Map<String, String> headers = new HashMap<>();
+        private Cookie cookie = new Cookie();
+        private String body;
 
-    public void addCookie(String name, String value) {
-        Cookie cookie = new Cookie();
-        cookie.setValue(name, value);
-        cookies.put(name, cookie);
-    }
-
-    public String generateHttpResponse() throws IOException {
-        // 상태 라인 및 헤더
-        String response = "HTTP/1.1 " + statusCode + " " + statusMessage + "\r\n";
-        for (Map.Entry<String, String> entry : headers.entrySet()) {
-            response += entry.getKey() + ": " + entry.getValue() + "\r\n";
+        public HttpResponseBuilder statusCode(int statusCode) {
+            this.statusCode = statusCode;
+            return this;
         }
 
-        // 쿠키
-        for (Map.Entry<String, Cookie> entry : cookies.entrySet()) {
-            response += "Set-Cookie: " + entry.getKey() + "=" + entry.getValue().getValue(entry.getKey()) + "\r\n";
+        public HttpResponseBuilder statusMessage(String statusMessage) {
+            this.statusMessage = statusMessage;
+            return this;
         }
 
-        // 바디
-        return response += "\r\n" + body;
-    }
+        public HttpResponseBuilder addHeader(String name, String value) {
+            this.headers.put(name, value);
+            return this;
+        }
 
-    // 빌더 패턴 메소드
-    public HttpResponse statusCode(int statusCode) {
-        this.statusCode = statusCode;
-        return this;
-    }
+        public HttpResponseBuilder addCookie(String name, String value) {
+            this.cookie.putValue(name, value);
+            return this;
+        }
 
-    public HttpResponse statusMessage(String statusMessage) {
-        this.statusMessage = statusMessage;
-        return this;
-    }
+        public HttpResponseBuilder body(String body) {
+            this.body = body;
+            return this;
+        }
 
-    public HttpResponse addHeader(String name, String value) {
-        this.headers.put(name, value);
-        return this;
-    }
+        public HttpResponse build() {
+            HttpResponseHeader httpResponseHeader = HttpResponseHeader.builder()
+                    .statusCode(statusCode)
+                    .statusMessage(statusMessage)
+                    .headers(headers)
+                    .cookie(cookie)
+                    .build();
 
-    public HttpResponse body(String body) {
-        this.body = body;
-        return this;
-    }
+            HttpResponseBody httpResponseBody = HttpResponseBody.builder()
+                    .body(body)
+                    .build();
 
-    public HttpResponse build() {
-        HttpResponse httpResponse = new HttpResponse();
-        httpResponse.setStatusCode(statusCode);
-        httpResponse.setStatusMessage(statusMessage);
-        httpResponse.setHeaders(headers);
-        httpResponse.setBody(body);
-        return httpResponse;
+            return new HttpResponse(httpResponseHeader, httpResponseBody);
+        }
     }
 }
