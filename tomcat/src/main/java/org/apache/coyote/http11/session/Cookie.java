@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class Cookie {
     private Map<String, String> values;
+    private  final String JSESSIONID = "JSESSIONID";
 
     public Cookie() {
         values = new HashMap<>();
@@ -16,6 +17,10 @@ public class Cookie {
 
     public String getValue(String key) {
         return values.get(key);
+    }
+
+    public String getJSessionId() {
+        return values.get(JSESSIONID);
     }
 }
 
