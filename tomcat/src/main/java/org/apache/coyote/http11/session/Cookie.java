@@ -1,22 +1,21 @@
 package org.apache.coyote.http11.session;
 
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public class Cookie {
     private Map<String, String> values;
-    private  final String JSESSIONID = "JSESSIONID";
+    private final String JSESSIONID = "JSESSIONID";
 
     public Cookie() {
         values = new HashMap<>();
     }
 
-    public void setValue(String key, String value) {
-        values.put(key, value);
-    }
-
-    public String getValue(String key) {
-        return values.get(key);
+    public void putValue(String name, String value) {
+        values.put(name, value);
     }
 
     public String getJSessionId() {
