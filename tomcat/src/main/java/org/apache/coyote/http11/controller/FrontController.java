@@ -18,7 +18,7 @@ public class FrontController implements Controller{
     }
 
     @Override
-    public HttpResponse handleRequest(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+    public HttpResponse handleRequest(HttpRequest httpRequest) throws IOException {
         HttpRequestHeader httpRequestHeader = httpRequest.getHttpRequestHeader();
 
         String path = httpRequestHeader.getPath();
@@ -34,6 +34,6 @@ public class FrontController implements Controller{
             controller = new StaticResourceController();
         }
 
-        return controller.handleRequest(httpRequest, httpResponse);
+        return controller.handleRequest(httpRequest);
     }
 }
