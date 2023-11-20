@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.apache.coyote.http11.session.Cookie;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Getter
 public class HttpRequestHeader {
@@ -21,7 +22,7 @@ public class HttpRequestHeader {
         this.headers = headers;
     }
 
-    public Cookie getCookie() {
+    public Optional<Cookie> getCookie() {
         String cookieHeader = headers.get("Cookie");
         if (cookieHeader != null) {
             Cookie cookie = new Cookie();
@@ -29,10 +30,10 @@ public class HttpRequestHeader {
             for (String part : cookieParts) {
                 String[] keyValue = part.split("=");
                 if (keyValue.length == 2) {
-                    cookie.setValue(keyValue[0], keyValue[1]);
+                    cookie.putValue(keyValue[0], keyValue[1]);
                 }
             }
-            return cookie;
+            return Optional.of(cookie);
         }
         // todo: 예외 추가하기
         return null;
