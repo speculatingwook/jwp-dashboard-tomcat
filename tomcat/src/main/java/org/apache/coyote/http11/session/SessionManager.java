@@ -16,17 +16,11 @@ public class SessionManager {
         SESSIONS.put(session.getSessionId(), session);
     }
 
-    public static Session findSession(String sessionId) {
-        return verifySession(sessionId);
+    public static Optional<Session> findSession(String sessionId) {
+        return Optional.ofNullable(SESSIONS.get(sessionId));
     }
 
     public void remove(Session session) {
         SESSIONS.remove(session.getSessionId());
-    }
-
-    private static Session verifySession(String sessionId) {
-        Optional<Session> findSession = Optional.of(SESSIONS.get(sessionId));
-        return findSession.orElseThrow(() -> new RuntimeException("not found Session"));
-
     }
 }
