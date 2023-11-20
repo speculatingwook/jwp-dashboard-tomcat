@@ -1,6 +1,6 @@
 package org.apache.coyote.http11.request;
 
-import org.apache.coyote.http11.session.Cookie;
+import lombok.Getter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,20 +9,23 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public class HttpRequest {
-
-    private String method;
-    private String path;
-    private String httpVersion;
-    private Map<String, String> headers;
-    private String body;
+    private HttpRequestHeader httpRequestHeader;
+    private HttpRequestBody httpRequestBody;
 
     public HttpRequest(InputStream inputStream) throws IOException {
-        parseRequest(inputStream);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+        httpRequestHeader = parseRequestHeader(reader);
+        httpRequestBody = parseRequestBody(reader);
     }
 
-    private void parseRequest(InputStream inputStream) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+    private HttpRequestHeader parseRequestHeader(BufferedReader reader) throws IOException {
+        String method = "";
+        String path = "";
+        String httpVersion = "";
+        Map<String, String> headers;
 
         // Read start line
         String startLine = reader.readLine();
@@ -43,47 +46,23 @@ public class HttpRequest {
             }
         }
 
+        return HttpRequestHeader.builder()
+                .method(method)
+                .path(path)
+                .httpVersion(httpVersion)
+                .headers(headers)
+                .build();
+}
+
+    private HttpRequestBody parseRequestBody(BufferedReader reader) throws IOException {
         // Read body
         StringBuilder bodyBuilder = new StringBuilder();
         while (reader.ready()) {
             bodyBuilder.append((char) reader.read());
         }
-        body = bodyBuilder.toString();
-    }
 
-    public String getMethod() {
-        return method;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public String getHttpVersion() {
-        return httpVersion;
-    }
-
-    public Map<String, String> getHeaders() {
-        return headers;
-    }
-
-    public String getBody() {
-        return body;
-    }
-
-    public Cookie getCookie() {
-        String cookieHeader = headers.get("Cookie");
-        if (cookieHeader != null) {
-            Cookie cookie = new Cookie();
-            String[] cookieParts = cookieHeader.split("; ");
-            for (String part : cookieParts) {
-                String[] keyValue = part.split("=");
-                if (keyValue.length == 2) {
-                    cookie.setValue(keyValue[0], keyValue[1]);
-                }
-            }
-            return cookie;
-        }
-        return null;
+        return HttpRequestBody.builder()
+                .body(bodyBuilder.toString())
+                .build();
     }
 }
