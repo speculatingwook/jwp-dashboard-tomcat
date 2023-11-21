@@ -21,8 +21,5 @@ public class RequestHandler {
 		return new RequestHandler(httpRequest);
 	}
 
-	private void createMethodMap(MethodScanner methodScanner) {
-		this.uriToGetMethodMap = methodScanner.getUriToGetMethodMap();
-		this.uriToPostMethodMap = methodScanner.getUriToPostMethodMap();
 	}
 }
