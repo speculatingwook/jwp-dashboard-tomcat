@@ -26,5 +26,10 @@ public class RequestHandler {
 		return methodsForHttpMethod.get(httpRequest.getUri());
 	}
 
+	private void invokeMethod(Method method, HttpRequest httpRequest) throws Exception {
+		Class<?> controllerClass = method.getDeclaringClass();
+		Object controllerInstance = controllerClass.getDeclaredConstructor().newInstance();
+		method.invoke(controllerInstance, httpRequest);
+
 	}
 }
