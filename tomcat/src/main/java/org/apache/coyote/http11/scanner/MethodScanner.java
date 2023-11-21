@@ -61,4 +61,9 @@ public class MethodScanner {
 		scanPostMapping(controllerClasses);
 	}
 
+	public void mapMethodsWithHttpMethod() {
+		methodMapByHttpMethod.put(GET, uriToGetMethodMap);
+		methodMapByHttpMethod.put(POST, uriToPostMethodMap);
+	}
+
 }
