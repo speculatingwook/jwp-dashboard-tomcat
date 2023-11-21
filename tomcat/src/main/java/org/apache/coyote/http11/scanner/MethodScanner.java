@@ -21,6 +21,7 @@ public class MethodScanner {
 	private MethodScanner() {
 		this.uriToGetMethodMap = new HashMap<>();
 		this.uriToPostMethodMap = new HashMap<>();
+		this.methodMapByHttpMethod = new HashMap<>();
 	}
 
 	public static MethodScanner getInstance() {
