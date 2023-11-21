@@ -1,8 +1,10 @@
 package org.apache.coyote.http11;
 
 import nextstep.exception.NotFoundControllerException;
+import nextstep.jwp.FrontController;
 import nextstep.jwp.RequestMapping;
 import nextstep.jwp.controller.Controller;
+import nextstep.jwp.db.InMemoryUserRepository;
 import nextstep.jwp.exception.UncheckedServletException;
 import org.apache.coyote.Processor;
 import org.apache.coyote.request.HttpRequest;
@@ -24,18 +26,17 @@ public class Http11Processor implements Runnable, Processor {
 
     private final Socket connection;
 
-    private final RequestMapping requestMapping;
+    private final FrontController frontController;
 
     public Http11Processor(final Socket connection) {
         this.connection = connection;
-        requestMapping = new RequestMapping();
+        frontController = new FrontController(new RequestMapping());
     }
 
     @Override
     public void run() {
         process(connection);
     }
-
     @Override
     public void process(final Socket connection) {
         try (final var inputStream = connection.getInputStream();
@@ -45,24 +46,17 @@ public class Http11Processor implements Runnable, Processor {
 
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(outputStream));
             HttpResponse httpResponse = new HttpResponse(); // HttpResponse 객체 생성
-            process(httpRequest, httpResponse);
+
+            httpResponse = frontController.execute(httpRequest, httpResponse);
             response(httpResponse, bw);
         } catch (IOException | UncheckedServletException e) {
             log.error(e.getMessage(), e);
         } catch (NoSuchAttributeException e) {
             throw new RuntimeException(e);
+        }finally {
+            System.out.println();
         }
     }
-
-    private HttpResponse process(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-        String path = httpRequest.getPath();
-        Controller controller = requestMapping.getController(path);
-        if (controller == null) {
-            throw new NotFoundControllerException(httpRequest.getPath() + httpRequest.getQueryString() + " 처리불가한 요청");
-        }
-        return controller.execute(httpRequest, httpResponse);
-    }
-
     private void response(HttpResponse httpResponse, BufferedWriter bw) throws IOException {
         bw.write(httpResponse.getResponse());
         bw.flush();
