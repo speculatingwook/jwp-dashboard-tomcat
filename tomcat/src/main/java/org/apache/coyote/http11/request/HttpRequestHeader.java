@@ -17,7 +17,6 @@ public class HttpRequestHeader {
     public HttpRequestHeader(List<String> lines) {
         this.contentLength = 0;
         for (String line : lines) {
-            log.info(line);
             if (line.startsWith("Host:")) {
                 this.host = line.split(" ")[1];
             }

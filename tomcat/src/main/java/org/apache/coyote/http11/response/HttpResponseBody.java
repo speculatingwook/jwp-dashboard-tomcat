@@ -1,5 +1,9 @@
 package org.apache.coyote.http11.response;
 
+import org.apache.coyote.http11.request.HttpRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -12,6 +16,7 @@ public class HttpResponseBody {
 
     private final String bodyContext;
     private final int contentLength;
+    private static final Logger log = LoggerFactory.getLogger(HttpResponseBody.class);
 
     public HttpResponseBody(final String bodyContext) {
         this.bodyContext = bodyContext;

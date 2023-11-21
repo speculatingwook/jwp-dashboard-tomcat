@@ -1,4 +1,4 @@
-package org.apache.coyote.http11.login;
+package org.apache.coyote.http11.controller;
 
 
 import nextstep.jwp.db.InMemoryUserRepository;

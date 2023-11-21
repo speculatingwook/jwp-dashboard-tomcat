@@ -1,11 +1,14 @@
 package org.apache.coyote.http11.request;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.coyote.http11.Cookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -16,8 +19,8 @@ public class HttpRequest {
     private final HttpRequestBody httpRequestBody;
     private static final Logger log = LoggerFactory.getLogger(HttpRequest.class);
     private static final String EMPTY_REQUEST = "요청이 비어있습니다.";
-
-    public HttpRequest(BufferedReader reader) throws IOException {
+    public HttpRequest(InputStream inputStream) throws IOException {
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         List<String> lines = bufferReaderToLines(reader);
         if (lines == null || lines.isEmpty()) {
             throw new NoSuchElementException(EMPTY_REQUEST);

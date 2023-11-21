@@ -4,6 +4,5 @@ import org.apache.coyote.http11.request.HttpRequest;
 import org.apache.coyote.http11.response.HttpResponse;
 
 public interface Controller {
-    boolean canHandle(String path);
-    void handleRequest(HttpRequest request, HttpResponse response);
+    void service(HttpRequest request, HttpResponse response);
 }

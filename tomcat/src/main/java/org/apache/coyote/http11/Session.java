@@ -3,7 +3,6 @@ package org.apache.coyote.http11;
 import nextstep.jwp.db.InMemoryUserRepository;
 import nextstep.jwp.model.User;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public class Session {

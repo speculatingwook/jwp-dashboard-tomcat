@@ -2,6 +2,8 @@ package org.apache.coyote.http11;
 
 import nextstep.jwp.exception.UncheckedServletException;
 import org.apache.coyote.Processor;
+import org.apache.coyote.http11.controller.Controller;
+import org.apache.coyote.http11.controller.RequestMapping;
 import org.apache.coyote.http11.request.HttpRequest;
 import org.apache.coyote.http11.response.HttpResponse;
 import org.slf4j.Logger;
@@ -35,14 +37,13 @@ public class Http11Processor implements Runnable, Processor {
 
     private void execute(final Socket connection) throws IOException{
         try (final var inputStream = connection.getInputStream();
-             final var outputStream = connection.getOutputStream();
-             final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-            final HttpRequest request = new HttpRequest(reader);
-            final HttpResponse response = new HttpResponse(request);
-            String result = response.getResponse();
+             final var outputStream = connection.getOutputStream();) {
+            final HttpRequest request = new HttpRequest(inputStream);
+            final HttpResponse response = new HttpResponse(outputStream);
 
-            outputStream.write(result.getBytes());
-            outputStream.flush();
+            Controller controller = RequestMapping.getController(request.getHttpRequestLine().getPath());
+            controller.service(request, response);
+            response.getResponse();
         } catch (IOException | UncheckedServletException e) {
             log.error(e.getMessage(), e);
         }
