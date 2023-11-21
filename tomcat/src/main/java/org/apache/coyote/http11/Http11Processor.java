@@ -42,7 +42,7 @@ public class Http11Processor implements Runnable, Processor {
         try (final var inputStream = connection.getInputStream();
              final var outputStream = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-            HttpRequest httpRequest = new HttpRequest(br); //HttpRequest 객체 생성
+            HttpRequest httpRequest = HttpRequest.parse(br); //HttpRequest 객체 생성
 
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(outputStream));
             HttpResponse httpResponse = new HttpResponse(); // HttpResponse 객체 생성
