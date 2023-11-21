@@ -4,25 +4,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RequestParam {
-    private Map<String,String> requestParams;
+    private Map<String, String> requestParam;
 
     public RequestParam() {
-        this.requestParams = new HashMap<>();
+        this.requestParam = new HashMap<>();
     }
 
-    public void put(String key, String value) {
-        requestParams.put(key, value);
+    private RequestParam(Map<String, String> requestParam) {
+        this.requestParam = requestParam;
     }
 
-    public String get(String key){
-        return requestParams.getOrDefault(key,null);
-    }
-    public boolean hasRequestParam(){
-        return !requestParams.isEmpty();
+    public static RequestParam from(HttpRequestLine requestLine, HttpRequestBody body) {
+        Map<String, String> params = new HashMap<>();
+
+        params.putAll(requestLine.getQueryStringMap());
+        params.putAll(body.getRequestBodyMap());
+        return new RequestParam(params);
     }
 
-    @Override
-    public String toString() {
-        return requestParams.toString();
+    public String getParameter(String key) {
+        return requestParam.getOrDefault(key, null);
     }
 }
