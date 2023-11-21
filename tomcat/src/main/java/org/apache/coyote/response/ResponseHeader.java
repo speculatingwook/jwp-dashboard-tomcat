@@ -12,11 +12,14 @@ public class ResponseHeader {
         header = new ArrayList<>();
     }
 
-    public static ResponseHeader of(String viewPath, ResponseBody responseBody, HttpStatus httpStatus) {
+    public static ResponseHeader of(String viewPath, ResponseBody responseBody, HttpStatus httpStatus, String cookie) {
         ResponseHeader responseHeader = new ResponseHeader();
         responseHeader.header.add(Constant.HTTP_VERSION + " " + httpStatus.toString() + " ");
         responseHeader.header.add("Content-Type: " + convertContentType(viewPath));
         responseHeader.header.add("Content-Length: " + convertLength(responseBody));
+        if (cookie != null) {
+            responseHeader.header.add("Set-Cookie: " + cookie);
+        }
         return responseHeader;
     }
 

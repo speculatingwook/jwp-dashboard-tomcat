@@ -25,7 +25,6 @@ public class ResponseBody {
     }
 
     private static String readFile(String uri) throws IOException {
-        System.out.println(uri);
         if(uri.equals("/")){
             uri = "/index.html";
         }

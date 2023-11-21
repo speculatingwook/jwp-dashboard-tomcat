@@ -11,8 +11,11 @@ public class HttpResponse {
     private String viewPath;
     private HttpStatus httpStatus;
     private ContentType contentType;
+    private String cookie;
 
-
+    public HttpResponse(String viewPath) {
+        this.viewPath = viewPath;
+    }
 
     public HttpResponse() {
         this.httpStatus = HttpStatus.OK;
@@ -29,7 +32,7 @@ public class HttpResponse {
     }
 
     private void makeResponseHeader() {
-        this.responseHeader = ResponseHeader.of(viewPath, responseBody, httpStatus);
+        this.responseHeader = ResponseHeader.of(viewPath, responseBody, httpStatus, cookie);
     }
 
 
@@ -49,11 +52,11 @@ public class HttpResponse {
         this.viewPath = viewPath;
     }
 
-    public ContentType getContentType() {
-        return contentType;
-    }
-
     public void setContentType(ContentType contentType) {
         this.contentType = contentType;
     }
+    public void setCookie(String cookie) {
+        this.cookie = cookie;
+    }
+
 }
