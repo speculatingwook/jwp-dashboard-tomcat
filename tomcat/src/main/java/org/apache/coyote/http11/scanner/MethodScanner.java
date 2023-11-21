@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.coyote.http11.annotation.GetMapping;
 import org.apache.coyote.http11.annotation.PostMapping;
+import org.apache.coyote.http11.common.HttpMethod;
 
 import lombok.Getter;
 
@@ -15,6 +16,7 @@ public class MethodScanner {
 
 	private Map<String, Method> uriToGetMethodMap;
 	private Map<String, Method> uriToPostMethodMap;
+	private Map<HttpMethod, Map<String, Method>> methodMapByHttpMethod;
 
 	private MethodScanner() {
 		this.uriToGetMethodMap = new HashMap<>();
