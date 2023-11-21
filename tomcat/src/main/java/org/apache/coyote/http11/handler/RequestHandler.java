@@ -3,18 +3,18 @@ package org.apache.coyote.http11.handler;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import org.apache.coyote.http11.common.HttpMethod;
 import org.apache.coyote.http11.httprequest.HttpRequest;
 import org.apache.coyote.http11.scanner.MethodScanner;
 
 public class RequestHandler {
 
 	private HttpRequest httpRequest;
-	private Map<String, Method> uriToGetMethodMap;
-	private Map<String, Method> uriToPostMethodMap;
+	private Map<HttpMethod, Map<String, Method>> methodMapByHttpMethod;
 
 	private RequestHandler(HttpRequest httpRequest) {
 		this.httpRequest = httpRequest;
-		createMethodMap(MethodScanner.getInstance());
+		this.methodMapByHttpMethod = MethodScanner.getInstance().getMethodMapByHttpMethod();
 	}
 
 	public static RequestHandler of(HttpRequest httpRequest) {
