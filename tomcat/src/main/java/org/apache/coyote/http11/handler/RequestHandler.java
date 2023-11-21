@@ -21,5 +21,10 @@ public class RequestHandler {
 		return new RequestHandler(httpRequest);
 	}
 
+	private Method findMethod(HttpRequest httpRequest) {
+		Map<String, Method> methodsForHttpMethod = methodMapByHttpMethod.get(httpRequest.getHttpMethod());
+		return methodsForHttpMethod.get(httpRequest.getUri());
+	}
+
 	}
 }
