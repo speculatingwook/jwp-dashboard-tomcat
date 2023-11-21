@@ -1,6 +1,7 @@
 package org.apache.coyote.http11.controller;
 
 import org.apache.coyote.http11.request.HttpRequest;
+import org.apache.coyote.http11.request.HttpRequestHeader;
 import org.apache.coyote.http11.response.ContentType;
 import org.apache.coyote.http11.response.HttpResponse;
 import org.apache.coyote.http11.response.HttpStatusCode;
@@ -14,8 +15,9 @@ public class StaticResourceController implements Controller {
     private static final String NOT_FOUND_PAGE_URL = "404.html";
 
     @Override
-    public HttpResponse handleRequest(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-        String requestUri = httpRequest.getPath();
+    public HttpResponse handleRequest(HttpRequest httpRequest) throws IOException {
+        HttpRequestHeader httpRequestHeader = httpRequest.getHttpRequestHeader();
+        String requestUri = httpRequestHeader.getPath();
 
         URL resource = getClass()
                 .getClassLoader()
@@ -25,7 +27,7 @@ public class StaticResourceController implements Controller {
             File file = new File(resource.getFile());
             String responseBody = new String(Files.readAllBytes(file.toPath()));
 
-            return httpResponse = new HttpResponse()
+            return HttpResponse.builder()
                     .statusCode(HttpStatusCode.OK.getCode())
                     .statusMessage(HttpStatusCode.OK.getMessage())
                     .addHeader("Content-Type", ContentType.findContentTypeFromUri(requestUri).getContentType())
@@ -36,7 +38,7 @@ public class StaticResourceController implements Controller {
         } catch (NullPointerException e) {
 
             // todo: 작동 안함
-            return httpResponse = new HttpResponse()
+            return HttpResponse.builder()
                     .statusCode(HttpStatusCode.NOT_FOUND.getCode())
                     .statusMessage(HttpStatusCode.NOT_FOUND.getMessage())
                     .addHeader("Location", NOT_FOUND_PAGE_URL)
