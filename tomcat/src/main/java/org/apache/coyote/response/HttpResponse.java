@@ -8,31 +8,55 @@ import java.io.IOException;
 public class HttpResponse {
     private ResponseHeader responseHeader;
     private ResponseBody responseBody;
+    private String viewPath;
+    private HttpStatus httpStatus;
+    private ContentType contentType;
+    private String cookie;
+
+    public HttpResponse(String viewPath) {
+        this.viewPath = viewPath;
+    }
 
     public HttpResponse() {
+        this.httpStatus = HttpStatus.OK;
     }
 
-    private void makeResponse(HttpRequest httpRequest) throws IOException {
-        makeResponseBody(httpRequest);
-        makeResponseHeader(httpRequest);
+    public HttpResponse makeResponse() throws IOException {
+        makeResponseBody();
+        makeResponseHeader();
+        return this;
     }
 
-    private void makeResponseBody(HttpRequest httpRequest) throws IOException {
-        this.responseBody = ResponseBody.from(httpRequest);
+    private void makeResponseBody() throws IOException {
+        this.responseBody = ResponseBody.from(viewPath);
     }
 
-    private void makeResponseHeader(HttpRequest httpRequest) {
-        this.responseHeader = ResponseHeader.of(httpRequest, responseBody);
+    private void makeResponseHeader() {
+        this.responseHeader = ResponseHeader.of(viewPath, responseBody, httpStatus, cookie);
     }
 
 
-    public String getResponse(HttpRequest httpRequest) throws IOException {
-        makeResponse(httpRequest);
-
+    public String getResponse() throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append(responseHeader)
                 .append(responseBody);
         return sb.toString();
+    }
+
+
+    public void setHttpStatus(HttpStatus httpStatus) {
+        this.httpStatus = httpStatus;
+    }
+
+    public void setViewPath(String viewPath) {
+        this.viewPath = viewPath;
+    }
+
+    public void setContentType(ContentType contentType) {
+        this.contentType = contentType;
+    }
+    public void setCookie(String cookie) {
+        this.cookie = cookie;
     }
 
 }

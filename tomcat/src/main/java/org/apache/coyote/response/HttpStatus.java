@@ -1,10 +1,13 @@
 package org.apache.coyote.response;
 
-public enum HttpCode {
+public enum HttpStatus {
 
-    OK(200, "OK");
+    OK(200, "OK"),
+    FOUND(302,"FOUND"),
+    UNAUTHORIZED(401,"UNAUTORIZED"),
+    CREATED(201, "CREATED");
 
-    HttpCode(int code, String message) {
+    HttpStatus(int code, String message) {
         this.code = code;
         this.message = message;
     }
