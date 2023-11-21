@@ -54,7 +54,7 @@ public class MethodScanner {
 		}
 	}
 
-	public void scanMapping(Set<Class<?>> controllerClasses) {
+	public void scanMethods(Set<Class<?>> controllerClasses) {
 		scanGetMapping(controllerClasses);
 		scanPostMapping(controllerClasses);
 	}
