@@ -1,5 +1,7 @@
 package org.apache.coyote.http11.scanner;
 
+import static org.apache.coyote.http11.common.HttpMethod.*;
+
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
