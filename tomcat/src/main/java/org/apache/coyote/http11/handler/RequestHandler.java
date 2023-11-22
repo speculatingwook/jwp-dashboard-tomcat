@@ -29,7 +29,7 @@ public class RequestHandler {
 	private void invokeMethod(Method method, HttpRequest httpRequest) throws Exception {
 		Class<?> controllerClass = method.getDeclaringClass();
 		Object controllerInstance = controllerClass.getDeclaredConstructor().newInstance();
-		method.invoke(controllerInstance, httpRequest);
+		Object invokedMethodResult = method.invoke(controllerInstance, httpRequest);
 
 	}
 }
