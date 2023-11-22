@@ -8,7 +8,6 @@ import java.net.Socket;
 import org.apache.coyote.Processor;
 import org.apache.coyote.http11.handler.RequestHandler;
 import org.apache.coyote.http11.httprequest.HttpRequest;
-import org.apache.coyote.http11.httpresponse.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,10 +36,7 @@ public class Http11Processor implements Runnable, Processor {
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
 			HttpRequest httpRequest = HttpRequest.from(bufferedReader);
-			HttpResponse httpResponse = new HttpResponse();
-
-			RequestHandler requestHandler = RequestHandler.of(httpRequest, httpResponse);
-
+			RequestHandler requestHandler = RequestHandler.of(httpRequest);
 
 			outputStream.flush();
 		} catch (IOException | UncheckedServletException e) {
