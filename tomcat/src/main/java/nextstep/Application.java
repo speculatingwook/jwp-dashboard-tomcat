@@ -16,7 +16,8 @@ public class Application {
 		log.info("web server start.");
 		ControllerScanner controllerScanner = new ControllerScanner(BASE_PACKAGE);
 		MethodScanner methodScanner = MethodScanner.getInstance();
-		methodScanner.createMethodMapByHttpMethod(controllerScanner.getControllerClasses());
+		methodScanner.scanMethods(controllerScanner.getControllerClasses());
+		methodScanner.mapMethodsWithHttpMethod();
 		log.info("methodMapByHttpMethod: {}", methodScanner.getMethodMapByHttpMethod());
 		final var tomcat = new Tomcat();
 		tomcat.start();
