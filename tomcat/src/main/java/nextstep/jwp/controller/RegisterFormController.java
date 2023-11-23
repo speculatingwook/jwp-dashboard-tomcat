@@ -8,7 +8,7 @@ public class RegisterFormController implements Controller {
 
     @Override
     public String process(HttpRequest request, HttpResponse response) {
-        return "/register.html";
+        return "register";
     }
 
 }

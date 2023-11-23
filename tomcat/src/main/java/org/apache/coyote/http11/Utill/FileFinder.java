@@ -14,7 +14,7 @@ public class FileFinder {
 
     private final String staticAbsolutePath = "static";
 
-    public String fromPath(String filePath) {
+    public String getFileToStringFromPath(String filePath) {
         try {
             URL resource = this.getClass()
                     .getClassLoader()
@@ -25,6 +25,18 @@ public class FileFinder {
             throw new NotFoundException(e.getMessage());
         } catch (IOException e) {
             throw new InternalServerException(e.getMessage());
+        }
+    }
+
+    public boolean isExist(String filePath) {
+        try {
+            URL resource = this.getClass()
+                    .getClassLoader()
+                    .getResource(staticAbsolutePath + filePath);
+            Path path = Paths.get(resource.toURI());
+            return Files.exists(path);
+        } catch (NullPointerException | URISyntaxException e) {
+            return false;
         }
     }
 }

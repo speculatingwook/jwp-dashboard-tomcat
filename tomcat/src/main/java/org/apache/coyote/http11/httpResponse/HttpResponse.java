@@ -1,9 +1,10 @@
 package org.apache.coyote.http11.httpResponse;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.coyote.http11.HttpHeader;
 import org.apache.coyote.http11.HttpStatus;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class HttpResponse {
 
@@ -17,14 +18,14 @@ public class HttpResponse {
     private HttpResponse(HttpStatus status, String body) {
         this.status = status;
         this.body = body;
-        headers.put(HttpHeader.ContentType.getHeaderName(), "text/html;charset=utf-8");
+        //headers.put(HttpHeader.ContentType.getHeaderName(), "text/html;charset=utf-8");
         headers.put(HttpHeader.ContentLength.getHeaderName(), String.valueOf(body.getBytes().length));
     }
 
     public HttpResponse() {
         this.status = HttpStatus.OK;
         this.body = "";
-        headers.put(HttpHeader.ContentType.getHeaderName(), "text/html;charset=utf-8");
+        //headers.put(HttpHeader.ContentType.getHeaderName(), "text/html;charset=utf-8");
         headers.put(HttpHeader.ContentLength.getHeaderName(), String.valueOf(body.getBytes().length));
     }
 
