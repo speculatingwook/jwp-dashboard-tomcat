@@ -17,8 +17,7 @@ public class LoginFormController implements Controller {
                 return "redirect:/index.html";
             }
         }
-
-        return "/login.html";
+        return "login";
     }
 
 }

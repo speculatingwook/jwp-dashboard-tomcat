@@ -1,35 +1,37 @@
-package org.apache.coyote.http11.handler;
+package org.apache.coyote.http11;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import nextstep.jwp.controller.CSSController;
-import nextstep.jwp.controller.IndexController;
-import nextstep.jwp.controller.JavaScriptController;
-import nextstep.jwp.controller.LoginController;
-import nextstep.jwp.controller.LoginFormController;
-import nextstep.jwp.controller.RegisterController;
-import nextstep.jwp.controller.RegisterFormController;
-import nextstep.jwp.controller.RootController;
-import org.apache.coyote.http11.HttpMethod;
-import org.apache.coyote.http11.HttpStatus;
+import nextstep.jwp.controller.*;
+import org.apache.coyote.http11.adapter.ControllerHandlerAdapter;
+import org.apache.coyote.http11.adapter.HandlerAdapter;
+import org.apache.coyote.http11.adapter.HttpRequestHandlerAdapter;
+import org.apache.coyote.http11.handler.ResourceHttpRequestHandler;
 import org.apache.coyote.http11.httpResponse.HttpResponse;
 import org.apache.coyote.http11.httprequest.HttpRequest;
+import org.apache.coyote.http11.view.ModelAndView;
+import org.apache.coyote.http11.view.View;
+import org.apache.coyote.http11.view.viewResolver.InternalResourceViewResolver;
+import org.apache.coyote.http11.view.viewResolver.UrlBasedViewResolver;
+import org.apache.coyote.http11.view.viewResolver.ViewResolver;
+
+import java.util.*;
 
 public class DispatcherServlet {
 
     private static final DispatcherServlet INSTANCE = new DispatcherServlet();
     private final List<HandlerAdapter> handlerAdapters = new ArrayList<>();
+    private final List<ViewResolver> viewResolvers = new ArrayList<>();
     private final Map<RequestMapping, Object> handlerMappingMap = new HashMap<>();
     private final String sessionKey = "JSESSIONID";
 
     private DispatcherServlet() {
-        handlerMappingMap.put(new RequestMapping("*.css", HttpMethod.GET), new CSSController());
-        handlerMappingMap.put(new RequestMapping("*.js", HttpMethod.GET), new JavaScriptController());
-        handlerMappingMap.put(new RequestMapping("/index.html", HttpMethod.GET), new IndexController());
+        ResourceHttpRequestHandler resourceHttpRequestHandler = new ResourceHttpRequestHandler();
+        handlerMappingMap.put(new RequestMapping("*.css", HttpMethod.GET), resourceHttpRequestHandler);
+        handlerMappingMap.put(new RequestMapping("*.js", HttpMethod.GET), resourceHttpRequestHandler);
+        handlerMappingMap.put(new RequestMapping("/401.html", HttpMethod.GET), resourceHttpRequestHandler);
+        handlerMappingMap.put(new RequestMapping("/404.html", HttpMethod.GET), resourceHttpRequestHandler);
+        handlerMappingMap.put(new RequestMapping("/500.html", HttpMethod.GET), resourceHttpRequestHandler);
+        handlerMappingMap.put(new RequestMapping("/index.html", HttpMethod.GET), resourceHttpRequestHandler);
+
         handlerMappingMap.put(new RequestMapping("/", HttpMethod.GET), new RootController());
         handlerMappingMap.put(new RequestMapping("/login", HttpMethod.GET), new LoginFormController());
         handlerMappingMap.put(new RequestMapping("/login", HttpMethod.POST), new LoginController());
@@ -37,29 +39,45 @@ public class DispatcherServlet {
         handlerMappingMap.put(new RequestMapping("/register", HttpMethod.POST), new RegisterController());
 
         handlerAdapters.add(new ControllerHandlerAdapter());
+        handlerAdapters.add(new HttpRequestHandlerAdapter());
+
+        viewResolvers.add(new InternalResourceViewResolver("/", ".html"));
+        viewResolvers.add(new UrlBasedViewResolver());
     }
 
     public static DispatcherServlet getInstance() {
         return INSTANCE;
     }
 
-    public HttpResponse service(HttpRequest request, HttpResponse response) {
 
-        if (request.getCookie().getValue(sessionKey) == null) {
-            String sessionId = UUID.randomUUID().toString();
-            request.addSessionId(sessionId);
-            response.addCookie(sessionKey, sessionId);
+    public void doService(HttpRequest request, HttpResponse response) {
+        try {
+            if (request.getCookie().getValue(sessionKey) == null) {
+                String sessionId = UUID.randomUUID().toString();
+                request.addSessionId(sessionId);
+                response.addCookie(sessionKey, sessionId);
+            }
+
+            doDispatch(request, response);
+        } catch (Exception e) {
+            System.err.println("Exception : " + e.getMessage());
+            response.sendError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
         }
+    }
 
+    private void doDispatch(HttpRequest request, HttpResponse response) {
         Object handler = getHandler(request);
         if (handler == null) {
             System.err.println("Not found controller");
             response.sendError(HttpStatus.NOT_FOUND, "Not Found");
-            return response;
+            return;
         }
 
         HandlerAdapter adapter = getHandlerAdapter(handler);
-        return adapter.handle(request, response, handler);
+        ModelAndView mv = adapter.handle(request, response, handler);
+        if (mv != null) {
+            render(mv, request, response);
+        }
     }
 
     private Object getHandler(HttpRequest request) {
@@ -76,6 +94,28 @@ public class DispatcherServlet {
         }
         throw new IllegalArgumentException("handler adapter를 찾을 수 없습니다. handler=" + handler);
     }
+
+    private void render(ModelAndView mv, HttpRequest request, HttpResponse response) {
+        String viewName = mv.getViewName();
+        View view = resolveViewName(viewName);
+        if (view == null) {
+            System.err.println("Could not resolve view with name '" + viewName + "'");
+            response.sendError(HttpStatus.NOT_FOUND, "Not Found");
+            return;
+        }
+        view.render(mv.getModel(), request, response);
+    }
+
+    private View resolveViewName(String viewName) {
+        for (ViewResolver viewResolver : this.viewResolvers) {
+            View view = viewResolver.resolveViewName(viewName);
+            if (view != null) {
+                return view;
+            }
+        }
+        return null;
+    }
+
 
     public static class RequestMapping {
         private final String path;

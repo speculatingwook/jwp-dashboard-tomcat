@@ -1,10 +1,11 @@
-package org.apache.coyote.http11.handler;
+package org.apache.coyote.http11.adapter;
 
 import org.apache.coyote.http11.httpResponse.HttpResponse;
 import org.apache.coyote.http11.httprequest.HttpRequest;
+import org.apache.coyote.http11.view.ModelAndView;
 
 public interface HandlerAdapter {
-    HttpResponse handle(HttpRequest request, HttpResponse response, Object handler);
+    ModelAndView handle(HttpRequest request, HttpResponse response, Object handler);
 
     boolean supports(Object httpRequest);
 

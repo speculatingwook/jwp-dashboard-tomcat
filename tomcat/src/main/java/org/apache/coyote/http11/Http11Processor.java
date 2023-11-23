@@ -1,15 +1,15 @@
 package org.apache.coyote.http11;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.Socket;
 import org.apache.coyote.Processor;
-import org.apache.coyote.http11.handler.DispatcherServlet;
 import org.apache.coyote.http11.handler.ExceptionHandler;
 import org.apache.coyote.http11.httpResponse.HttpResponse;
 import org.apache.coyote.http11.httprequest.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.Socket;
 
 public class Http11Processor implements Runnable, Processor {
 
@@ -37,7 +37,7 @@ public class Http11Processor implements Runnable, Processor {
             try {
                 HttpRequest httpRequest = HttpRequest.parse(bufferedReader);
                 DispatcherServlet dispatcherServlet = DispatcherServlet.getInstance();
-                httpResponse = dispatcherServlet.service(httpRequest, httpResponse);
+                dispatcherServlet.doService(httpRequest, httpResponse);
             } catch (Exception e) {
                 log.error(e.getMessage());
                 httpResponse = ExceptionHandler.handle(e);
@@ -48,6 +48,4 @@ public class Http11Processor implements Runnable, Processor {
             log.error(e.getMessage());
         }
     }
-
-
 }
