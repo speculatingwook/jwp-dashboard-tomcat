@@ -28,8 +28,8 @@ public class LoginController implements Controller{
 
     public LoginController() {
         router = new Router();
-        router.addHandler(HttpMethod.GET, "/login", this::handleGetLogin);
-        router.addHandler(HttpMethod.POST, "/login", this::handlePostLogin);
+        router.addHandler(HttpMethod.GET, "/login", this::getLoginHandler);
+        router.addHandler(HttpMethod.POST, "/login", this::postLoginHandler);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class LoginController implements Controller{
         return router.mappingEndpointHandler(httpRequest);
     }
 
-    public HttpResponse handleGetLogin(HttpRequest httpRequest) throws IOException {
+    public HttpResponse getLoginHandler(HttpRequest httpRequest) throws IOException {
         HttpRequestHeader httpRequestHeader = httpRequest.getHttpRequestHeader();
         Optional<Cookie> optionalCookie = httpRequestHeader.getCookie();
 
@@ -73,7 +73,7 @@ public class LoginController implements Controller{
                 .build();
     }
 
-    public HttpResponse handlePostLogin(HttpRequest httpRequest) throws UnsupportedEncodingException {
+    public HttpResponse postLoginHandler(HttpRequest httpRequest) throws UnsupportedEncodingException {
         HttpRequestBody httpRequestBody = httpRequest.getHttpRequestBody();
 
         String requestBody = httpRequestBody.getBody();
@@ -81,20 +81,25 @@ public class LoginController implements Controller{
         String account = queryParameters.get("account");
         String password = queryParameters.get("password");
 
-        if(loginService.login(account, password)) {
-            String jSessionId = SessionManager.generateJSessionId();
-            Session session = Session.createSession(jSessionId);
-            SessionManager.add(session);
-            Cookie cookie = new Cookie();
+        if(loginService.login(account, password)) return loginSuccessHandler();
+        return loginFailHandler();
+    }
 
-            return HttpResponse.builder()
-                    .statusCode(HttpStatusCode.FOUND.getCode())
-                    .statusMessage(HttpStatusCode.FOUND.getMessage())
-                    .addHeader("Location", INDEX_PAGE_URL)
-                    .addCookie("JSESSIONID", jSessionId)
-                    .build();
-        }
+    private HttpResponse loginSuccessHandler() {
+        String jSessionId = SessionManager.generateJSessionId();
+        Session session = Session.createSession(jSessionId);
+        SessionManager.add(session);
+        Cookie cookie = new Cookie();
 
+        return HttpResponse.builder()
+                .statusCode(HttpStatusCode.FOUND.getCode())
+                .statusMessage(HttpStatusCode.FOUND.getMessage())
+                .addHeader("Location", INDEX_PAGE_URL)
+                .addCookie("JSESSIONID", jSessionId)
+                .build();
+    }
+
+    private HttpResponse loginFailHandler() {
         return HttpResponse.builder()
                 .statusCode(HttpStatusCode.UNAUTHORIZED.getCode())
                 .statusMessage(HttpStatusCode.UNAUTHORIZED.getMessage())
@@ -102,3 +107,4 @@ public class LoginController implements Controller{
                 .build();
     }
 }
+
