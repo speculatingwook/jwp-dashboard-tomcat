@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Connector implements Runnable {
 
@@ -15,6 +17,8 @@ public class Connector implements Runnable {
 
     private static final int DEFAULT_PORT = 8080;
     private static final int DEFAULT_ACCEPT_COUNT = 100;
+    private static final int maxThreads = 50;
+    private static final ExecutorService threadPool = Executors.newFixedThreadPool(maxThreads);
 
     private final ServerSocket serverSocket;
     private boolean stopped;
@@ -65,12 +69,13 @@ public class Connector implements Runnable {
             return;
         }
         log.info("connect host: {}, port: {}", connection.getInetAddress(), connection.getPort());
-        var processor = new Http11Processor(connection);
-        new Thread(processor).start();
+        Runnable task = new Http11Processor(connection);
+        threadPool.submit(task);
     }
 
     public void stop() {
         stopped = true;
+        threadPool.shutdown();
         try {
             serverSocket.close();
         } catch (IOException e) {
