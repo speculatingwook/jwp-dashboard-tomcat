@@ -1,8 +1,6 @@
 package org.apache.coyote.http11;
 
-import nextstep.jwp.db.InMemoryUserRepository;
 import nextstep.jwp.exception.UncheckedServletException;
-import nextstep.jwp.model.User;
 import org.apache.coyote.Processor;
 import org.apache.coyote.http11.controller.Controller;
 import org.apache.coyote.http11.controller.FrontController;
@@ -11,10 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-
 public class Http11Processor implements Runnable, Processor {
 
     private static final Logger log = LoggerFactory.getLogger(Http11Processor.class);
@@ -41,7 +35,6 @@ public class Http11Processor implements Runnable, Processor {
 
             FrontController CONTROLLER = new FrontController();
             Controller controller =  CONTROLLER.match(httpRequest);
-            System.out.println(controller.getClass());
             controller.handleRequest(httpRequest, httpResponse);
 
             outputStream.write(httpResponse.generateResponse().getBytes());
