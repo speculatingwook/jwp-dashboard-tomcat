@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Router {
+    private static final String NOT_FOUND_PAGE_URL = "404.html";
+
     private Map<HttpMethod, Map<String, Controller>> routes;
 
     public Router() {
@@ -38,8 +40,9 @@ public class Router {
 
         // 등록된 컨트롤러 메소드가 없을 경우 404 Not Found 반환
         return HttpResponse.builder()
-                .statusCode(HttpStatusCode.NOT_FOUND.getCode())
-                .statusMessage(HttpStatusCode.NOT_FOUND.getMessage())
+                .statusCode(HttpStatusCode.FOUND.getCode())
+                .statusMessage(HttpStatusCode.FOUND.getMessage())
+                .addHeader("Location", NOT_FOUND_PAGE_URL)
                 .build();
     }
 }
