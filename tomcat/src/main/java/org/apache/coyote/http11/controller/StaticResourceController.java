@@ -13,36 +13,45 @@ import java.nio.file.Files;
 
 public class StaticResourceController implements Controller {
     private static final String NOT_FOUND_PAGE_URL = "404.html";
+    private String requestUri;
+    private String responseBody;
 
     @Override
     public HttpResponse handleRequest(HttpRequest httpRequest) throws IOException {
         HttpRequestHeader httpRequestHeader = httpRequest.getHttpRequestHeader();
-        String requestUri = httpRequestHeader.getPath();
-
-        URL resource = getClass()
-                .getClassLoader()
-                .getResource("static" + requestUri);
+        requestUri = httpRequestHeader.getPath();
 
         try {
-            File file = new File(resource.getFile());
-            String responseBody = new String(Files.readAllBytes(file.toPath()));
+            URL resource = getClass()
+                    .getClassLoader()
+                    .getResource("static" + requestUri);
 
-            return HttpResponse.builder()
-                    .statusCode(HttpStatusCode.OK.getCode())
-                    .statusMessage(HttpStatusCode.OK.getMessage())
-                    .addHeader("Content-Type", ContentType.findContentTypeFromUri(requestUri).getContentType())
-                    .addHeader("Content-Length", String.valueOf(responseBody.getBytes().length))
-                    .body(responseBody)
-                    .build();
+            File file = new File(resource.getFile());
+            responseBody = new String(Files.readAllBytes(file.toPath()));
+
+            return findResourceSuccessHandler();
 
         } catch (NullPointerException e) {
+            return findResourceFailHandler();
 
-            // todo: 작동 안함
-            return HttpResponse.builder()
-                    .statusCode(HttpStatusCode.NOT_FOUND.getCode())
-                    .statusMessage(HttpStatusCode.NOT_FOUND.getMessage())
-                    .addHeader("Location", NOT_FOUND_PAGE_URL)
-                    .build();
         }
+    }
+
+    private HttpResponse findResourceSuccessHandler() {
+        return HttpResponse.builder()
+                .statusCode(HttpStatusCode.OK.getCode())
+                .statusMessage(HttpStatusCode.OK.getMessage())
+                .addHeader("Content-Type", ContentType.findContentTypeFromUri(requestUri).getContentType())
+                .addHeader("Content-Length", String.valueOf(responseBody.getBytes().length))
+                .body(responseBody)
+                .build();
+    }
+
+    private HttpResponse findResourceFailHandler() {
+        return HttpResponse.builder()
+                .statusCode(HttpStatusCode.FOUND.getCode())
+                .statusMessage(HttpStatusCode.FOUND.getMessage())
+                .addHeader("Location", NOT_FOUND_PAGE_URL)
+                .build();
     }
 }
