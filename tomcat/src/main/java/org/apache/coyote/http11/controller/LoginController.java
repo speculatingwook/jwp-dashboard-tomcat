@@ -20,7 +20,6 @@ import java.util.Optional;
 
 public class LoginController implements Controller{
     private static final String INDEX_PAGE_URL = "index.html";
-    private static final String NOT_FOUND_PAGE_URL = "static/404.html";
     private static final String UNAUTHORIZED_PAGE_URL = "401.html";
     private static final String LOGIN_PAGE_URL = "static/login.html";
     private LoginService loginService = new LoginService();
@@ -101,8 +100,8 @@ public class LoginController implements Controller{
 
     private HttpResponse loginFailHandler() {
         return HttpResponse.builder()
-                .statusCode(HttpStatusCode.UNAUTHORIZED.getCode())
-                .statusMessage(HttpStatusCode.UNAUTHORIZED.getMessage())
+                .statusCode(HttpStatusCode.FOUND.getCode())
+                .statusMessage(HttpStatusCode.FOUND.getMessage())
                 .addHeader("Location", UNAUTHORIZED_PAGE_URL)
                 .build();
     }
