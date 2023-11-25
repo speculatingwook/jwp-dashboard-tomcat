@@ -45,6 +45,12 @@ public class HttpResponse {
         outputStream.write(result.getBytes());
         outputStream.flush();
     }
+
+    public HttpResponse sendRedirect(String redirectUrl) {
+        header = new HttpResponseHeader(StatusCode.FOUND.getStatus())
+                .addLocation(redirectUrl);
+        return this;
+    }
     public HttpResponse addBody(HttpResponseBody body) {
         this.body = body;
         return this;

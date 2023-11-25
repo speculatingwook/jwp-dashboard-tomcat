@@ -2,6 +2,8 @@ package org.apache.coyote.http11.request;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.coyote.http11.Cookie;
+import org.apache.coyote.http11.HttpSession;
+import org.apache.coyote.http11.HttpSessions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +61,10 @@ public class HttpRequest {
 
     public Cookie getCookie() {
         return httpRequestHeader.getCookie();
+    }
+
+    public HttpSession getSession() {
+        return HttpSessions.getSession(getCookie().getSessionId());
     }
 
 }

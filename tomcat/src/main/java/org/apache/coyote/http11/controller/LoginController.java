@@ -1,6 +1,7 @@
 package org.apache.coyote.http11.controller;
 
 import org.apache.coyote.http11.Cookie;
+import org.apache.coyote.http11.HttpSession;
 import org.apache.coyote.http11.Paths;
 import org.apache.coyote.http11.StatusCode;
 import org.apache.coyote.http11.request.HttpRequest;
@@ -8,7 +9,6 @@ import org.apache.coyote.http11.response.HttpResponse;
 import org.apache.coyote.http11.response.HttpResponseBody;
 import org.apache.coyote.http11.response.HttpResponseHeader;
 
-import java.nio.file.Path;
 
 public class LoginController extends AbstractController {
     private HttpResponseHeader header;
@@ -22,26 +22,21 @@ public class LoginController extends AbstractController {
     }
     @Override
     public void doPost(HttpRequest request, HttpResponse response) {
-        if (Paths.LOGIN.getPath().contains(request.getHttpRequestLine().getPath())) {
-            LoginHandler login = new LoginHandler(request.getHttpRequestBody().getValue("account"), request.getHttpRequestBody().getValue("password"));
-            if (login.checkUser()) {
-                Cookie newCookie = request.getCookie();
-                newCookie.setJSessionId();
-                body = HttpResponseBody.of(Paths.LOGIN.createPath());
-                header = new HttpResponseHeader(StatusCode.FOUND.getStatus())
-                        .addLocation(Paths.INDEX.getPath())
-                        .addContentType(Paths.LOGIN.getContentType())
-                        .addContentLength(body.getContentLength())
-                        .setCookie(newCookie);
-            }
-            else{
-                body = HttpResponseBody.of(Paths.UNAUTHORIZED.createPath());
-                header = new HttpResponseHeader(StatusCode.UNAUTHORIZED.getStatus())
+        HttpSession session = request.getSession();
+        LoginHandler login = new LoginHandler(request.getHttpRequestBody().getValue("account"), request.getHttpRequestBody().getValue("password"));
+        if (login.checkUser()) {
+            Cookie newCookie = request.getCookie();
+            newCookie.setJSessionId();
+            response.sendRedirect(Paths.INDEX.createPath());
+        }
+        else {
+            body = HttpResponseBody.of(Paths.UNAUTHORIZED.createPath());
+            header = new HttpResponseHeader(StatusCode.UNAUTHORIZED.getStatus())
                         .addContentType(Paths.UNAUTHORIZED.getContentType())
                         .addContentLength(body.getContentLength());
-            }
-            response.addBody(body).addHeader(header);
         }
+        response.addBody(body).addHeader(header);
+
     }
 
     public void to(String path) {
