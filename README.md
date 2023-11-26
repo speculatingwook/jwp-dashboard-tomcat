@@ -124,6 +124,46 @@ Content-Type: text/html;charset=utf-8;
 
 그리고 로그인된 상태에서 /login 페이지에 HTTP GET method로 접근하면 이미 로그인한 상태니 index.html 페이지로 리다이렉트 처리한다.
 
+# 🐱 톰캣 구현하기 3단계 - 리팩터링
+## 🚀 미션 설명
+HTTP 서버를 구현한 코드의 복잡도가 높아졌다.
+적절한 클래스를 추가하고 역할을 맡겨서 코드 복잡도를 낮춰보자.
+
+## ⚙️ 기능 요구 사항
+### 1. HttpRequest 클래스 구현하기
+HTTP 요청을 처리하는 클래스를 추가한다.
+HTTP 요청은 어떤 형태로 구성되어 있는가?
+클래스로 HTTP 요청을 어떻게 구성하면 좋을까?
+HTTP 요청 이미지를 참고해서 구현해보자
+
+### 2. HttpResponse 클래스 구현하기
+HTTP 응답을 처리하는 클래스를 추가한다.
+HTTP 응답은 어떤 형태로 구성되어 있는가?
+클라이언트에게 어떤 형태로 HTTP를 응답하면 좋을까?
+
+### 3. Controller 인터페이스 추가하기
+HTTP 요청, 응답을 다른 객체에게 역할을 맡기고 나니까 uri 경로에 따른 if절 분기 처리가 남는다.
+if절 분기는 어떻게 리팩터링하는게 좋을까?
+컨트롤러 인터페이스를 추가하고 각 분기에 있는 로직마다 AbstractController를 상속한 구현체로 만들어보자.
+
+# 🐱 톰캣 구현하기 4단계 - 동시성 확장하기
+
+## 🚀 미션 설명
+HTTP 서버를 구현한 코드의 복잡도가 높아졌다.
+적절한 클래스를 추가하고 역할을 맡겨서 코드 복잡도를 낮춰보자.
+
+## ⚙️ 기능 요구 사항
+### 1. Executors 로 Thread Pool 적용
+Connector 클래스의 void process(final Socket connection) 메서드에서 요청마다 스레드를 새로 생성하고 있다.
+Connector 클래스에서 Executors 클래스를 사용해서 ExecutorService 객체를 만들어보자.
+스레드 갯수는 maxThreads 라는 변수로 지정한다.
+
+### 2. 동시성 컬렉션 사용하기
+SessionManager 클래스에서 Session 컬렉션은 여러 스레드가 동시에 접근할 수 있다.
+그러다보니 Session 컬렉션에 여러 스레드가 동시에 접근하여 읽고 쓰다보면 스레드 안정성을 보장하기 어렵다.
+동시성 컬렉션(Concurrent Collections)을 적용해서 스레드 안정성과 원자성을 보장해보자.
+
+
 ## ✏️ 미션 진행 요구 사항
 
 - 미션은 [jwp-dashboard-http-mission](https://github.com/speculatingwook/jwp-dashboard-http-mission) 저장소를 Fork & Clone해 시작한다.
