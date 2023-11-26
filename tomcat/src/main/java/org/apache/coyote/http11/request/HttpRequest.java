@@ -1,9 +1,8 @@
 package org.apache.coyote.http11.request;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.apache.coyote.http11.Cookie;
 import org.apache.coyote.http11.HttpSession;
-import org.apache.coyote.http11.HttpSessions;
+import org.apache.coyote.http11.HttpSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +63,7 @@ public class HttpRequest {
     }
 
     public HttpSession getSession() {
-        return HttpSessions.getSession(getCookie().getSessionId());
+        return HttpSessionManager.getSession(getCookie().getSessionId());
     }
 
 }
