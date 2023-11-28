@@ -1,6 +1,6 @@
 package org.apache.coyote.response;
 
-import org.apache.coyote.request.HttpRequest;
+import org.apache.coyote.session.Cookie;
 
 import java.io.IOException;
 
@@ -11,7 +11,7 @@ public class HttpResponse {
     private String viewPath;
     private HttpStatus httpStatus;
     private ContentType contentType;
-    private String cookie;
+    private Cookie cookie;
 
     public HttpResponse(String viewPath) {
         this.viewPath = viewPath;
@@ -21,10 +21,9 @@ public class HttpResponse {
         this.httpStatus = HttpStatus.OK;
     }
 
-    public HttpResponse makeResponse() throws IOException {
+    public void makeResponse() throws IOException {
         makeResponseBody();
         makeResponseHeader();
-        return this;
     }
 
     private void makeResponseBody() throws IOException {
@@ -35,14 +34,12 @@ public class HttpResponse {
         this.responseHeader = ResponseHeader.of(viewPath, responseBody, httpStatus, cookie);
     }
 
-
     public String getResponse() throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append(responseHeader)
                 .append(responseBody);
         return sb.toString();
     }
-
 
     public void setHttpStatus(HttpStatus httpStatus) {
         this.httpStatus = httpStatus;
@@ -55,8 +52,13 @@ public class HttpResponse {
     public void setContentType(ContentType contentType) {
         this.contentType = contentType;
     }
-    public void setCookie(String cookie) {
-        this.cookie = cookie;
+    public void addCookie(String key, String val) {
+        this.cookie.addCookie(key,val);
     }
 
+    public void sendRedirect(String viewName) throws IOException {
+        this.viewPath = viewName;
+        this.contentType = ContentType.from(viewName);
+        this.makeResponse();
+    }
 }

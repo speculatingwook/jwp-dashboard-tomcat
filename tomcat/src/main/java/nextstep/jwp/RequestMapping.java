@@ -1,10 +1,9 @@
 package nextstep.jwp;
 
-import nextstep.jwp.controller.CSSController;
+import nextstep.jwp.controller.StaticController;
 import nextstep.jwp.controller.Controller;
 import nextstep.jwp.controller.ExceptionController;
 import nextstep.jwp.controller.IndexController;
-import nextstep.jwp.controller.JSController;
 import nextstep.jwp.controller.LoginController;
 import nextstep.jwp.controller.LoginFormController;
 import nextstep.jwp.controller.RegisterController;
@@ -30,8 +29,7 @@ public class RequestMapping {
     }
 
     private void initGetHandler() {
-        getHandlers.put("/css", new CSSController());
-        getHandlers.put("/js", new JSController());
+        getHandlers.put("/static", new StaticController());
         getHandlers.put("/", new IndexController());
         getHandlers.put("/index", new IndexController());
         getHandlers.put("/index.html", new IndexController());
@@ -44,13 +42,9 @@ public class RequestMapping {
         System.out.println("method = " + method);
         System.out.println("url = " + url);
         System.out.println();
-        if(url.contains(".css")){
-            return getHandlers.get("/css");
+        if(url.contains(".css") || url.contains(".js")){
+            return getHandlers.get("/static");
         }
-        if(url.contains(".js")){
-            return getHandlers.get("/js");
-        }
-
         if(method.trim().equals("GET")){
             return getHandlers.get(url);
         }

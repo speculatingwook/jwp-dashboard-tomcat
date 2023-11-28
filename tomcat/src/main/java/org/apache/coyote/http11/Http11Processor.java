@@ -47,7 +47,8 @@ public class Http11Processor implements Runnable, Processor {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(outputStream));
             HttpResponse httpResponse = new HttpResponse(); // HttpResponse 객체 생성
 
-            httpResponse = frontController.execute(httpRequest, httpResponse);
+            frontController.execute(httpRequest, httpResponse);
+
             response(httpResponse, bw);
         } catch (IOException | UncheckedServletException e) {
             log.error(e.getMessage(), e);

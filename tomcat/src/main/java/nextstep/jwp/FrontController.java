@@ -15,13 +15,13 @@ public class FrontController {
         this.requestMapping = requestMapping;
     }
 
-    public HttpResponse execute(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+    public void execute(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         String path = httpRequest.getPath();
         Controller controller = requestMapping.getController(httpRequest.getHttpMethod(), path);
         System.out.println(controller.getClass());
         if (controller == null) {
             throw new NotFoundControllerException(httpRequest.getPath() + httpRequest.getRequestBody() + " 처리불가한 요청");
         }
-        return controller.execute(httpRequest, httpResponse);
+        controller.execute(httpRequest, httpResponse);
     }
 }
