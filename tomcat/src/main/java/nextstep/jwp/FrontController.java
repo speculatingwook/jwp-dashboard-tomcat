@@ -18,8 +18,9 @@ public class FrontController {
     public HttpResponse execute(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         String path = httpRequest.getPath();
         Controller controller = requestMapping.getController(httpRequest.getHttpMethod(), path);
+        System.out.println(controller.getClass());
         if (controller == null) {
-            throw new NotFoundControllerException(httpRequest.getPath() + httpRequest.getRequestParam() + " 처리불가한 요청");
+            throw new NotFoundControllerException(httpRequest.getPath() + httpRequest.getRequestBody() + " 처리불가한 요청");
         }
         return controller.execute(httpRequest, httpResponse);
     }
