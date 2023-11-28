@@ -7,6 +7,7 @@ import org.apache.coyote.request.HttpRequest;
 import org.apache.coyote.response.ContentType;
 import org.apache.coyote.response.HttpResponse;
 import org.apache.coyote.response.HttpStatus;
+import org.apache.coyote.session.Session;
 
 import java.io.IOException;
 
@@ -14,18 +15,18 @@ public class RegisterFormController implements Controller {
 
     @Override
     public HttpResponse execute(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-        String account = (String) httpRequest.getAttribute("account");
-        String password = (String) httpRequest.getAttribute("password");
-        String email = (String) httpRequest.getAttribute("email");
+        Session session = httpRequest.getSession();
+        String account = (String) session.getAttribute("account");
+        String password = (String) session.getAttribute("password");
+        String email = (String) session.getAttribute("email");
         InMemoryUserRepository.save(new User(1L, account, password, email));
 
-        return forwardProcess(httpResponse, HttpStatus.CREATED, Constant.INDEX_VIEW_PATH, ContentType.from(Constant.INDEX_VIEW_PATH), httpRequest.getCookie());
+        return forwardProcess(httpResponse, HttpStatus.CREATED, Constant.INDEX_VIEW_PATH, ContentType.from(Constant.INDEX_VIEW_PATH));
     }
-    private HttpResponse forwardProcess(HttpResponse httpResponse, HttpStatus httpStatus, String viewPath, ContentType contentType, String cookie) throws IOException {
+    private HttpResponse forwardProcess(HttpResponse httpResponse, HttpStatus httpStatus, String viewPath, ContentType contentType) throws IOException {
         httpResponse.setHttpStatus(httpStatus);
         httpResponse.setViewPath(viewPath);
         httpResponse.setContentType(contentType);
-        httpResponse.setCookie(cookie);
         return httpResponse.makeResponse();
     }
 }
