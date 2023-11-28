@@ -29,7 +29,7 @@ public class HttpRequestHeader {
     }
 
     public String getHeader(String key){
-        return header.get(key);
+        return header.getOrDefault(key, null);
     }
 
     @Override
