@@ -38,6 +38,9 @@ public class HttpRequestBody {
     }
 
     public Map<String, String> getRequestBodyMap() {
+        if (requestBody.isEmpty()) {
+            return new HashMap<>();
+        }
         Map<String, String> bodyMap = new HashMap<>();
         String[] bodyStringArray = requestBody.split("\\&");
         Arrays.stream(bodyStringArray)
