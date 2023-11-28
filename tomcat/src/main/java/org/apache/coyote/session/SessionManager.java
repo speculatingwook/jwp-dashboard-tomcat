@@ -1,26 +1,29 @@
 package org.apache.coyote.session;
 
+import nextstep.util.Constant;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class SessionManager {
-    private Map<String, Session> sessionMap;
-
-    private final SessionManager sessionManager = new SessionManager();
-
-    public static SessionManager getSessionManager(){
-        return this.sessionManager;
-    }
+    private static Map<String, Session> sessionMap = new HashMap<>();
 
     private SessionManager() {
-        this.sessionMap = new HashMap<>();
     }
 
-    public Session getSession(String sessionId) {
-        return sessionMap.get(sessionId);
+    public static Session getSession(String jSessionId) {
+
+        if (jSessionId == null) {
+            return createSession();
+        }
+        return sessionMap.getOrDefault(jSessionId, null);
     }
 
-    public void addSessionMap(String sessionId, Session session) {
-        sessionMap.put(sessionId, session);
+    public static Session createSession() {
+        Session session = new Session();
+        sessionMap.put(session.getSessionId(), session);
+        return session;
     }
 }

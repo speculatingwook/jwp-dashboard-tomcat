@@ -1,5 +1,6 @@
 package org.apache.coyote.session;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -9,6 +10,7 @@ public class Session {
 
     public Session() {
         sessionId = UUID.randomUUID().toString();
+        this.attributes = new HashMap<>();
     }
 
     public String getSessionId() {
@@ -24,6 +26,6 @@ public class Session {
     }
 
     public Object getAttribute(String key) {
-        return this.attributes.get(key);
+        return this.attributes.getOrDefault(key,null);
     }
 }
