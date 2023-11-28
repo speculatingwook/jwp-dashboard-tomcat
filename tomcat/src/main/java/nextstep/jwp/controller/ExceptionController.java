@@ -14,10 +14,10 @@ import static org.apache.coyote.response.HttpStatus.BAD_REQUEST;
 
 public class ExceptionController implements Controller{
     @Override
-    public HttpResponse execute(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+    public void execute(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         httpResponse.setHttpStatus(BAD_REQUEST);
         httpResponse.setViewPath(ERROR_400_VIEW_PATH);
         httpResponse.setContentType(from(ERROR_400_VIEW_PATH));
-        return httpResponse.makeResponse();
+        httpResponse.makeResponse();
     }
 }

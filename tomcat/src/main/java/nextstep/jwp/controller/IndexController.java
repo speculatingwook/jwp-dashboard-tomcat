@@ -13,11 +13,7 @@ import static nextstep.util.Constant.INDEX_VIEW_PATH;
 public class IndexController implements Controller {
 
     @Override
-    public HttpResponse execute(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-        httpResponse.setViewPath(INDEX_VIEW_PATH);
-        httpResponse.setContentType(ContentType.from(INDEX_VIEW_PATH));
-        httpResponse.setHttpStatus(HttpStatus.OK);
-        return httpResponse.makeResponse();
-
+    public void execute(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+        httpResponse.sendRedirect(INDEX_VIEW_PATH);
     }
 }
