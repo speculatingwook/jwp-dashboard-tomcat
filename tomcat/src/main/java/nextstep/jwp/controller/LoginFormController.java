@@ -2,6 +2,7 @@ package nextstep.jwp.controller;
 
 import nextstep.jwp.db.InMemoryUserRepository;
 import nextstep.jwp.model.User;
+import nextstep.util.Constant;
 import org.apache.coyote.request.HttpRequest;
 import org.apache.coyote.response.ContentType;
 import org.apache.coyote.response.HttpResponse;
@@ -17,25 +18,25 @@ import static org.apache.coyote.response.ContentType.from;
 
 public class LoginFormController implements Controller{
     @Override
-    public HttpResponse execute(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+    public void execute(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         String account = httpRequest.getParameter("account");
         Optional<User> user = InMemoryUserRepository.findByAccount(account);
 
         //fail
         if (user.isEmpty()) {
-            return forwardProcess(httpResponse, HttpStatus.UNAUTHORIZED, ERROR_401_VIEW_PATH, from(ERROR_401_VIEW_PATH),null);
+            forwardProcess(httpResponse, HttpStatus.UNAUTHORIZED, ERROR_401_VIEW_PATH, from(ERROR_401_VIEW_PATH),null);
         }
         Session session = httpRequest.getSession();
         session.setAttribute("user", user);
         //success
-        return forwardProcess(httpResponse, HttpStatus.FOUND, INDEX_VIEW_PATH, from(INDEX_VIEW_PATH),"JSESSIONID=" + session.getSessionId());
+        forwardProcess(httpResponse, HttpStatus.FOUND, INDEX_VIEW_PATH, from(INDEX_VIEW_PATH),"JSESSIONID=" + session.getSessionId());
     }
 
-    private HttpResponse forwardProcess(HttpResponse httpResponse, HttpStatus httpStatus, String viewPath, ContentType contentType, String cookie) throws IOException {
+    private void forwardProcess(HttpResponse httpResponse, HttpStatus httpStatus, String viewPath, ContentType contentType, String sessionId) throws IOException {
         httpResponse.setHttpStatus(httpStatus);
         httpResponse.setViewPath(viewPath);
         httpResponse.setContentType(contentType);
-        httpResponse.setCookie(cookie);
-        return httpResponse.makeResponse();
+        httpResponse.addCookie(Constant.JSEESIONID, sessionId);
+        httpResponse.makeResponse();
     }
 }

@@ -3,7 +3,7 @@ package org.apache.coyote.session;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 
 public class Cookie {
     private Map<String, String> cookies;
@@ -28,5 +28,21 @@ public class Cookie {
 
     public String getCookie(String key) {
         return cookies.getOrDefault(key, null);
+    }
+
+    public void addCookie(String key, String val) {
+        cookies.put(key, val);
+    }
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        Set<String> keySet = cookies.keySet();
+        for (String key : keySet) {
+            sb.append(key)
+                    .append("=")
+                    .append(cookies.get(key))
+                    .append(";");
+        }
+        return sb.toString();
     }
 }
