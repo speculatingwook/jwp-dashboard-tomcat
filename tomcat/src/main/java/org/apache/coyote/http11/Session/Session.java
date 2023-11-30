@@ -6,14 +6,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Session {
-    private static Map<String, User> sessionData = new HashMap<>();
-
-    public static void loginUser(String sessionId, User user) {
-        sessionData.put(sessionId, user);
+    private final String id;
+    private static Map<String, Object> session = new HashMap<>();
+    public Session(final String id) {
+        this.id = id;
     }
 
-    public static User getUser(String sessionId) {
-        return sessionData.get(sessionId);
+    public static void setSession(String sessionId, Object user) {
+        session.put(sessionId, user);
+    }
+
+    public static Object getSession(String sessionId) {
+        return session.get(sessionId);
+    }
+
+    public String getId() {
+        return id;
     }
 
 }

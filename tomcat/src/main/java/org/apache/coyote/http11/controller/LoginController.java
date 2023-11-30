@@ -6,6 +6,7 @@ import nextstep.jwp.model.User;
 import org.apache.coyote.http11.HttpRequest;
 import org.apache.coyote.http11.HttpResponse;
 import org.apache.coyote.http11.Session.Session;
+import org.apache.coyote.http11.Session.SessionManager;
 import org.apache.coyote.http11.enums.ContentType;
 import java.io.IOException;
 import java.util.Optional;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 public class LoginController extends AbstractController{
     User user;
+    private final SessionManager sessionManager = new SessionManager();
 
     Cookie cookie;
     @Override
@@ -39,7 +41,9 @@ public class LoginController extends AbstractController{
         if (loginUser.isPresent()) {
             user = loginUser.get();
             String sessionId = generateUniqueSessionId();
-            Session.loginUser(sessionId, user);
+            Session session = new Session(sessionId);
+            session.setSession(sessionId, user);
+            sessionManager.add(session);
             setCookie(httpResponse, sessionId);
             redirectToHome("/index.html",httpResponse);
         } else {
@@ -48,7 +52,10 @@ public class LoginController extends AbstractController{
     }
     private boolean checkLogin(HttpRequest httpRequest) {
         String sessionId = httpRequest.getCookie().get("JSESSIONID");
-        user = Session.getUser(sessionId);
+        Optional<Session> session = sessionManager.findSession(sessionId);
+        if (session.isPresent()) {
+            user = (User) session.get().getSession(sessionId);
+        }
         return (user != null);
     }
 
