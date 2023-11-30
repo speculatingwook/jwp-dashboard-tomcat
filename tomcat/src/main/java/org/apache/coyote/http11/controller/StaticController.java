@@ -1,13 +1,13 @@
 package org.apache.coyote.http11.controller;
 
-import org.apache.coyote.http11.HttpRequest;
-import org.apache.coyote.http11.HttpResponse;
+import org.apache.coyote.http11.HTTPRequest.HttpRequest;
+import org.apache.coyote.http11.HTTPResponse.HttpResponse;
 
 import java.io.IOException;
 public class StaticController extends AbstractController {
 
     @Override
-    public void handleRequest(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-        getStaticResourceFile(httpRequest.getRequestPath(), httpResponse);
+    public HttpResponse handleRequest(HttpRequest httpRequest) throws IOException {
+       return getStaticResourceFile(httpRequest.getRequestPath());
     }
 }

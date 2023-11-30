@@ -1,6 +1,6 @@
 package org.apache.coyote.http11.controller;
 
-import org.apache.coyote.http11.HttpRequest;
+import org.apache.coyote.http11.HTTPRequest.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

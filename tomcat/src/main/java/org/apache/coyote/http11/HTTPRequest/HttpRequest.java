@@ -1,4 +1,4 @@
-package org.apache.coyote.http11;
+package org.apache.coyote.http11.HTTPRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ public class HttpRequest {
     private Map<String, String> params;
     private Map<String, String> body;
     private Map<String, String> cookies;
-    HttpRequest (BufferedReader reader) throws IOException {
+    public HttpRequest(BufferedReader reader) throws IOException {
         StringBuilder headerBuilder = new StringBuilder();
         String firstLine = reader.readLine();
         headerBuilder.append(firstLine).append("\r\n");

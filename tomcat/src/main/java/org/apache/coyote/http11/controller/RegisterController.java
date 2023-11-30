@@ -2,9 +2,10 @@ package org.apache.coyote.http11.controller;
 
 import nextstep.jwp.db.InMemoryUserRepository;
 import nextstep.jwp.model.User;
-import org.apache.coyote.http11.HttpRequest;
-import org.apache.coyote.http11.HttpResponse;
-import org.apache.coyote.http11.enums.ContentType;
+import org.apache.coyote.http11.HTTPRequest.HttpRequest;
+import org.apache.coyote.http11.HTTPResponse.ContentType;
+import org.apache.coyote.http11.HTTPResponse.HttpResponse;
+import org.apache.coyote.http11.HTTPResponse.HttpStatusCode;
 
 import java.io.IOException;
 import java.util.Map;
@@ -12,22 +13,23 @@ import java.util.Map;
 public class RegisterController extends AbstractController {
 
     @Override
-    public void handleRequest(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+    public HttpResponse handleRequest(HttpRequest httpRequest) throws IOException {
         String method = httpRequest.getMethod();
         String path = httpRequest.getRequestPath();
         if (method.equals("POST")) {
-            handleRegisterRequest(httpRequest, httpResponse);
+            return handleRegisterRequest(httpRequest);
         } else {
-            getStaticResourceFile(path + ".html", httpResponse);
+            return getStaticResourceFile(path + ".html");
         }
 
     }
 
-    private void handleRegisterRequest(HttpRequest httpRequest, HttpResponse httpResponse) {
+    private HttpResponse handleRegisterRequest(HttpRequest httpRequest) {
         Map<String, String> body = httpRequest.getBody();
         User user = new User(body.get("account"), body.get("password"), body.get("email"));
         System.out.println(user);
         InMemoryUserRepository.save(user);
-        redirectToHome("/index.html",httpResponse);
+        generateRedirection("/index.html");
+        return generateHTTPResponse(ContentType.HTML, HttpStatusCode.FOUND);
     }
 }

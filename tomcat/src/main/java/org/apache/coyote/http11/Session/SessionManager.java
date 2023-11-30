@@ -12,7 +12,11 @@ public class SessionManager {
     }
 
     public Optional<Session> findSession(String id) {
-        return Optional.ofNullable(SESSIONS.get(id));
+        if (id != null) {
+            return Optional.ofNullable(SESSIONS.get(id));
+        } else {
+            return Optional.empty();
+        }
     }
 
     public void remove(Session session) {
