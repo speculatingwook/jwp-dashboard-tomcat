@@ -1,87 +1,70 @@
 package org.apache.coyote.request;
 
+import nextstep.util.Constant;
+import org.apache.coyote.session.Cookie;
+import org.apache.coyote.session.Session;
+import org.apache.coyote.session.SessionManager;
+
 import javax.naming.directory.NoSuchAttributeException;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
-import java.util.Arrays;
 
 public class HttpRequest {
-    private QueryString queryString;
-    private String path;
-    private String httpMethod;
-
+    private HttpRequestBody requestBody;
+    private HttpRequestLine httpRequestLine;
     private HttpRequestHeader header;
-    public HttpRequest(Reader reader) throws NoSuchAttributeException, IOException {
-        queryString = new QueryString();
-        header = new HttpRequestHeader();
+    private RequestParam requestParam;
+    private Session session;
+    private Cookie cookie;
 
-        //첫줄은 HTTP 메소드와 URI
-        parseMethodAndPath((BufferedReader) reader);
-        parseHeader(reader);
+
+    public static HttpRequest parse(BufferedReader br) throws NoSuchAttributeException, IOException {
+        HttpRequestLine requestLine = HttpRequestLine.parse(br);
+        HttpRequestHeader header = HttpRequestHeader.parse(br);
+        HttpRequestBody body = HttpRequestBody.parseBody(br, header.getHeader(Constant.CONTENT_LENGTH));
+        RequestParam params = RequestParam.from(requestLine, body);
+        Cookie httpCookie = Cookie.parseCookie(header.getHeader(Constant.COOKIE));
+        Session httpSession = SessionManager.getSession(httpCookie.getCookie(Constant.JSEESIONID));
+        return new HttpRequest(requestLine, header, body, params, httpSession, httpCookie);
+    }
+
+    private HttpRequest(HttpRequestLine httpRequestLine, HttpRequestHeader header, HttpRequestBody requestBody, RequestParam param, Session session, Cookie cookie) {
+        this.httpRequestLine = httpRequestLine;
+        this.header = header;
+        this.requestBody = requestBody;
+        this.requestParam = param;
+        this.session = session;
+        this.cookie = cookie;
+    }
+
+    public String getHttpMethod() {
+        return httpRequestLine.getHttpMethod();
     }
 
     public String getPath() {
-        return path;
+        return httpRequestLine.getPath();
     }
 
-    public String getHttpMethod(){
-        return httpMethod;
-    }
-
-    public void addQueryStringValue(String key, String value) {
-        queryString.addQueryString(key, value);
-    }
-
-    private void parseMethodAndPath(BufferedReader br) throws IOException, NoSuchAttributeException {
-        //첫줄 Method & URI parsing
-        String firstLine = br.readLine();
-        if (firstLine == null)
-            throw new NoSuchAttributeException("없음");
-
-        String[] methodPathSplit = firstLine.split(" ");
-        this.httpMethod = methodPathSplit[0];
-
-        this.path = methodPathSplit[1];
-        //parse QueryString and uri
-        if (methodPathSplit[1].contains("?")) {
-            String[] uriQueryString = methodPathSplit[1].split("\\?");
-            this.path = uriQueryString[0];
-
-            //parse QueryString Key & Value
-            parseQueryString(uriQueryString[1]);
+    public Session getSession() {
+        if (this.session == null) {
+            this.session = SessionManager.createSession();
         }
-
+        return session;
     }
 
-    private void parseQueryString(String queryString) {
-        String[] queryStringArray = queryString.split("\\&");
-        Arrays.stream(queryStringArray)
-                .forEach(keyVal -> {
-                    String[] keyValSplit = keyVal.split("=");
-                    this.addQueryStringValue(keyValSplit[0], keyValSplit[1]);
-                });
-    }
-
-    public void parseHeader(Reader reader) throws IOException {
-        BufferedReader br = new BufferedReader(reader);
-        while (br.ready()) {
-            String header = br.readLine();
-            if (header.contains(": ")) {
-                String[] keyVal = header.split(": ");
-                this.header.addHeader(keyVal[0], keyVal[1]);
-            }
+    public Session getSession(boolean create) {
+        if (create && this.session == null) {
+            this.session = SessionManager.createSession();
         }
+        return session;
     }
 
-
-    @Override
-    public String toString() {
-        return "HttpRequest{" +
-                "queryString=" + queryString +
-                ", uri='" + path + '\'' +
-                ", httpMethod='" + httpMethod + '\'' +
-                ", header=" + header +
-                '}';
+    public HttpRequestBody getRequestBody() {
+        return requestBody;
     }
+
+    public String getParameter(String key) {
+        return requestParam.getParameter(key);
+    }
+    
 }
