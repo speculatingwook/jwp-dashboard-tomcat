@@ -10,7 +10,7 @@ import java.util.Map;
 public class FrontController {
 
     private static final Logger log = LoggerFactory.getLogger(FrontController.class);
-    private Map<String, Controller> controllerMap;
+    private final Map<String, Controller> controllerMap;
     public FrontController() {
         controllerMap = new HashMap<>();
         controllerMap.put("/login", new LoginController());
@@ -18,7 +18,7 @@ public class FrontController {
     }
 
     public Controller match(HttpRequest httpRequest) {
-        Controller controller = controllerMap.get(httpRequest.getRequestPath());
+        Controller controller = controllerMap.get(httpRequest.getRequestPath().getPath());
         if (controller != null)
             return controller;
         return new StaticController();

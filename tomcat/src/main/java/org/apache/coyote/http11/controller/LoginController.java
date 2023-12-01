@@ -3,7 +3,9 @@ package org.apache.coyote.http11.controller;
 import jakarta.servlet.http.Cookie;
 import nextstep.jwp.db.InMemoryUserRepository;
 import nextstep.jwp.model.User;
+import org.apache.coyote.http11.HTTPRequest.HttpMethod;
 import org.apache.coyote.http11.HTTPRequest.HttpRequest;
+import org.apache.coyote.http11.HTTPRequest.HttpRequestPath;
 import org.apache.coyote.http11.HTTPResponse.HttpResponse;
 import org.apache.coyote.http11.HTTPResponse.HttpStatusCode;
 import org.apache.coyote.http11.Session.Session;
@@ -19,22 +21,22 @@ public class LoginController extends AbstractController{
     Cookie cookie;
     @Override
     public HttpResponse handleRequest(HttpRequest httpRequest) throws IOException {
-        String method = httpRequest.getMethod();
-        String path = httpRequest.getRequestPath();
-        if (method.equals("POST")) {
+        HttpMethod method = httpRequest.getMethod();
+        HttpRequestPath requestPath = httpRequest.getRequestPath();
+        if (method.equals(HttpMethod.POST)) {
             return handleLoginRequest(httpRequest);
         } else {
             if(checkLogin(httpRequest)) {
                 generateRedirection("/index.html");
                 return generateHTTPResponse(ContentType.HTML, HttpStatusCode.FOUND);
             } else {
-                return getStaticResourceFile(path + ".html");
+                return getStaticResourceFile(requestPath.getPath()+ ".html");
             }
         }
     }
     private HttpResponse handleLoginRequest(HttpRequest httpRequest) {
-        String account = httpRequest.getBody().get("account");
-        String password = httpRequest.getBody().get("password");
+        String account = httpRequest.getRequestBody().getBody().get("account");
+        String password = httpRequest.getRequestBody().getBody().get("password");
         Optional<User> loginUser = authenticate(account, password);
 
         if (loginUser.isPresent()) {
@@ -50,7 +52,7 @@ public class LoginController extends AbstractController{
         return generateHTTPResponse(ContentType.HTML, HttpStatusCode.FOUND);
     }
     private boolean checkLogin(HttpRequest httpRequest) {
-        String sessionId = httpRequest.getCookie().get("JSESSIONID");
+        String sessionId = httpRequest.getRequestHeader().getCookie().get("JSESSIONID");
         Optional<Session> session = sessionManager.findSession(sessionId);
         System.out.println(session.isPresent());
         return session.isPresent();
